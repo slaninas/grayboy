@@ -84,6 +84,14 @@ public:
 		std::cout << std::dec;
 	}
 
+	auto get_header_checksum() {
+		unsigned char sum = 0;
+		for (auto i = 0x134; i < 0x14C+1; ++i) {
+			sum -= std::to_integer<char>(buffer_[i]) +1;
+		}
+		return static_cast<int>(sum);
+	}
+
 private:
 	std::vector<std::byte> buffer_;
 };

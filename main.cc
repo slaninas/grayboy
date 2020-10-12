@@ -42,6 +42,10 @@ int main(int argc, const char** argv) {
 	cart.print_as_hex(0x14A, 0x14A + 1);
 
 	std::cout << "Header Checksum: ";
-	cart.print_as_int(0x14D, 0x14D + 1);
+	cart.print_as_hex(0x14D, 0x14D + 1);
+
+	std::cout << std::hex;
+	std::cout << "Calculated Header Checksum: " << cart.get_header_checksum() << '\n';
+	std::cout << std::dec;
 
 }

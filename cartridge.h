@@ -5,6 +5,7 @@
 #include <iterator>
 #include <algorithm>
 #include <cstddef>
+#include <iomanip>
 
 // TODO: Move into utils file
 template<typename TInput, typename TOutput>
@@ -48,6 +49,23 @@ public:
 		title_str.push_back(']');
 
 		return title_str;
+	}
+
+	void print_hex_logo() {
+		const auto start = 0x104;
+		const auto end = 0x133 + 1;
+
+		std::cout << std::hex;
+		auto line_counter = 1;
+		for(auto i = start; i < end; ++i, line_counter++) {
+			std::cout << std::setw(2) << std::to_integer<int>(buffer_[i]) << ' ';
+			if (line_counter % 16 == 0) std::cout << '\n';
+		}
+		std::cout << '\n';
+		std::cout << std::dec;
+
+
+
 	}
 
 private:

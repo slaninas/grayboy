@@ -26,4 +26,5 @@ int main(int argc, const char** argv) {
 
 	auto cart = Cartridge{filename};
 	std::cout << cart.get_title() << '\n';
+	cart.print_hex_logo();
 }

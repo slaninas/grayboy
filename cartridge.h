@@ -46,7 +46,11 @@ public:
 	}
 
 	auto get_title() {
-		return get_as_string(0x0134, 0x0134 + 12);
+		return get_as_string(0x0134, 0x0134 + 11);
+	}
+
+	auto get_manufacturer_code() {
+		return get_as_string(0x13F, 0x13F + 4);
 	}
 
 	void print_hex_logo() {

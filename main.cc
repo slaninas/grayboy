@@ -25,6 +25,7 @@ int main(int argc, const char** argv) {
 	auto filename = std::string(argv[1]);
 
 	auto cart = Cartridge{filename};
-	std::cout << cart.get_title() << '\n';
+	std::cout << "Title: " << cart.get_title() << '\n';
+	std::cout << "Manufacturer Code: " << cart.get_manufacturer_code() << '\n';
 	cart.print_hex_logo();
 }

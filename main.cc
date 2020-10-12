@@ -27,5 +27,21 @@ int main(int argc, const char** argv) {
 	auto cart = Cartridge{filename};
 	std::cout << "Title: " << cart.get_title() << '\n';
 	std::cout << "Manufacturer Code: " << cart.get_manufacturer_code() << '\n';
-	cart.print_hex_logo();
+	// cart.print_hex_logo();
+
+	std::cout << "CGB Flag: ";
+	cart.print_as_hex(0x143, 0x143 + 1);
+
+	std::cout << "ROM Size Code: ";
+	cart.print_as_hex(0x148, 0x148 + 1);
+
+	std::cout << "RAM Size Code (in cartridge): ";
+	cart.print_as_hex(0x149, 0x149 + 1);
+
+	std::cout << "Destination Code: ";
+	cart.print_as_hex(0x14A, 0x14A + 1);
+
+	std::cout << "Header Checksum: ";
+	cart.print_as_int(0x14D, 0x14D + 1);
+
 }

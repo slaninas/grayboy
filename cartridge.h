@@ -30,9 +30,26 @@ public:
 		convert(buffer, buffer_);
 	}
 
+	// TODO: Move these print* methods elsewhere?
 	void print(const uint16_t start, const uint16_t end) {
 		for (auto i = start; i < end; ++i) {
 			std::cout << std::to_integer<char>(buffer_[i]);
+		}
+		std::cout << '\n';
+	}
+
+	void print_as_hex(const uint16_t start, const uint16_t end) {
+		std::cout << std::hex;
+		for (auto i = start; i < end; ++i) {
+			std::cout << std::to_integer<int>(buffer_[i]);
+		}
+		std::cout << '\n';
+		std::cout << std::dec;
+	}
+
+	void print_as_int(const uint16_t start, const uint16_t end) {
+		for (auto i = start; i < end; ++i) {
+			std::cout << std::to_integer<int>(buffer_[i]);
 		}
 		std::cout << '\n';
 	}

@@ -37,23 +37,21 @@ public:
 		std::cout << '\n';
 	}
 
-	std::string get_title() {
-		auto title_begin = begin(buffer_) + 0x0134;
-		auto title_length = 15;
-		auto title = std::vector(title_begin, title_begin + title_length);
-		auto title_str = std::string{};
 
-		convert(title, title_str);
+	auto get_as_string(const uint16_t start, const uint16_t end) {
+		auto bytes = std::vector(begin(buffer_) + start, begin(buffer_) + end);
+		auto bytes_as_string = std::string{};
+		convert(bytes, bytes_as_string);
+		return bytes_as_string;
+	}
 
-		title_str.insert(11, "[");
-		title_str.push_back(']');
-
-		return title_str;
+	auto get_title() {
+		return get_as_string(0x0134, 0x0134 + 12);
 	}
 
 	void print_hex_logo() {
 		const auto start = 0x104;
-		const auto end = 0x133 + 1;
+		const auto end = 0x134;
 
 		std::cout << std::hex;
 		auto line_counter = 1;
@@ -63,9 +61,6 @@ public:
 		}
 		std::cout << '\n';
 		std::cout << std::dec;
-
-
-
 	}
 
 private:

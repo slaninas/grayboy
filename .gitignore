@@ -1,0 +1,3 @@
+# Build dir and vim tmp files
+build
+*.swp

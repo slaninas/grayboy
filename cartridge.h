@@ -45,7 +45,8 @@ public:
 	};
 
 	// TODO: Move these print* methods elsewhere?
-	void print(const uint16_t start, const uint16_t end) {
+	void print(const std::pair<uint16_t, uint16_t>& range) {
+		const auto [start, end] = range;
 		for (auto i = start; i < end; ++i) {
 			std::cout << std::to_integer<char>(buffer_[i]);
 		}
@@ -53,7 +54,8 @@ public:
 	}
 
 	// TODO: Delete all (start, end) methods, leave just (std::pair) versions
-	void print_as_hex(const uint16_t start, const uint16_t end) {
+	void print_as_hex(const std::pair<uint16_t, uint16_t>& range) {
+		const auto [start, end] = range;
 		std::cout << std::hex;
 		for (auto i = start; i < end; ++i) {
 			std::cout << std::to_integer<int>(buffer_[i]);
@@ -62,44 +64,16 @@ public:
 		std::cout << std::dec;
 	}
 
-	auto print_as_hex(const std::pair<uint16_t, uint16_t>& range) {
+	auto get_as_string(const std::pair<uint16_t, uint16_t>& range) {
 		const auto [start, end] = range;
-		return print_as_hex(start, end);
-	}
-
-	void print_as_int(const uint16_t start, const uint16_t end) {
-		for (auto i = start; i < end; ++i) {
-			std::cout << std::to_integer<int>(buffer_[i]);
-		}
-		std::cout << '\n';
-	}
-
-
-	auto get_as_string(const uint16_t start, const uint16_t end) {
 		auto bytes = std::vector(begin(buffer_) + start, begin(buffer_) + end);
 		auto bytes_as_string = std::string{};
 		convert(bytes, bytes_as_string);
 		return bytes_as_string;
 	}
 
-	auto get_as_string(const std::pair<uint16_t, uint16_t>& range) {
-		const auto [start, end] = range;
-		return get_as_string(start, end);
-	}
-
-	auto get_title() {
-		const auto [start, end] = addreses["title"];
-		return get_as_string(start, end);
-	}
-
-	auto get_manufacturer_code() {
-		const auto [start, end] = addreses["manufacturer_code"];
-		return get_as_string(start, end);
-	}
-
 	void print_hex_logo() {
-		const auto start = 0x104;
-		const auto end = 0x134;
+		const auto [start, end] = addreses["nintendo_logo"];
 
 		std::cout << std::hex;
 		auto line_counter = 1;

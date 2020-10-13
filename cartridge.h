@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <iomanip>
+#include <map>
 
 // TODO: Move into utils file
 template<typename TInput, typename TOutput>
@@ -29,6 +30,13 @@ public:
 
 		convert(buffer, buffer_);
 	}
+
+	// TODO: Why can't it be const? At least make std::pair const?
+	static inline std::map<const char*, std::pair<std::uint16_t, std::uint16_t>> addreses = {
+		{"nintendo_logo",     {0x104, 0x134}},
+		{"title",             {0x134, 0x13f}},
+		{"manufacturer_code", {0x13f, 0x143}}
+	};
 
 	// TODO: Move these print* methods elsewhere?
 	void print(const uint16_t start, const uint16_t end) {
@@ -63,11 +71,13 @@ public:
 	}
 
 	auto get_title() {
-		return get_as_string(0x0134, 0x0134 + 11);
+		const auto [start, end] = addreses["title"];
+		return get_as_string(start, end);
 	}
 
 	auto get_manufacturer_code() {
-		return get_as_string(0x13F, 0x13F + 4);
+		const auto [start, end] = addreses["manufacturer_code"];
+		return get_as_string(start, end);
 	}
 
 	void print_hex_logo() {

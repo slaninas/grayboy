@@ -44,15 +44,6 @@ public:
 		{"header_checksum",   {0x14d, 0x14e}}
 	};
 
-	// TODO: Move these print* methods elsewhere?
-	void print(const std::pair<uint16_t, uint16_t>& range) {
-		const auto [start, end] = range;
-		for (auto i = start; i < end; ++i) {
-			std::cout << std::to_integer<char>(buffer_[i]);
-		}
-		std::cout << '\n';
-	}
-
 	// TODO: Delete all (start, end) methods, leave just (std::pair) versions
 	void print_as_hex(const std::pair<uint16_t, uint16_t>& range) {
 		const auto [start, end] = range;

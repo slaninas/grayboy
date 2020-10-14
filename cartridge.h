@@ -44,23 +44,49 @@ public:
 		{"header_checksum",   {0x14d, 0x14e}}
 	};
 
-	// TODO: Delete all (start, end) methods, leave just (std::pair) versions
+
+	auto get_header_checksum() {
+		unsigned char sum = 0;
+		for (auto i = 0x134; i < 0x14C+1; ++i) {
+			sum -= std::to_integer<char>(buffer_[i]) +1;
+		}
+		return static_cast<int>(sum);
+	}
+
+	void print_info() {
+		std::cout << "Cartridge Info:\n";
+		std::cout << std::string(20, '-') << '\n';
+
+		std::cout << "Title: "; print_as_string(addreses["title"]); std::cout << '\n';
+		std::cout << "Manufacturer Code: "; print_as_string(addreses["manufacturer_code"]); std::cout << '\n';
+		std::cout << "CBG Flag: "; print_as_hex(addreses["cbg_flag"]); std::cout << '\n';
+		std::cout << "ROM Size Code: "; print_as_hex(addreses["rom_size_code"]); std::cout << '\n';
+		std::cout << "RAM Size Code (in cartridge): "; print_as_hex(addreses["ram_size_code"]); std::cout << '\n';
+		std::cout << "Destination Code: "; print_as_hex(addreses["destination_code"]); std::cout << '\n';
+		std::cout << "Header Checksum: "; print_as_hex(addreses["header_checksum"]); std::cout << '\n';
+
+		std::cout << std::hex;
+		std::cout << "Calculated Header Checksum: " << get_header_checksum() << '\n';
+		std::cout << std::dec;
+	}
+
+
+private:
 	void print_as_hex(const std::pair<uint16_t, uint16_t>& range) {
 		const auto [start, end] = range;
 		std::cout << std::hex;
 		for (auto i = start; i < end; ++i) {
 			std::cout << std::to_integer<int>(buffer_[i]);
 		}
-		std::cout << '\n';
 		std::cout << std::dec;
 	}
 
-	auto get_as_string(const std::pair<uint16_t, uint16_t>& range) {
+	void print_as_string(const std::pair<uint16_t, uint16_t>& range) {
 		const auto [start, end] = range;
 		auto bytes = std::vector(begin(buffer_) + start, begin(buffer_) + end);
 		auto bytes_as_string = std::string{};
 		convert(bytes, bytes_as_string);
-		return bytes_as_string;
+		std::cout << bytes_as_string;
 	}
 
 	void print_hex_logo() {
@@ -76,32 +102,5 @@ public:
 		std::cout << std::dec;
 	}
 
-	auto get_header_checksum() {
-		unsigned char sum = 0;
-		for (auto i = 0x134; i < 0x14C+1; ++i) {
-			sum -= std::to_integer<char>(buffer_[i]) +1;
-		}
-		return static_cast<int>(sum);
-	}
-
-	void print_info() {
-		std::cout << "Cartridge Info:\n";
-		std::cout << std::string(20, '-') << '\n';
-
-		std::cout << "Title: " << get_as_string(addreses["title"]) << '\n';
-		std::cout << "Manufacturer Code: " << get_as_string(addreses["manufacturer_code"]) << '\n';
-		std::cout << "CBG Flag: "; print_as_hex(addreses["cbg_flag"]);
-		std::cout << "ROM Size Code: "; print_as_hex(addreses["rom_size_code"]);
-		std::cout << "RAM Size Code (in cartridge): "; print_as_hex(addreses["ram_size_code"]);
-		std::cout << "Destination Code: "; print_as_hex(addreses["destination_code"]);
-		std::cout << "Header Checksum: "; print_as_hex(addreses["header_checksum"]);
-
-		std::cout << std::hex;
-		std::cout << "Calculated Header Checksum: " << get_header_checksum() << '\n';
-		std::cout << std::dec;
-	}
-
-
-private:
 	std::vector<std::byte> buffer_;
 };

@@ -10,12 +10,14 @@ union RegisterPair {
 	};
 };
 
-// TODO: Zero registers or do not initialize at all?
+// TODO: Zero registers or do not initialize at all or like original ROM?
 struct Registers {
 	RegisterPair AF = {0xabcd};
 	RegisterPair BC = {10};
 	RegisterPair DE = {100};
 	RegisterPair HL = {1000};
+	uint16_t SP = 1234;
+	uint16_t PC = 0;
 };
 
 struct Instruction {
@@ -25,6 +27,7 @@ struct Instruction {
 	uint8_t cycles;
 };
 
+// Make exceptions asserts and run in debug
 // TODO: Add unit tests
 class Cpu {
 public:

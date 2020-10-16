@@ -77,8 +77,8 @@ public:
 	uint8_t& H = *H_ptr;
 	uint8_t& L = *L_ptr;
 
-	uint16_t PC = *PC_ptr;
-	uint16_t SP = *SP_ptr;
+	uint16_t& PC = *PC_ptr;
+	uint16_t& SP = *SP_ptr;
 };
 
 std::ostream& operator<<(std::ostream& os, const Registers& registers) {

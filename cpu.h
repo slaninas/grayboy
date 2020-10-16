@@ -10,6 +10,7 @@ union RegisterPair {
 	};
 };
 
+// TODO: Zero registers or do not initialize at all?
 struct Registers {
 	RegisterPair AF = {0xabcd};
 	RegisterPair BC = {10};

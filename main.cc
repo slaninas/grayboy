@@ -33,9 +33,4 @@ int main(int argc, const char** argv) {
 	auto cpu = Cpu{std::move(memory)};
 	cpu.print_regs();
 
-	cpu.execute_next();
-
-	cpu.print_regs();
-
-
 }

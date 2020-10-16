@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "cartridge.h"
+#include "cpu.h"
 
 template<typename T>
 void p(const std::vector<T>& vec, const size_t num_values) {
@@ -25,8 +26,10 @@ int main(int argc, const char** argv) {
 	auto filename = std::string(argv[1]);
 
 	auto cart = Cartridge{filename};
-	cart.print_info();
-	// cart.print_hex_logo();
+	// cart.print_info();
+
+	auto cpu = Cpu{};
+	cpu.print_regs();
 
 
 }

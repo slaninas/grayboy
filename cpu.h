@@ -104,10 +104,8 @@ public:
 
 		switch(opcode) {
 			case 0x01:
-				// regs_.BC.hi = memory_[instruction_start + 1];
-				// regs_.BC.lo = memory_[instruction_start + 2];
-				regs_.B = 0xff;
-				regs_.C = 0xee;
+				regs_.B = memory_[instruction_start + 1];
+				regs_.C = memory_[instruction_start + 2];
 				break;
 			default:
 				throw std::runtime_error("Opcode not implemented yet.");

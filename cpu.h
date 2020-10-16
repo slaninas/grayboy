@@ -90,7 +90,7 @@ public:
 	}
 
 
-	auto execute_next() {
+	[[nodiscard]] auto execute_next() {
 		std::cout << memory_.size() << '\n';
 
 		const auto instruction_start = regs_.PC;

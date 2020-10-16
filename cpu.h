@@ -6,31 +6,31 @@
 // TODO: Zero registers or do not initialize at all or like original ROM?
 // TODO: Add unit tests for registers
 struct Registers{
-	std::array<uint8_t, 12> registers = {};
+	std::array<uint8_t, 12> register_array = {};
 private:
 	// TODO: Better way of doing this?
-	uint16_t* AF_ptr = reinterpret_cast<uint16_t*>(registers.data() + 0);
-	uint8_t* F_ptr= registers.data() + 0;
-	uint8_t* A_ptr= registers.data() + 1;
+	uint16_t* AF_ptr = reinterpret_cast<uint16_t*>(register_array.data() + 0);
+	uint8_t* F_ptr= register_array.data() + 0;
+	uint8_t* A_ptr= register_array.data() + 1;
 
-	uint16_t* BC_ptr = reinterpret_cast<uint16_t*>(registers.data() + 2);
-	uint8_t* C_ptr = registers.data() + 2;
-	uint8_t* B_ptr = registers.data() + 3;
+	uint16_t* BC_ptr = reinterpret_cast<uint16_t*>(register_array.data() + 2);
+	uint8_t* C_ptr = register_array.data() + 2;
+	uint8_t* B_ptr = register_array.data() + 3;
 
-	uint16_t* DE_ptr = reinterpret_cast<uint16_t*>(registers.data() + 4);
-	uint8_t* E_ptr = registers.data() + 4;
-	uint8_t* D_ptr = registers.data() + 5;
+	uint16_t* DE_ptr = reinterpret_cast<uint16_t*>(register_array.data() + 4);
+	uint8_t* E_ptr = register_array.data() + 4;
+	uint8_t* D_ptr = register_array.data() + 5;
 
-	uint16_t* HL_ptr = reinterpret_cast<uint16_t*>(registers.data() + 6);
-	uint8_t* L_ptr = registers.data() + 6;
-	uint8_t* H_ptr = registers.data() + 7;
+	uint16_t* HL_ptr = reinterpret_cast<uint16_t*>(register_array.data() + 6);
+	uint8_t* L_ptr = register_array.data() + 6;
+	uint8_t* H_ptr = register_array.data() + 7;
 
-	uint16_t* PC_ptr = reinterpret_cast<uint16_t*>(registers.data()  + 8);
-	uint16_t* SP_ptr = reinterpret_cast<uint16_t*>(registers.data()  + 10);
+	uint16_t* PC_ptr = reinterpret_cast<uint16_t*>(register_array.data()  + 8);
+	uint16_t* SP_ptr = reinterpret_cast<uint16_t*>(register_array.data()  + 10);
 
 public:
 	Registers()  {}
-	Registers(const std::array<uint8_t, 12>& regs) : registers{regs} {}
+	Registers(const std::array<uint8_t, 12>& regs_array) : register_array{regs_array} {}
 
 	uint16_t& AF = *AF_ptr;
 	uint8_t& A = *A_ptr;

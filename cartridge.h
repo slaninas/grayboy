@@ -22,6 +22,7 @@ auto convert(const TInput& source, TOutput& destination) {
 	);
 }
 
+// TODO: Add unit tests
 // TODO: Add check for header checksum?
 class Cartridge {
 public:

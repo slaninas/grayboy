@@ -1,11 +1,12 @@
 #pragma once
 
 #include <vector>
+#include <iostream>
 
 // TODO: Zero registers or do not initialize at all or like original ROM?
 // TODO: Add unit tests for registers
 struct Registers{
-	std::array<uint8_t, 12> registers = {0xF0, 0xE1, 0xD2, 0xC3, 0xB4, 0xA5, 0x96, 0x87, 0x88, 0x79, 0x69, 0x5a};
+	std::array<uint8_t, 12> registers = {};
 private:
 	// TODO: Better way of doing this?
 	uint16_t* AF_ptr = reinterpret_cast<uint16_t*>(registers.data() + 0);
@@ -59,10 +60,10 @@ struct Instruction {
 // TODO: Add unit tests
 class Cpu {
 public:
+	using MemoryType = std::array<uint8_t, 1 << 16>;
 
-	template<typename TArray>
-	Cpu(TArray&& memory) :
-		memory_{std::forward<TArray>(memory)}
+	Cpu(MemoryType&& memory) :
+		memory_{memory}
 	{}
 
 	void print_regs() {
@@ -120,7 +121,7 @@ private:
 	uint8_t flags_;
 
 	// TODO: Implement memory
-	std::array<uint8_t, 1 << 16> memory_ = {};
+	MemoryType memory_ = {};
 
 	std::vector<Instruction> instructions_ = {
 		{"LD BC, d16", 0x01, 3, 3},

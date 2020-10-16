@@ -32,6 +32,10 @@ public:
 	Registers() = default;
 	Registers(const std::array<uint8_t, 12>& regs_array) : register_array{regs_array} {}
 
+	void clear() {
+		std::fill(begin(register_array), end(register_array), 0x0);
+	}
+
 	auto& print(std::ostream& os) const {
 		auto print_pair = [&](const auto& name, const auto& both, const auto& hi, const auto& lo) {
 			os << std::hex;
@@ -99,6 +103,9 @@ public:
 	{}
 
 
+	void clear_registers() {
+		regs_.clear();
+	}
 
 	[[nodiscard]] auto execute_next() {
 		std::cout << memory_.size() << '\n';

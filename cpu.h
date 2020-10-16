@@ -32,6 +32,11 @@ struct Instruction {
 class Cpu {
 public:
 
+	template<typename TArray>
+	Cpu(TArray&& memory) :
+		memory_{std::forward<TArray>(memory)}
+	{}
+
 	void print_regs() {
 		auto print_pair = [](const auto& reg, const auto& name) {
 			std::cout << name << ": ";
@@ -85,7 +90,7 @@ private:
 	uint8_t flags_;
 
 	// TODO: Implement memory
-	std::array<uint8_t, 1 << 16> memory_ = {0x01, 0xab, 0xcd};
+	std::array<uint8_t, 1 << 16> memory_ = {};
 
 	std::vector<Instruction> instructions_ = {
 		{"LD BC, d16", 0x01, 3, 3},

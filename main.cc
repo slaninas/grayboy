@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <array>
 
 #include "cartridge.h"
 #include "cpu.h"
@@ -28,7 +29,8 @@ int main(int argc, const char** argv) {
 	auto cart = Cartridge{filename};
 	// cart.print_info();
 
-	auto cpu = Cpu{};
+	auto memory = std::array<uint8_t, 1 << 16>{0x01, 0xAB, 0xCB};
+	auto cpu = Cpu{std::move(memory)};
 	cpu.print_regs();
 
 	cpu.execute_next();

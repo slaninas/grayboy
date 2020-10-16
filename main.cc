@@ -31,5 +31,9 @@ int main(int argc, const char** argv) {
 	auto cpu = Cpu{};
 	cpu.print_regs();
 
+	cpu.execute_next();
+
+	cpu.print_regs();
+
 
 }

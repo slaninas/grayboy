@@ -45,16 +45,60 @@ public:
 		print_pair(regs_.BC, "BC");
 		print_pair(regs_.DE, "DE");
 		print_pair(regs_.HL, "HL");
+		std::cout << "SP: " << static_cast<int>(regs_.SP) << '\n';
+		std::cout << "PC: " << static_cast<int>(regs_.PC) << '\n';
 		std::cout << std::dec;
 	}
 
+
+	auto execute_next() {
+		std::cout << memory_.size() << '\n';
+
+		const auto instruction_start = regs_.PC;
+		const auto opcode = memory_[instruction_start];
+
+		if (opcode == 0xBC) {
+			throw std::runtime_error("16-bit opcodes not implemented yet.");
+		}
+
+		const auto instruction = find_by_opcode(opcode);
+
+		switch(opcode) {
+			case 0x01:
+				// regs_.BC.hi = memory_[instruction_start + 1];
+				// regs_.BC.lo = memory_[instruction_start + 2];
+				regs_.BC.hi = 0xff;
+				regs_.BC.lo = 0xee;
+				break;
+			default:
+				throw std::runtime_error("Opcode not implemented yet.");
+				break;
+		}
+
+		regs_.PC += instruction.size;
+		return instruction.cycles;
+	}
 
 
 private:
 	Registers regs_;
 	uint8_t flags_;
 
+	// TODO: Implement memory
+	std::array<uint8_t, 1 << 16> memory_ = {0x01, 0xab, 0xcd};
+
 	std::vector<Instruction> instructions_ = {
-		{"LD BC, d16", 0x01, 3, 3}
+		{"LD BC, d16", 0x01, 3, 3},
+		{"LD (BC), A", 0x02, 1, 2}
 	};
+
+	const Instruction& find_by_opcode(const uint16_t opcode) {
+		auto res = std::find_if(begin(instructions_), end(instructions_), [opcode](const auto& instruction) { return instruction.opcode ==  opcode; });
+		if (res == end(instructions_)) {
+			throw std::runtime_error("Opcode not found");
+		}
+		return *res;
+	}
+
+
 };

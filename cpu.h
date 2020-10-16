@@ -121,7 +121,6 @@ private:
 	Registers regs_;
 	uint8_t flags_;
 
-	// TODO: Implement memory
 	MemoryType memory_ = {};
 
 	std::vector<Instruction> instructions_ = {

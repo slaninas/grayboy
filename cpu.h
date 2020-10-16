@@ -29,27 +29,32 @@ private:
 	uint16_t* SP_ptr = reinterpret_cast<uint16_t*>(register_array.data()  + 10);
 
 public:
-	Registers()  {}
+	Registers() = default;
 	Registers(const std::array<uint8_t, 12>& regs_array) : register_array{regs_array} {}
 
-	void print() {
-		auto print_pair = [](const auto& name, const auto& both, const auto& hi, const auto& lo) {
-			std::cout << std::hex;
-			std::cout << name << ": " << static_cast<int>(both);
-			std::cout << " [" << static_cast<int>(hi) << ' ' << static_cast<int>(lo) << ']';
-			std::cout << '\n';
-			std::cout << std::dec;
+	auto& print(std::ostream& os) const {
+		auto print_pair = [&](const auto& name, const auto& both, const auto& hi, const auto& lo) {
+			os << std::hex;
+			os << name << ": " << static_cast<int>(both);
+			os << " [" << static_cast<int>(hi) << ' ' << static_cast<int>(lo) << ']';
+			os << '\n';
+			os << std::dec;
 		};
 
-		std::cout << "Registers: \n" << std::string(20, '-') << '\n';
+		os << "Registers: \n" << std::string(20, '-') << '\n';
 		print_pair("AF", AF, A, F);
 		print_pair("BC", BC, B, C);
 		print_pair("DE", DE, D, E);
 		print_pair("HL", HL, H, L);
 
-		std::cout << "PC: " << static_cast<int>(PC) << '\n';
-		std::cout << "SP: " << static_cast<int>(SP) << '\n';
+		os << "PC: " << static_cast<int>(PC) << '\n';
+		os << "SP: " << static_cast<int>(SP) << '\n';
 
+		return os;
+	}
+
+	void print() const {
+		print(std::cout);
 	}
 
 	uint16_t& AF = *AF_ptr;
@@ -71,6 +76,10 @@ public:
 	uint16_t PC = *PC_ptr;
 	uint16_t SP = *SP_ptr;
 };
+
+std::ostream& operator<<(std::ostream& os, const Registers& registers) {
+	return registers.print(os);
+}
 
 struct Instruction {
 	std::string mnemonic;
@@ -117,7 +126,7 @@ public:
 		return instruction.cycles;
 	}
 
-	[[nodiscard]] auto get_registers() {
+	[[nodiscard]] auto get_registers_dump() {
 		return regs_;
 	}
 

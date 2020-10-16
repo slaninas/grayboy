@@ -31,6 +31,7 @@ int main(int argc, const char** argv) {
 
 	auto memory = std::array<uint8_t, 1 << 16>{0x01, 0xAB, 0xCB};
 	auto cpu = Cpu{std::move(memory)};
-	cpu.print_regs();
-
+	cpu.get_registers().print();
+	cpu.execute_next();
+	cpu.get_registers().print();
 }

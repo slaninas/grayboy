@@ -32,6 +32,26 @@ public:
 	Registers()  {}
 	Registers(const std::array<uint8_t, 12>& regs_array) : register_array{regs_array} {}
 
+	void print() {
+		auto print_pair = [](const auto& name, const auto& both, const auto& hi, const auto& lo) {
+			std::cout << std::hex;
+			std::cout << name << ": " << static_cast<int>(both);
+			std::cout << " [" << static_cast<int>(hi) << ' ' << static_cast<int>(lo) << ']';
+			std::cout << '\n';
+			std::cout << std::dec;
+		};
+
+		std::cout << "Registers: \n" << std::string(20, '-') << '\n';
+		print_pair("AF", AF, A, F);
+		print_pair("BC", BC, B, C);
+		print_pair("DE", DE, D, E);
+		print_pair("HL", HL, H, L);
+
+		std::cout << "PC: " << static_cast<int>(PC) << '\n';
+		std::cout << "SP: " << static_cast<int>(SP) << '\n';
+
+	}
+
 	uint16_t& AF = *AF_ptr;
 	uint8_t& A = *A_ptr;
 	uint8_t& F = *F_ptr;
@@ -69,25 +89,6 @@ public:
 		memory_{memory}
 	{}
 
-	void print_regs() {
-		auto print_pair = [](const auto& name, const auto& both, const auto& hi, const auto& lo) {
-			std::cout << std::hex;
-			std::cout << name << ": " << static_cast<int>(both);
-			std::cout << " [" << static_cast<int>(hi) << ' ' << static_cast<int>(lo) << ']';
-			std::cout << '\n';
-			std::cout << std::dec;
-		};
-
-		std::cout << "Registers: \n" << std::string(20, '-') << '\n';
-		print_pair("AF", regs_.AF, regs_.A, regs_.F);
-		print_pair("BC", regs_.BC, regs_.B, regs_.C);
-		print_pair("DE", regs_.DE, regs_.D, regs_.E);
-		print_pair("HL", regs_.HL, regs_.H, regs_.L);
-
-		std::cout << "PC: " << static_cast<int>(regs_.PC) << '\n';
-		std::cout << "SP: " << static_cast<int>(regs_.SP) << '\n';
-
-	}
 
 
 	[[nodiscard]] auto execute_next() {
@@ -114,6 +115,10 @@ public:
 
 		regs_.PC += instruction.size;
 		return instruction.cycles;
+	}
+
+	[[nodiscard]] auto get_registers() {
+		return regs_;
 	}
 
 

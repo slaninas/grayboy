@@ -29,6 +29,9 @@ private:
 	uint16_t* SP_ptr = reinterpret_cast<uint16_t*>(registers.data()  + 10);
 
 public:
+	Registers()  {}
+	Registers(const std::array<uint8_t, 12>& regs) : registers{regs} {}
+
 	uint16_t& AF = *AF_ptr;
 	uint8_t& A = *A_ptr;
 	uint8_t& F = *F_ptr;

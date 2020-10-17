@@ -6,15 +6,17 @@
 #include "cpu.h"
 
 template<typename T>
-void p(const std::vector<T>& vec, const size_t num_values) {
+void p(const T& vec, const size_t num_values) {
+	std::cout << std::hex;
 	for (size_t i = 0; i < num_values; ++i) {
-		std::cout << (char)vec[i];
+		std::cout << (int)vec[i] << ' ';
 	}
 	std::cout << '\n';
+	std::cout << std::dec;
 }
 
 template<typename T>
-void p(const std::vector<T>& vec) {
+void p(const T& vec) {
 	p(vec, vec.size());
 }
 
@@ -31,7 +33,7 @@ int main(int argc, const char** argv) {
 
 	auto memory = std::array<uint8_t, 1 << 16>{0x01, 0xAB, 0xCB};
 	auto cpu = Cpu{std::move(memory)};
-	cpu.get_registers_dump().print();
+	auto copy = cpu.registers_dump().array_copy();
 	cpu.execute_next();
-	cpu.get_registers_dump().print();
+	cpu.registers_dump().print();
 }

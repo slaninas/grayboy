@@ -3,87 +3,7 @@
 #include <vector>
 #include <iostream>
 
-// TODO: Zero registers or do not initialize at all or like original ROM?
-// TODO: Add unit tests for registers
-struct Registers{
-	std::array<uint8_t, 12> register_array = {};
-private:
-	// TODO: Better way of doing this?
-	uint16_t* AF_ptr = reinterpret_cast<uint16_t*>(register_array.data() + 0);
-	uint8_t* F_ptr= register_array.data() + 0;
-	uint8_t* A_ptr= register_array.data() + 1;
-
-	uint16_t* BC_ptr = reinterpret_cast<uint16_t*>(register_array.data() + 2);
-	uint8_t* C_ptr = register_array.data() + 2;
-	uint8_t* B_ptr = register_array.data() + 3;
-
-	uint16_t* DE_ptr = reinterpret_cast<uint16_t*>(register_array.data() + 4);
-	uint8_t* E_ptr = register_array.data() + 4;
-	uint8_t* D_ptr = register_array.data() + 5;
-
-	uint16_t* HL_ptr = reinterpret_cast<uint16_t*>(register_array.data() + 6);
-	uint8_t* L_ptr = register_array.data() + 6;
-	uint8_t* H_ptr = register_array.data() + 7;
-
-	uint16_t* PC_ptr = reinterpret_cast<uint16_t*>(register_array.data()  + 8);
-	uint16_t* SP_ptr = reinterpret_cast<uint16_t*>(register_array.data()  + 10);
-
-public:
-	Registers() = default;
-	Registers(const std::array<uint8_t, 12>& regs_array) : register_array{regs_array} {}
-
-	void clear() {
-		std::fill(begin(register_array), end(register_array), 0x0);
-	}
-
-	auto& print(std::ostream& os) const {
-		auto print_pair = [&](const auto& name, const auto& both, const auto& hi, const auto& lo) {
-			os << std::hex;
-			os << name << ": " << static_cast<int>(both);
-			os << " [" << static_cast<int>(hi) << ' ' << static_cast<int>(lo) << ']';
-			os << '\n';
-			os << std::dec;
-		};
-
-		os << "Registers: \n" << std::string(20, '-') << '\n';
-		print_pair("AF", AF, A, F);
-		print_pair("BC", BC, B, C);
-		print_pair("DE", DE, D, E);
-		print_pair("HL", HL, H, L);
-
-		os << "PC: " << static_cast<int>(PC) << '\n';
-		os << "SP: " << static_cast<int>(SP) << '\n';
-
-		return os;
-	}
-
-	void print() const {
-		print(std::cout);
-	}
-
-	uint16_t& AF = *AF_ptr;
-	uint8_t& A = *A_ptr;
-	uint8_t& F = *F_ptr;
-
-	uint16_t& BC = *BC_ptr;
-	uint8_t& B = *B_ptr;
-	uint8_t& C = *C_ptr;
-
-	uint16_t& DE = *DE_ptr;
-	uint8_t& D = *D_ptr;
-	uint8_t& E = *E_ptr;
-
-	uint16_t& HL = *HL_ptr;
-	uint8_t& H = *H_ptr;
-	uint8_t& L = *L_ptr;
-
-	uint16_t& PC = *PC_ptr;
-	uint16_t& SP = *SP_ptr;
-};
-
-std::ostream& operator<<(std::ostream& os, const Registers& registers) {
-	return registers.print(os);
-}
+#include "registers.h"
 
 struct Instruction {
 	std::string mnemonic;
@@ -104,11 +24,11 @@ public:
 
 
 	void clear_registers() {
-		regs_.clear();
+		// regs_.clear();
 	}
 
 	[[nodiscard]] auto execute_next() {
-		const auto instruction_start = regs_.PC;
+		const auto instruction_start = regs_.read_PC();
 		const auto opcode = memory_[instruction_start];
 
 		if (opcode == 0xBC) {
@@ -119,8 +39,11 @@ public:
 
 		switch(opcode) {
 			case 0x01:
-				regs_.B = memory_[instruction_start + 1];
-				regs_.C = memory_[instruction_start + 2];
+				regs_.write_B(memory_[instruction_start + 1]);
+				regs_.write_C(memory_[instruction_start + 2]);
+				break;
+			case 0x02:
+				memory_[regs_.read_BC()] = regs_.read_A();
 				break;
 			case 0x02:
 				memory_[regs_.BC] = regs_.A;
@@ -130,26 +53,22 @@ public:
 				break;
 		}
 
-		regs_.PC += instruction.size;
+		regs_.write_PC(regs_.read_PC() + instruction.size);
 		return instruction.cycles;
 	}
 
-	[[nodiscard]] auto get_registers_dump() {
+	[[nodiscard]] auto registers_dump() const {
 		return regs_;
 	}
 
-	[[nodiscard]] auto& registers() {
-		return regs_;
-	}
-
-	[[nodiscard]] auto& memory() {
+	[[nodiscard]] auto memory_dump() const {
 		return memory_;
 	}
 
 
 private:
-	Registers regs_;
-	uint8_t flags_;
+	Registers regs_ = {};
+	// uint8_t flags_;
 
 	MemoryType memory_ = {};
 

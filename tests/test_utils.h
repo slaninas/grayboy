@@ -6,6 +6,16 @@
 
 #include "cpu.h"
 
+template<typename T>
+void p(const T& cont) {
+	std::cout << std::hex;
+	for (const auto& el : cont) {
+		std::cout << (int)el << ' ';
+	}
+	std::cout << '\n';
+	std::cout << std::dec;
+}
+
 class RegistersCompare : public Catch::MatcherBase<Registers> {
 public:
 	RegistersCompare(const Registers& registers) :
@@ -13,7 +23,7 @@ public:
 	{}
 
 	virtual bool match(const Registers& other) const override {
-		return other.register_array == registers_.register_array;
+		return other.array_copy() == registers_.array_copy();
 	}
 
 	virtual std::string describe() const override {

@@ -134,38 +134,38 @@ struct MakeRegisters{
 
 	void check_consistency() {
 		if (AF.has_value()) {
-			if (A.has_value() && (AF.value() & 0xFF00) != A.value()) {
-				std::logic_error("Value in AF register doesn't correspond to the value in A");
+			if (A.has_value() && (AF.value() & 0xFF00) >> 8 != A.value()) {
+				throw std::logic_error("Value in AF register doesn't correspond to the value in A");
 			}
 			if (F.has_value() && (AF.value() & 0x00FF) != B.value()) {
-				std::logic_error("Value in AF register doesn't correspond to the value in F");
+				throw std::logic_error("Value in AF register doesn't correspond to the value in F");
 			}
 		}
 
 		if (BC.has_value()) {
-			if (B.has_value() && (BC.value() & 0xFF00) != B.value()) {
-				std::logic_error("Value in BC register doesn't correspond to the value in B");
+			if (B.has_value() && (BC.value() & 0xFF00) >> 8 != B.value()) {
+				throw std::logic_error("Value in BC register doesn't correspond to the value in B");
 			}
 			if (C.has_value() && (BC.value() & 0x00FF) != C.value()) {
-				std::logic_error("Value in BC register doesn't correspond to the value in C");
+				throw std::logic_error("Value in BC register doesn't correspond to the value in C");
 			}
 		}
 
 		if (DE.has_value()) {
-			if (D.has_value() && (DE.value() & 0xFF00) != D.value()) {
-				std::logic_error("Value in BC register doesn't correspond to the value in D");
+			if (D.has_value() && (DE.value() & 0xFF00) >> 8 != D.value()) {
+				throw std::logic_error("Value in BC register doesn't correspond to the value in D");
 			}
 			if (D.has_value() && (DE.value() & 0x00FF) != E.value()) {
-				std::logic_error("Value in BC register doesn't correspond to the value in E");
+				throw std::logic_error("Value in BC register doesn't correspond to the value in E");
 			}
 		}
 
 		if (HL.has_value()) {
-			if (H.has_value() && (HL.value() & 0xFF00) != H.value()) {
-				std::logic_error("Value in BC register doesn't correspond to the value in H");
+			if (H.has_value() && (HL.value() & 0xFF00) >> 8 != H.value()) {
+				throw std::logic_error("Value in BC register doesn't correspond to the value in H");
 			}
 			if (L.has_value() && (HL.value() & 0x00FF) != L.value()) {
-				std::logic_error("Value in BC register doesn't correspond to the value in L");
+				throw std::logic_error("Value in BC register doesn't correspond to the value in L");
 			}
 		}
 

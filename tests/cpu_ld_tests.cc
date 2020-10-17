@@ -50,9 +50,9 @@ TEST_CASE("LD BC, d16 - 0x01", "[ld]") {
 TEST_CASE("LD (BC), A - 0x02", "[ld]") {
 	// TODO: Add comparator for memory, use it
 	auto memory = Cpu::MemoryType{0x02};
-
 	auto cpu = Cpu{std::move(memory)};
-	SECTION("Copy 0x12 from A into (BC) (0x00)") {
+
+	SECTION("Copy A (0x12) from A into address held in BC (0x00)") {
 		cpu.registers().write_A(0x12);
 		cpu.registers().write_BC(0x00);
 
@@ -63,6 +63,20 @@ TEST_CASE("LD (BC), A - 0x02", "[ld]") {
 		CHECK(cpu.memory_dump() == correct_memory);
 
 		const auto correct_registers = MakeRegisters{.A=0x12, .BC=0x00, .PC=0x01}.get();
+		CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+	}
+
+	SECTION("Copy A (0xBC) into address held in BC (0x04)") {
+		cpu.registers().write_A(0xBC);
+		cpu.registers().write_BC(0x04);
+
+		const auto cycles = cpu.execute_next();
+		CHECK(cycles == 2);
+
+		const auto correct_memory = Cpu::MemoryType{0x02, 0x00, 0x00, 0x00, 0xBC};
+		CHECK(cpu.memory_dump() == correct_memory);
+
+		const auto correct_registers = MakeRegisters{.A=0xBC, .BC=0x04, .PC=0x01}.get();
 		CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
 	}
 

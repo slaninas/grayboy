@@ -16,25 +16,33 @@ TEST_CASE("LD BC, d16 - 0x01", "[ld]") {
 	// TODO: Check this in tests for registers
 	CHECK_THAT(cpu.registers_dump(), RegistersCompare{empty_regs});
 
-	const auto cycles = cpu.execute_next();
-	CHECK(cycles == 3);
-	auto correct_state = MakeRegisters{.B=0xEE, .C=0xFF, .PC=0x03}.get();
-	CHECK_THAT(cpu.registers_dump(), RegistersCompare{correct_state});
+	SECTION("Copy 0xEEFF into BC") {
+		const auto cycles = cpu.execute_next();
+		CHECK(cycles == 3);
+		auto correct_state = MakeRegisters{.B=0xEE, .C=0xFF, .PC=0x03}.get();
+		CHECK_THAT(cpu.registers_dump(), RegistersCompare{correct_state});
+	}
 
-	const auto cycles2 = cpu.execute_next();
-	CHECK(cycles2 == 3);
-	correct_state = MakeRegisters{.B=0xAB, .C=0xCD, .PC=0x06}.get();
-	CHECK_THAT(cpu.registers_dump(), RegistersCompare{correct_state});
+	SECTION("Copy 0xABCD into BC") {
+		cpu.registers().write_PC(0x03);
+		const auto cycles2 = cpu.execute_next();
+		CHECK(cycles2 == 3);
+		auto correct_state = MakeRegisters{.B=0xAB, .C=0xCD, .PC=0x06}.get();
+		CHECK_THAT(cpu.registers_dump(), RegistersCompare{correct_state});
+	}
 
-	const auto cycles3 = cpu.execute_next();
-	CHECK(cycles3 == 3);
+	SECTION("Copy 0x0100 into BC") {
+		cpu.registers().write_PC(0x06);
+		const auto cycles3 = cpu.execute_next();
+		CHECK(cycles3 == 3);
 
-	correct_state = MakeRegisters{.B=0x01, .C=0x00, .PC=0x09}.get();
-	CHECK_THAT(cpu.registers_dump(), RegistersCompare{correct_state});
+		auto correct_state = MakeRegisters{.B=0x01, .C=0x00, .PC=0x09}.get();
+		CHECK_THAT(cpu.registers_dump(), RegistersCompare{correct_state});
+	}
 
-	cpu.clear_registers();
+	// cpu.clear_registers();
 	// TODO: Check this in tests for registers
-	CHECK_THAT(cpu.registers_dump(), RegistersCompare{empty_regs});
+	// CHECK_THAT(cpu.registers_dump(), RegistersCompare{empty_regs});
 }
 
 TEST_CASE("LD (BC), A - 0x02", "[ld]") {

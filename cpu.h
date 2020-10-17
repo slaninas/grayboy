@@ -122,6 +122,9 @@ public:
 				regs_.B = memory_[instruction_start + 1];
 				regs_.C = memory_[instruction_start + 2];
 				break;
+			case 0x02:
+				memory_[regs_.BC] = regs_.A;
+				break;
 			default:
 				throw std::runtime_error("Opcode not implemented yet.");
 				break;

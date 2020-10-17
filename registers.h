@@ -108,20 +108,19 @@ struct MakeRegisters{
 
 
 	auto get() {
-
 		check_consistency();
 
-		const auto A_val = static_cast<uint8_t>(AF.has_value() ? AF.value() & 0x00FF : A.value_or(0x00));
-		const auto F_val = static_cast<uint8_t>(AF.has_value() ? AF.value() & 0xFF00 : F.value_or(0x00));
+		const auto A_val = static_cast<uint8_t>(AF.has_value() ? (AF.value() & 0xFF00) >> 8 : A.value_or(0x00));
+		const auto F_val = static_cast<uint8_t>(AF.has_value() ? AF.value() & 0x00FF : F.value_or(0x00));
 
-		const auto B_val = static_cast<uint8_t>(BC.has_value() ? BC.value() & 0x00FF : B.value_or(0x00));
-		const auto C_val = static_cast<uint8_t>(BC.has_value() ? BC.value() & 0xFF00 : C.value_or(0x00));
+		const auto B_val = static_cast<uint8_t>(BC.has_value() ? (BC.value() & 0xFF00) >> 8 : B.value_or(0x00));
+		const auto C_val = static_cast<uint8_t>(BC.has_value() ? BC.value() & 0x00FF : C.value_or(0x00));
 
-		const auto D_val = static_cast<uint8_t>(DE.has_value() ? DE.value() & 0x00FF : D.value_or(0x00));
-		const auto E_val = static_cast<uint8_t>(DE.has_value() ? DE.value() & 0xFF00 : E.value_or(0x00));
+		const auto D_val = static_cast<uint8_t>(DE.has_value() ? (DE.value() & 0xFF00) >> 8 : D.value_or(0x00));
+		const auto E_val = static_cast<uint8_t>(DE.has_value() ? DE.value() & 0x00FF : E.value_or(0x00));
 
-		const auto H_val = static_cast<uint8_t>(HL.has_value() ? HL.value() & 0x00FF : H.value_or(0x00));
-		const auto L_val = static_cast<uint8_t>(HL.has_value() ? HL.value() & 0xFF00 : L.value_or(0x00));
+		const auto H_val = static_cast<uint8_t>(HL.has_value() ? (HL.value() & 0xFF00) >> 8 : H.value_or(0x00));
+		const auto L_val = static_cast<uint8_t>(HL.has_value() ? HL.value() & 0x00FF : L.value_or(0x00));
 
 		const auto PC_val = static_cast<uint8_t>(PC.value_or(0x0000));
 		const auto SP_val = static_cast<uint8_t>(SP.value_or(0x0000));
@@ -135,37 +134,37 @@ struct MakeRegisters{
 
 	void check_consistency() {
 		if (AF.has_value()) {
-			if (A.has_value() && (AF.value() & 0x00FF) != A.value()) {
+			if (A.has_value() && (AF.value() & 0xFF00) != A.value()) {
 				std::logic_error("Value in AF register doesn't correspond to the value in A");
 			}
-			if (F.has_value() && (AF.value() & 0xFF00) != B.value()) {
+			if (F.has_value() && (AF.value() & 0x00FF) != B.value()) {
 				std::logic_error("Value in AF register doesn't correspond to the value in F");
 			}
 		}
 
 		if (BC.has_value()) {
-			if (B.has_value() && (BC.value() & 0x00FF) != B.value()) {
+			if (B.has_value() && (BC.value() & 0xFF00) != B.value()) {
 				std::logic_error("Value in BC register doesn't correspond to the value in B");
 			}
-			if (C.has_value() && (BC.value() & 0xFF00) != C.value()) {
+			if (C.has_value() && (BC.value() & 0x00FF) != C.value()) {
 				std::logic_error("Value in BC register doesn't correspond to the value in C");
 			}
 		}
 
 		if (DE.has_value()) {
-			if (D.has_value() && (DE.value() & 0x00FF) != D.value()) {
+			if (D.has_value() && (DE.value() & 0xFF00) != D.value()) {
 				std::logic_error("Value in BC register doesn't correspond to the value in D");
 			}
-			if (D.has_value() && (DE.value() & 0xFF00) != E.value()) {
+			if (D.has_value() && (DE.value() & 0x00FF) != E.value()) {
 				std::logic_error("Value in BC register doesn't correspond to the value in E");
 			}
 		}
 
 		if (HL.has_value()) {
-			if (H.has_value() && (HL.value() & 0x00FF) != H.value()) {
+			if (H.has_value() && (HL.value() & 0xFF00) != H.value()) {
 				std::logic_error("Value in BC register doesn't correspond to the value in H");
 			}
-			if (L.has_value() && (HL.value() & 0xFF00) != L.value()) {
+			if (L.has_value() && (HL.value() & 0x00FF) != L.value()) {
 				std::logic_error("Value in BC register doesn't correspond to the value in L");
 			}
 		}

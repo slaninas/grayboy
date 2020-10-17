@@ -24,7 +24,7 @@ public:
 
 
 	void clear_registers() {
-		// regs_.clear();
+		regs_.clear();
 	}
 
 	[[nodiscard]] auto execute_next() {
@@ -45,9 +45,6 @@ public:
 			case 0x02:
 				memory_[regs_.read_BC()] = regs_.read_A();
 				break;
-			case 0x02:
-				memory_[regs_.BC] = regs_.A;
-				break;
 			default:
 				throw std::runtime_error("Opcode not implemented yet.");
 				break;
@@ -63,6 +60,10 @@ public:
 
 	[[nodiscard]] auto memory_dump() const {
 		return memory_;
+	}
+
+	[[nodiscard]] auto& registers() {
+		return regs_;
 	}
 
 

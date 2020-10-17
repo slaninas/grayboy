@@ -33,7 +33,6 @@ int main(int argc, const char** argv) {
 
 	auto memory = std::array<uint8_t, 1 << 16>{0x01, 0xAB, 0xCB};
 	auto cpu = Cpu{std::move(memory)};
-	auto copy = cpu.registers_dump().array_copy();
-	cpu.execute_next();
+	[[maybe_unused]] auto cycles = cpu.execute_next();
 	cpu.registers_dump().print();
 }

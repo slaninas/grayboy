@@ -138,6 +138,14 @@ public:
 		return regs_;
 	}
 
+	[[nodiscard]] auto& registers() {
+		return regs_;
+	}
+
+	[[nodiscard]] auto& memory() {
+		return memory_;
+	}
+
 
 private:
 	Registers regs_;

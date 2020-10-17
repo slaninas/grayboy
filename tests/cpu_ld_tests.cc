@@ -3,7 +3,6 @@
 #include "test_utils.h"
 #include "cpu.h"
 
-
 TEST_CASE("LD BC, d16 - 0x01", "[ld]") {
 	auto memory = Cpu::MemoryType{
 		0x01, 0xEE, 0xFF,

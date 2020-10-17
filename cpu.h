@@ -48,6 +48,9 @@ public:
 			case 0x02:
 				memory_[regs_.read_BC()] = regs_.read_A();
 				break;
+			case 0x03:
+				regs_.write_BC(regs_.read_BC() + 1);
+				break;
 			default:
 				throw std::runtime_error("Opcode not implemented yet.");
 				break;
@@ -79,7 +82,8 @@ private:
 	std::vector<Instruction> instructions_ = {
 		{"NOP", 0x00, 1, 1},
 		{"LD BC, d16", 0x01, 3, 3},
-		{"LD (BC), A", 0x02, 1, 2}
+		{"LD (BC), A", 0x02, 1, 2},
+		{"INC BC", 0x03, 1, 2},
 	};
 
 	const Instruction& find_by_opcode(const uint16_t opcode) {

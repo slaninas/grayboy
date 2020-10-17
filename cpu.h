@@ -18,7 +18,8 @@ class Cpu {
 public:
 	using MemoryType = std::array<uint8_t, 1 << 16>;
 
-	Cpu(MemoryType&& memory) :
+	// TODO: Make move possible?
+	Cpu(const MemoryType& memory) :
 		memory_{memory}
 	{}
 

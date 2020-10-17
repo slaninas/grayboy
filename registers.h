@@ -89,19 +89,31 @@ std::ostream& operator<<(std::ostream& os, const Registers& registers) {
 	return registers.print(os);
 }
 
+// TODO: Use std::optional and check if registors are consistent, e.g. AF is same as A combined with F
+// TODO: Actually use 16bit registers if they are set
 struct MakeRegisters{
+	const uint16_t AF;
 	const uint8_t A;
 	const uint8_t F;
+	const uint16_t BC;
 	const uint8_t B;
 	const uint8_t C;
+	const uint16_t DE;
 	const uint8_t D;
 	const uint8_t E;
+	const uint16_t HL;
 	const uint8_t H;
 	const uint8_t L;
 	const uint16_t PC;
 	const uint16_t SP;
 
+	auto check_consistency() {
+
+	}
+
 	auto get() {
+		check_consistency();
+
 		auto array = std::array<uint8_t, 12>{F, A, C, B, E, D, L, H};
 		auto registers = Registers{array};
 		registers.write_PC(PC);

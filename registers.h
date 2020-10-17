@@ -88,3 +88,25 @@ private:
 std::ostream& operator<<(std::ostream& os, const Registers& registers) {
 	return registers.print(os);
 }
+
+struct MakeRegisters{
+	const uint8_t A;
+	const uint8_t F;
+	const uint8_t B;
+	const uint8_t C;
+	const uint8_t D;
+	const uint8_t E;
+	const uint8_t H;
+	const uint8_t L;
+	const uint16_t PC;
+	const uint16_t SP;
+
+	auto get() {
+		auto array = std::array<uint8_t, 12>{F, A, C, B, E, D, L, H};
+		auto registers = Registers{array};
+		registers.write_PC(PC);
+		registers.write_SP(SP);
+		return registers;
+	}
+
+};

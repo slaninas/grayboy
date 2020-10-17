@@ -18,29 +18,18 @@ TEST_CASE("LD BC, d16 - 0x01", "[ld]") {
 
 	const auto cycles = cpu.execute_next();
 	CHECK(cycles == 3);
-
-	auto correct_state = Registers{};
-	correct_state.write_B(0xEE);
-	correct_state.write_C(0xFF);
-	correct_state.write_PC(0x03);
+	auto correct_state = MakeRegisters{.B=0xEE, .C=0xFF, .PC=0x03}.get();
 	CHECK_THAT(cpu.registers_dump(), RegistersCompare{correct_state});
 
 	const auto cycles2 = cpu.execute_next();
 	CHECK(cycles2 == 3);
-
-	correct_state.clear();
-	correct_state.write_B(0xAB);
-	correct_state.write_C(0xCD);
-	correct_state.write_PC(0x06);
+	correct_state = MakeRegisters{.B=0xAB, .C=0xCD, .PC=0x06}.get();
 	CHECK_THAT(cpu.registers_dump(), RegistersCompare{correct_state});
 
 	const auto cycles3 = cpu.execute_next();
 	CHECK(cycles3 == 3);
 
-	correct_state.clear();
-	correct_state.write_B(0x01);
-	correct_state.write_C(0x00);
-	correct_state.write_PC(0x09);
+	correct_state = MakeRegisters{.B=0x01, .C=0x00, .PC=0x09}.get();
 	CHECK_THAT(cpu.registers_dump(), RegistersCompare{correct_state});
 
 	cpu.clear_registers();
@@ -72,6 +61,7 @@ TEST_CASE("LD (BC), A - 0x02", "[ld]") {
 	correct_registers.write_A(0x12);
 	correct_registers.write_BC(0x00);
 	correct_registers.write_PC(0x01);
+	// const auto correct_state = MakeRegisters{.B=0x01, .C=0x00, .PC=0x09}.get();
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
 
 }

@@ -9,5 +9,9 @@ target_link_libraries(registers_tests test_main)
 add_executable(cpu_ld_tests  cpu_ld_tests.cc)
 target_link_libraries(cpu_ld_tests test_main)
 
+add_executable(cpu_misc_tests  cpu_misc_tests.cc)
+target_link_libraries(cpu_misc_tests test_main)
+
 add_test("registers_tests " registers_tests)
 add_test("cpu_ld_tests" cpu_ld_tests)
+add_test("cpu_misc_tests" cpu_misc_tests)

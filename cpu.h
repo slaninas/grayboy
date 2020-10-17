@@ -39,6 +39,8 @@ public:
 		const auto instruction = find_by_opcode(opcode);
 
 		switch(opcode) {
+			case 0x00:
+				break;
 			case 0x01:
 				regs_.write_B(memory_[instruction_start + 1]);
 				regs_.write_C(memory_[instruction_start + 2]);
@@ -75,6 +77,7 @@ private:
 	MemoryType memory_ = {};
 
 	std::vector<Instruction> instructions_ = {
+		{"NOP", 0x00, 1, 1},
 		{"LD BC, d16", 0x01, 3, 3},
 		{"LD (BC), A", 0x02, 1, 2}
 	};

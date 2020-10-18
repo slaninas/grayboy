@@ -4,6 +4,7 @@
 #include "cpu.h"
 
 TEST_CASE("LD BC, d16 - 0x01", "[ld]") {
+	// TODO: Check flags - they should stay the same for LD BC, d16
 	auto memory = Cpu::MemoryType{
 		0x01, 0xEE, 0xFF,
 		0x01, 0xAB, 0xCD,
@@ -45,6 +46,7 @@ TEST_CASE("LD BC, d16 - 0x01", "[ld]") {
 }
 
 TEST_CASE("LD (BC), A - 0x02", "[ld]") {
+	// TODO: Check flags - they should stay the same for LD (BC), A
 	// TODO: Add comparator for memory, use it
 	auto memory = Cpu::MemoryType{0x02};
 	auto cpu = Cpu{std::move(memory)};

@@ -146,4 +146,112 @@ TEST_CASE("Registers write", "[registers]") {
 	}
 }
 
+TEST_CASE("MakeFlags", "[registers]") {
+	SECTION("One flag set only") {
+		auto flags = MakeFlags{}.get();
+		CHECK(flags == 0x00);
+
+		flags = MakeFlags{.Z=1}.get();
+		CHECK(flags == 0x80);
+
+		flags = MakeFlags{.N=1}.get();
+		CHECK(flags == 0x40);
+
+		flags = MakeFlags{.H=1}.get();
+		CHECK(flags == 0x20);
+
+		flags = MakeFlags{.C=1}.get();
+		CHECK(flags == 0x10);
+	}
+
+	SECTION("More flags set at once") {
+		auto flags = MakeFlags{.Z=1, .N=1, .H=0, .C=0}.get();
+		CHECK(flags == 0xc0);
+
+		flags = MakeFlags{.Z=1, .N=1, .H=1, .C=1}.get();
+		CHECK(flags == 0xf0);
+
+		flags = MakeFlags{.Z=0, .N=1, .H=0, .C=1}.get();
+		CHECK(flags == 0x50);
+	}
+}
+
+TEST_CASE("Registers' flags set/read", "[registers]") {
+	// TODO: Make .F=0x0X and check that X is never changed
+	auto regs = MakeRegisters{.F=0x00}.get();
+
+	CHECK(regs.read_flag("Z") == false);
+	CHECK(regs.read_flag("N") == false);
+	CHECK(regs.read_flag("H") == false);
+	CHECK(regs.read_flag("C") == false);
+
+	SECTION("Z") {
+		regs.set_flag("Z", false);
+		CHECK(regs.read_flag("Z") == true);
+		CHECK(regs.read_flag("N") == false);
+		CHECK(regs.read_flag("H") == false);
+		CHECK(regs.read_flag("C") == false);
+	}
+	SECTION("N") {
+		regs.set_flag("N", false);
+		CHECK(regs.read_flag("Z") == false);
+		CHECK(regs.read_flag("N") == true);
+		CHECK(regs.read_flag("H") == false);
+		CHECK(regs.read_flag("C") == false);
+	}
+	SECTION("H") {
+		regs.set_flag("H", false);
+		CHECK(regs.read_flag("Z") == false);
+		CHECK(regs.read_flag("N") == false);
+		CHECK(regs.read_flag("H") == true);
+		CHECK(regs.read_flag("C") == false);
+	}
+	SECTION("C") {
+		regs.set_flag("C", false);
+		CHECK(regs.read_flag("Z") == false);
+		CHECK(regs.read_flag("N") == false);
+		CHECK(regs.read_flag("H") == false);
+		CHECK(regs.read_flag("C") == true);
+	}
+}
+
+TEST_CASE("Registers' flags unset/read", "[registers]") {
+	// TODO: Make .F=0x0X and check that X is never changed
+	auto regs = MakeRegisters{.F=0xff}.get();
+
+	CHECK(regs.read_flag("Z") == true);
+	CHECK(regs.read_flag("N") == true);
+	CHECK(regs.read_flag("H") == true);
+	CHECK(regs.read_flag("C") == true);
+
+	SECTION("Z") {
+		regs.set_flag("Z", false);
+		CHECK(regs.read_flag("Z") == false);
+		CHECK(regs.read_flag("N") == true);
+		CHECK(regs.read_flag("H") == true);
+		CHECK(regs.read_flag("C") == true);
+	}
+	SECTION("N") {
+		regs.set_flag("N", false);
+		CHECK(regs.read_flag("Z") == true);
+		CHECK(regs.read_flag("N") == false);
+		CHECK(regs.read_flag("H") == true);
+		CHECK(regs.read_flag("C") == true);
+	}
+	SECTION("H") {
+		regs.set_flag("H", false);
+		CHECK(regs.read_flag("Z") == true);
+		CHECK(regs.read_flag("N") == true);
+		CHECK(regs.read_flag("H") == false);
+		CHECK(regs.read_flag("C") == true);
+	}
+	SECTION("C") {
+		regs.set_flag("C", false);
+		CHECK(regs.read_flag("Z") == true);
+		CHECK(regs.read_flag("N") == true);
+		CHECK(regs.read_flag("H") == true);
+		CHECK(regs.read_flag("C") == false);
+	}
+}
+
 

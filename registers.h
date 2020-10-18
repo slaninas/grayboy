@@ -12,6 +12,7 @@ public:
 	using ArrayType = std::array<uint8_t, 12>;
 
 	Registers() = default;
+	// TODO: Remove this constructor, use MakeRegisters only
 	Registers(const ArrayType& regs_array) : register_array_{regs_array} {}
 
 	void clear() {
@@ -33,6 +34,7 @@ public:
 		}
 	}
 
+
 	template<size_t kSize>
 	void write(const char(&reg_name)[kSize], uint16_t value) {
 		constexpr auto reg_name_size = kSize - 1; // Subtract \0 at the end
@@ -49,15 +51,54 @@ public:
 		}
 	}
 
+	template<size_t kSize>
+	[[nodiscard]] auto read_flag(const char(&flag_name)[kSize]) const {
+		assert((kSize == 2) && "Flags are only one letter (+ \n), you cannot address them by more letters.");
+		const auto flag = std::string_view{flag_name};
+		if (flag == "Z") return static_cast<bool>(read("F") & (1 << 7));
+		else if (flag == "N") return static_cast<bool>(read("F") & (1 << 6));
+		else if (flag == "H") return static_cast<bool>(read("F") & (1 << 5));
+		else if (flag == "C") return static_cast<bool>(read("F") & (1 << 4));
+
+		assert(false && "You should not be here, it means you called read_flag with incorrect flag name.");
+	}
+
+	template<size_t kSize>
+	void set_flag(const char(&flag_name)[kSize], const bool value) {
+		assert((kSize == 2) && "Flags are only one letter (+ \n), you cannot address them by more letters.");
+		const char flag = flag_name[0];
+		const auto F_value = read("F");
+
+		switch (flag) {
+			case 'Z':
+				write("F", value ? F_value | (1 << 7) : F_value ^ (1 << 7));
+				break;
+			case 'N':
+				write("F", value ? F_value | (1 << 6) : F_value ^ (1 << 6));
+				break;
+			case 'H':
+				write("F", value ? F_value | (1 << 5) : F_value ^ (1 << 5));
+				break;
+			case 'C':
+				write("F", value ? F_value | (1 << 4) : F_value ^ (1 << 4));
+				break;
+
+			default:
+				assert(false && "You should not be here, it means you called set_flag with incorrect flag name.");
+				break;
+		}
+	}
+
 	auto& print(std::ostream& os) const {
 		os << std::hex;
 		auto print_pair = [&](const auto& name, const auto& both, const auto& hi, const auto& lo) {
 			os << name << ": " << static_cast<int>(both);
-			os << " [" << static_cast<int>(hi) << ' ' << static_cast<int>(lo) << ']';
+			os << "\t[" << name[0] << "=" << static_cast<int>(hi) << ' ' << name[1] << "="<< static_cast<int>(lo) << ']';
 			os << '\n';
 		};
 
 		os << "Registers: \n" << std::string(20, '-') << '\n';
+		// print_pair("AF", read("AF"), read("A"), read("F"));
 		print_pair("AF", read("AF"), read("A"), read("F"));
 		print_pair("BC", read("BC"), read("B"), read("C"));
 		print_pair("DE", read("DE"), read("D"), read("E"));
@@ -65,6 +106,8 @@ public:
 
 		os << "PC: " << static_cast<int>(read("PC")) << '\n';
 		os << "SP: " << static_cast<int>(read("SP")) << '\n';
+		os << "Flags: ";
+		os << "Z=" << read_flag("Z") << " N=" << read_flag("N") << " H=" << read_flag("H") << " C=" << read_flag("C") << "]\n";
 
 		os << std::dec;
 		return os;
@@ -111,7 +154,6 @@ std::ostream& operator<<(std::ostream& os, const Registers& registers) {
 	return registers.print(os);
 }
 
-// TODO: When AF, A and B should not be set etc., add unit test for that
 struct MakeRegisters{
 	std::optional<uint16_t> AF;
 	std::optional<uint8_t> A;
@@ -193,4 +235,21 @@ struct MakeRegisters{
 
 	}
 
+};
+
+// TODO: Reuse for other?
+struct MakeFlags {
+	std::optional<bool> Z;
+	std::optional<bool> N;
+	std::optional<bool> H;
+	std::optional<bool> C;
+
+	auto get() {
+		auto value = static_cast<uint8_t>(0x00);
+		value += static_cast<uint8_t>(Z.value_or(0x00)) << 7;
+		value += static_cast<uint8_t>(N.value_or(0x00)) << 6;
+		value += static_cast<uint8_t>(H.value_or(0x00)) << 5;
+		value += static_cast<uint8_t>(C.value_or(0x00)) << 4;
+		return value;
+	}
 };

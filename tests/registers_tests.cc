@@ -10,13 +10,13 @@
 TEST_CASE("Registers initialization", "[registers]") {
 	SECTION("Default initialization") {
 		auto regs = Registers{};
-		CHECK(regs.array_copy() == Registers::ArrayType{});
+		CHECK(regs.dump() == Registers::ArrayType{});
 	}
 	SECTION("Initialization with non-zeroed array") {
 		// Fill array with something
 		const auto reg_array = Registers::ArrayType{0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xde, 0xf0, 0xaa, 0xbb, 0xcc};
 		auto regs = Registers{reg_array};
-		CHECK(regs.array_copy() == reg_array);
+		CHECK(regs.dump() == reg_array);
 	}
 }
 

@@ -74,10 +74,6 @@ public:
 		print(std::cout);
 	}
 
-	// TODO: remove
-	auto array_copy() const {
-		return register_array_;
-	}
 	auto dump() const {
 		return register_array_;
 	}

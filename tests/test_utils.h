@@ -23,7 +23,7 @@ public:
 	{}
 
 	virtual bool match(const Registers& other) const override {
-		return other.array_copy() == registers_.array_copy();
+		return other.dump() == registers_.dump();
 	}
 
 	virtual std::string describe() const override {

@@ -1,7 +1,10 @@
 #pragma once
 
+#include <stdexcept>
+
 // TODO: Zero registers or do not initialize at all or like original ROM?
 // TODO: Add unit tests for registers
+// TODO: Use assert and run in debug instead of throwing when it makes sense
 class Registers{
 public:
 
@@ -52,6 +55,38 @@ public:
 	void write_PC(uint16_t value) { *reinterpret_cast<uint16_t*>(register_array_.data() + 8) = value; }
 	void write_SP(uint16_t value) { *reinterpret_cast<uint16_t*>(register_array_.data() + 10) = value; }
 
+	template<size_t kSize>
+	[[nodiscard]] auto read(const char(&reg_name)[kSize]) {
+		constexpr auto reg_name_size = kSize - 1; // Subtract \0 at the end
+		const auto reg_index = register_index(reg_name);
+
+		// 8bit registers
+		if constexpr(reg_name_size == 1) {
+			return register_array_[reg_index];;
+		}
+		// Combined 16bit registers
+		else {
+			return *reinterpret_cast<uint16_t*>(register_array_.data() + reg_index);
+		}
+	}
+
+	// TODO: check if I'm not trying to write 16bit value into 8bit
+	template<size_t kSize>
+	void write(const char(&reg_name)[kSize], uint16_t value) {
+		constexpr auto reg_name_size = kSize - 1; // Subtract \0 at the end
+		const auto reg_index = register_index(reg_name);
+
+		// 8bit registers
+		if constexpr(reg_name_size == 1) {
+			register_array_[reg_index] = value;
+		}
+		// Combined 16bit registers
+		else {
+			*reinterpret_cast<uint16_t*>(register_array_.data() + reg_index) = value;
+		}
+	}
+
+
 	auto& print(std::ostream& os) const {
 		os << std::hex;
 		auto print_pair = [&](const auto& name, const auto& both, const auto& hi, const auto& lo) {
@@ -83,6 +118,31 @@ public:
 
 private:
 	std::array<uint8_t, 12> register_array_ = {};
+
+	int register_index(const char* reg_name) const {
+		const auto reg= std::string_view{reg_name};
+
+		if (reg == "AF") return 0;
+		else if (reg == "F") return 0;
+		else if (reg == "A") return 1;
+
+		else if (reg == "BC") return 2;
+		else if (reg == "C") return 2;
+		else if (reg == "B") return 3;
+
+		else if (reg == "DE") return 4;
+		else if (reg == "E") return 4;
+		else if (reg == "D") return 5;
+
+		else if (reg == "HL") return 6;
+		else if (reg == "L") return 6;
+		else if (reg == "H") return 7;
+
+		else if (reg == "PC") return 8;
+		else if (reg == "SP") return 10;
+		else throw std::logic_error(std::string("Register ") + reg_name + " doesn't exist");
+	}
+
 };
 
 std::ostream& operator<<(std::ostream& os, const Registers& registers) {

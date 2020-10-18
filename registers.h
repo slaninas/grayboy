@@ -12,45 +12,45 @@ public:
 		std::fill(begin(register_array_), end(register_array_), 0x0);
 	}
 
-	// TODO: Maybe use macro?
-	auto read_AF() const { return *reinterpret_cast<const uint16_t*>(register_array_.data() + 0);}
-	auto read_F() const {	return register_array_[0]; }
-	auto read_A() const {	return register_array_[1]; }
+	// TODO: Maybe use macro? Rather do it differently
+	[[nodiscard]] auto read_AF() const { return *reinterpret_cast<const uint16_t*>(register_array_.data() + 0);}
+	[[nodiscard]] auto read_F() const {	return register_array_[0]; }
+	[[nodiscard]] auto read_A() const {	return register_array_[1]; }
 
-	auto read_BC() const { return *reinterpret_cast<const uint16_t*>(register_array_.data() + 2);}
-	auto read_C() const {	return register_array_[2]; }
-	auto read_B() const {	return register_array_[3]; }
+	[[nodiscard]] auto read_BC() const { return *reinterpret_cast<const uint16_t*>(register_array_.data() + 2);}
+	[[nodiscard]] auto read_C() const {	return register_array_[2]; }
+	[[nodiscard]] auto read_B() const {	return register_array_[3]; }
 
-	auto read_DE() const { return *reinterpret_cast<const uint16_t*>(register_array_.data() + 4);}
-	auto read_E() const {	return register_array_[4]; }
-	auto read_D() const {	return register_array_[5]; }
+	[[nodiscard]] auto read_DE() const { return *reinterpret_cast<const uint16_t*>(register_array_.data() + 4);}
+	[[nodiscard]] auto read_E() const {	return register_array_[4]; }
+	[[nodiscard]] auto read_D() const {	return register_array_[5]; }
 
-	auto read_HL() const { return *reinterpret_cast<const uint16_t*>(register_array_.data() + 6);}
-	auto read_L() const {	return register_array_[6]; }
-	auto read_H() const {	return register_array_[7]; }
+	[[nodiscard]] auto read_HL() const { return *reinterpret_cast<const uint16_t*>(register_array_.data() + 6);}
+	[[nodiscard]] auto read_L() const {	return register_array_[6]; }
+	[[nodiscard]] auto read_H() const {	return register_array_[7]; }
 
-	auto read_PC() const { return *reinterpret_cast<const uint16_t*>(register_array_.data() + 8);}
-	auto read_SP() const { return *reinterpret_cast<const uint16_t*>(register_array_.data() + 10);}
+	[[nodiscard]] auto read_PC() const { return *reinterpret_cast<const uint16_t*>(register_array_.data() + 8);}
+	[[nodiscard]] auto read_SP() const { return *reinterpret_cast<const uint16_t*>(register_array_.data() + 10);}
 
 
-	auto write_AF(uint16_t value) { *reinterpret_cast<uint16_t*>(register_array_.data() + 0) = value; }
-	auto write_F(uint8_t value) {	register_array_[0] = value; }
-	auto write_A(uint8_t value) {	register_array_[1] = value; }
+	void write_AF(uint16_t value) { *reinterpret_cast<uint16_t*>(register_array_.data() + 0) = value; }
+	void write_F(uint8_t value) {	register_array_[0] = value; }
+	void write_A(uint8_t value) {	register_array_[1] = value; }
 
-	auto write_BC(uint16_t value) { *reinterpret_cast<uint16_t*>(register_array_.data() + 2) = value; }
-	auto write_C(uint8_t value) {	register_array_[2] = value; }
-	auto write_B(uint8_t value) {	register_array_[3] = value; }
+	void write_BC(uint16_t value) { *reinterpret_cast<uint16_t*>(register_array_.data() + 2) = value; }
+	void write_C(uint8_t value) {	register_array_[2] = value; }
+	void write_B(uint8_t value) {	register_array_[3] = value; }
 
-	auto write_DE(uint16_t value) { *reinterpret_cast<uint16_t*>(register_array_.data() + 4) = value; }
-	auto write_E(uint8_t value) {	register_array_[4] = value; }
-	auto write_D(uint8_t value) {	register_array_[5] = value; }
+	void write_DE(uint16_t value) { *reinterpret_cast<uint16_t*>(register_array_.data() + 4) = value; }
+	void write_E(uint8_t value) {	register_array_[4] = value; }
+	void write_D(uint8_t value) {	register_array_[5] = value; }
 
-	auto write_HL(uint16_t value) { *reinterpret_cast<uint16_t*>(register_array_.data() + 6) = value; }
-	auto write_L(uint8_t value) {	register_array_[6] = value; }
-	auto write_H(uint8_t value) {	register_array_[7] = value; }
+	void write_HL(uint16_t value) { *reinterpret_cast<uint16_t*>(register_array_.data() + 6) = value; }
+	void write_L(uint8_t value) {	register_array_[6] = value; }
+	void write_H(uint8_t value) {	register_array_[7] = value; }
 
-	auto write_PC(uint16_t value) { *reinterpret_cast<uint16_t*>(register_array_.data() + 8) = value; }
-	auto write_SP(uint16_t value) { *reinterpret_cast<uint16_t*>(register_array_.data() + 10) = value; }
+	void write_PC(uint16_t value) { *reinterpret_cast<uint16_t*>(register_array_.data() + 8) = value; }
+	void write_SP(uint16_t value) { *reinterpret_cast<uint16_t*>(register_array_.data() + 10) = value; }
 
 	auto& print(std::ostream& os) const {
 		os << std::hex;

@@ -12,11 +12,14 @@ TEST_CASE("Registers initialization", "[registers]") {
 		auto regs = Registers{};
 		CHECK(regs.dump() == Registers::ArrayType{});
 	}
-	SECTION("Initialization with non-zeroed array") {
+	SECTION("Initialization with non-zeroed array, then clear") {
 		// Fill array with something
 		const auto reg_array = Registers::ArrayType{0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xde, 0xf0, 0xaa, 0xbb, 0xcc};
 		auto regs = Registers{reg_array};
 		CHECK(regs.dump() == reg_array);
+
+		regs.clear();
+		CHECK(regs.dump() == Registers::ArrayType{});
 	}
 }
 

@@ -42,9 +42,6 @@ TEST_CASE("LD BC, d16 - 0x01", "[ld]") {
 		CHECK_THAT(cpu.registers_dump(), RegistersCompare{correct_state});
 	}
 
-	// cpu.clear_registers();
-	// TODO: Check this in tests for registers
-	// CHECK_THAT(cpu.registers_dump(), RegistersCompare{empty_regs});
 }
 
 TEST_CASE("LD (BC), A - 0x02", "[ld]") {

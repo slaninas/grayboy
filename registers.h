@@ -1,15 +1,18 @@
 #pragma once
 
+#include <iostream>
 #include <stdexcept>
+#include <cassert>
 
 // TODO: Zero registers or do not initialize at all or like original ROM?
 // TODO: Add unit tests for registers
 // TODO: Use assert and run in debug instead of throwing when it makes sense
 class Registers{
 public:
+	using ArrayType = std::array<uint8_t, 12>;
 
 	Registers() = default;
-	Registers(const std::array<uint8_t, 12>& regs_array) : register_array_{regs_array} {}
+	Registers(const ArrayType& regs_array) : register_array_{regs_array} {}
 
 	void clear() {
 		std::fill(begin(register_array_), end(register_array_), 0x0);
@@ -78,6 +81,7 @@ public:
 
 		// 8bit registers
 		if constexpr(reg_name_size == 1) {
+			assert(((value & static_cast<uint16_t>(0xff00)) == 0) && "Don't write 16bit value into 8bit register.");
 			register_array_[reg_index] = value;
 		}
 		// Combined 16bit registers
@@ -112,7 +116,11 @@ public:
 		print(std::cout);
 	}
 
+	// TODO: remove
 	auto array_copy() const {
+		return register_array_;
+	}
+	auto dump() const {
 		return register_array_;
 	}
 

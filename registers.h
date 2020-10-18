@@ -182,8 +182,8 @@ struct MakeRegisters{
 		const auto H_val = static_cast<uint8_t>(HL.has_value() ? (HL.value() & 0xFF00) >> 8 : H.value_or(0x00));
 		const auto L_val = static_cast<uint8_t>(HL.has_value() ? HL.value() & 0x00FF : L.value_or(0x00));
 
-		const auto PC_val = static_cast<uint8_t>(PC.value_or(0x0000));
-		const auto SP_val = static_cast<uint8_t>(SP.value_or(0x0000));
+		const auto PC_val = static_cast<uint16_t>(PC.value_or(0x0000));
+		const auto SP_val = static_cast<uint16_t>(SP.value_or(0x0000));
 
 		auto array = std::array<uint8_t, 12>{F_val, A_val, C_val, B_val, E_val, D_val, L_val, H_val};
 		auto registers = Registers{array};

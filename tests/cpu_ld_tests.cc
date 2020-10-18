@@ -25,7 +25,7 @@ TEST_CASE("LD BC, d16 - 0x01", "[ld]") {
 	}
 
 	SECTION("Copy 0xABCD into BC") {
-		cpu.registers().write_PC(0x03);
+		cpu.registers().write("PC", 0x03);
 		const auto cycles = cpu.execute_next();
 		CHECK(cycles == 3);
 
@@ -34,7 +34,7 @@ TEST_CASE("LD BC, d16 - 0x01", "[ld]") {
 	}
 
 	SECTION("Copy 0x0100 into BC") {
-		cpu.registers().write_PC(0x06);
+		cpu.registers().write("PC", 0x06);
 		const auto cycles = cpu.execute_next();
 		CHECK(cycles == 3);
 
@@ -53,8 +53,8 @@ TEST_CASE("LD (BC), A - 0x02", "[ld]") {
 	auto cpu = Cpu{std::move(memory)};
 
 	SECTION("Copy A (0x12) from A into address held in BC (0x00)") {
-		cpu.registers().write_A(0x12);
-		cpu.registers().write_BC(0x00);
+		cpu.registers().write("A", 0x12);
+		cpu.registers().write("BC", 0x00);
 
 		const auto cycles = cpu.execute_next();
 		CHECK(cycles == 2);
@@ -67,8 +67,8 @@ TEST_CASE("LD (BC), A - 0x02", "[ld]") {
 	}
 
 	SECTION("Copy A (0xBC) into address held in BC (0x04)") {
-		cpu.registers().write_A(0xBC);
-		cpu.registers().write_BC(0x04);
+		cpu.registers().write("A", 0xBC);
+		cpu.registers().write("BC", 0x04);
 
 		const auto cycles = cpu.execute_next();
 		CHECK(cycles == 2);

@@ -29,7 +29,7 @@ public:
 	}
 
 	[[nodiscard]] auto execute_next() {
-		const auto instruction_start = regs_.read_PC();
+		const auto instruction_start = regs_.read("PC");
 		const auto opcode = memory_[instruction_start];
 
 		if (opcode == 0xBC) {
@@ -42,21 +42,21 @@ public:
 			case 0x00:
 				break;
 			case 0x01:
-				regs_.write_B(memory_[instruction_start + 1]);
-				regs_.write_C(memory_[instruction_start + 2]);
+				regs_.write("B", memory_[instruction_start + 1]);
+				regs_.write("C", memory_[instruction_start + 2]);
 				break;
 			case 0x02:
-				memory_[regs_.read_BC()] = regs_.read_A();
+				memory_[regs_.read("BC")] = regs_.read("A");
 				break;
 			case 0x03:
-				regs_.write_BC(regs_.read_BC() + 1);
+				regs_.write("BC", regs_.read("BC") + 1);
 				break;
 			default:
 				throw std::runtime_error("Opcode not implemented yet.");
 				break;
 		}
 
-		regs_.write_PC(regs_.read_PC() + instruction.size);
+		regs_.write("PC", regs_.read("PC") + instruction.size);
 		return instruction.cycles;
 	}
 

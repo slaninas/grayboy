@@ -18,48 +18,8 @@ public:
 		std::fill(begin(register_array_), end(register_array_), 0x0);
 	}
 
-	// TODO: Maybe use macro? Rather do it differently
-	[[nodiscard]] auto read_AF() const { return *reinterpret_cast<const uint16_t*>(register_array_.data() + 0);}
-	[[nodiscard]] auto read_F() const {	return register_array_[0]; }
-	[[nodiscard]] auto read_A() const {	return register_array_[1]; }
-
-	[[nodiscard]] auto read_BC() const { return *reinterpret_cast<const uint16_t*>(register_array_.data() + 2);}
-	[[nodiscard]] auto read_C() const {	return register_array_[2]; }
-	[[nodiscard]] auto read_B() const {	return register_array_[3]; }
-
-	[[nodiscard]] auto read_DE() const { return *reinterpret_cast<const uint16_t*>(register_array_.data() + 4);}
-	[[nodiscard]] auto read_E() const {	return register_array_[4]; }
-	[[nodiscard]] auto read_D() const {	return register_array_[5]; }
-
-	[[nodiscard]] auto read_HL() const { return *reinterpret_cast<const uint16_t*>(register_array_.data() + 6);}
-	[[nodiscard]] auto read_L() const {	return register_array_[6]; }
-	[[nodiscard]] auto read_H() const {	return register_array_[7]; }
-
-	[[nodiscard]] auto read_PC() const { return *reinterpret_cast<const uint16_t*>(register_array_.data() + 8);}
-	[[nodiscard]] auto read_SP() const { return *reinterpret_cast<const uint16_t*>(register_array_.data() + 10);}
-
-
-	void write_AF(uint16_t value) { *reinterpret_cast<uint16_t*>(register_array_.data() + 0) = value; }
-	void write_F(uint8_t value) {	register_array_[0] = value; }
-	void write_A(uint8_t value) {	register_array_[1] = value; }
-
-	void write_BC(uint16_t value) { *reinterpret_cast<uint16_t*>(register_array_.data() + 2) = value; }
-	void write_C(uint8_t value) {	register_array_[2] = value; }
-	void write_B(uint8_t value) {	register_array_[3] = value; }
-
-	void write_DE(uint16_t value) { *reinterpret_cast<uint16_t*>(register_array_.data() + 4) = value; }
-	void write_E(uint8_t value) {	register_array_[4] = value; }
-	void write_D(uint8_t value) {	register_array_[5] = value; }
-
-	void write_HL(uint16_t value) { *reinterpret_cast<uint16_t*>(register_array_.data() + 6) = value; }
-	void write_L(uint8_t value) {	register_array_[6] = value; }
-	void write_H(uint8_t value) {	register_array_[7] = value; }
-
-	void write_PC(uint16_t value) { *reinterpret_cast<uint16_t*>(register_array_.data() + 8) = value; }
-	void write_SP(uint16_t value) { *reinterpret_cast<uint16_t*>(register_array_.data() + 10) = value; }
-
 	template<size_t kSize>
-	[[nodiscard]] auto read(const char(&reg_name)[kSize]) {
+	[[nodiscard]] auto read(const char(&reg_name)[kSize]) const {
 		constexpr auto reg_name_size = kSize - 1; // Subtract \0 at the end
 		const auto reg_index = register_index(reg_name);
 
@@ -69,11 +29,10 @@ public:
 		}
 		// Combined 16bit registers
 		else {
-			return *reinterpret_cast<uint16_t*>(register_array_.data() + reg_index);
+			return *reinterpret_cast<const uint16_t*>(register_array_.data() + reg_index);
 		}
 	}
 
-	// TODO: check if I'm not trying to write 16bit value into 8bit
 	template<size_t kSize>
 	void write(const char(&reg_name)[kSize], uint16_t value) {
 		constexpr auto reg_name_size = kSize - 1; // Subtract \0 at the end
@@ -81,7 +40,7 @@ public:
 
 		// 8bit registers
 		if constexpr(reg_name_size == 1) {
-			assert(((value & static_cast<uint16_t>(0xff00)) == 0) && "Don't write 16bit value into 8bit register.");
+			assert(((value & static_cast<uint16_t>(0xff00)) == 0) && "Writing 16bit value into 8bit register is not allowed.");
 			register_array_[reg_index] = value;
 		}
 		// Combined 16bit registers
@@ -89,7 +48,6 @@ public:
 			*reinterpret_cast<uint16_t*>(register_array_.data() + reg_index) = value;
 		}
 	}
-
 
 	auto& print(std::ostream& os) const {
 		os << std::hex;
@@ -100,13 +58,13 @@ public:
 		};
 
 		os << "Registers: \n" << std::string(20, '-') << '\n';
-		print_pair("AF", read_AF(), read_A(), read_F());
-		print_pair("BC", read_BC(), read_B(), read_C());
-		print_pair("DE", read_DE(), read_D(), read_E());
-		print_pair("HL", read_HL(), read_H(), read_L());
+		print_pair("AF", read("AF"), read("A"), read("F"));
+		print_pair("BC", read("BC"), read("B"), read("C"));
+		print_pair("DE", read("DE"), read("D"), read("E"));
+		print_pair("HL", read("HL"), read("H"), read("L"));
 
-		os << "PC: " << static_cast<int>(read_PC()) << '\n';
-		os << "SP: " << static_cast<int>(read_SP()) << '\n';
+		os << "PC: " << static_cast<int>(read("PC")) << '\n';
+		os << "SP: " << static_cast<int>(read("SP")) << '\n';
 
 		os << std::dec;
 		return os;
@@ -195,8 +153,8 @@ struct MakeRegisters{
 
 		auto array = std::array<uint8_t, 12>{F_val, A_val, C_val, B_val, E_val, D_val, L_val, H_val};
 		auto registers = Registers{array};
-		registers.write_PC(PC_val);
-		registers.write_SP(SP_val);
+		registers.write("PC", PC_val);
+		registers.write("SP", SP_val);
 		return registers;
 	}
 

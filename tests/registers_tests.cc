@@ -177,13 +177,15 @@ TEST_CASE("MakeFlags", "[registers]") {
 }
 
 TEST_CASE("Registers' flags set/read", "[registers]") {
-	// TODO: Make .F=0x0X and check that X is never changed
-	auto regs = MakeRegisters{.F=0x00}.get();
+	const auto F_init = 0x0f;
+	const auto F_lower_nibbel = F_init & 0x0f;
+	auto regs = MakeRegisters{.F=F_init}.get();
 
 	CHECK(regs.read_flag("Z") == false);
 	CHECK(regs.read_flag("N") == false);
 	CHECK(regs.read_flag("H") == false);
 	CHECK(regs.read_flag("C") == false);
+	CHECK((regs.read("F") & 0x0f) == F_lower_nibbel);
 
 	SECTION("Z") {
 		regs.set_flag("Z", false);
@@ -191,6 +193,7 @@ TEST_CASE("Registers' flags set/read", "[registers]") {
 		CHECK(regs.read_flag("N") == false);
 		CHECK(regs.read_flag("H") == false);
 		CHECK(regs.read_flag("C") == false);
+		CHECK((regs.read("F") & 0x0f) == F_lower_nibbel);
 	}
 	SECTION("N") {
 		regs.set_flag("N", false);
@@ -198,6 +201,7 @@ TEST_CASE("Registers' flags set/read", "[registers]") {
 		CHECK(regs.read_flag("N") == true);
 		CHECK(regs.read_flag("H") == false);
 		CHECK(regs.read_flag("C") == false);
+		CHECK((regs.read("F") & 0x0f) == F_lower_nibbel);
 	}
 	SECTION("H") {
 		regs.set_flag("H", false);
@@ -205,6 +209,7 @@ TEST_CASE("Registers' flags set/read", "[registers]") {
 		CHECK(regs.read_flag("N") == false);
 		CHECK(regs.read_flag("H") == true);
 		CHECK(regs.read_flag("C") == false);
+		CHECK((regs.read("F") & 0x0f) == F_lower_nibbel);
 	}
 	SECTION("C") {
 		regs.set_flag("C", false);
@@ -212,17 +217,20 @@ TEST_CASE("Registers' flags set/read", "[registers]") {
 		CHECK(regs.read_flag("N") == false);
 		CHECK(regs.read_flag("H") == false);
 		CHECK(regs.read_flag("C") == true);
+		CHECK((regs.read("F") & 0x0f) == F_lower_nibbel);
 	}
 }
 
 TEST_CASE("Registers' flags unset/read", "[registers]") {
-	// TODO: Make .F=0x0X and check that X is never changed
-	auto regs = MakeRegisters{.F=0xff}.get();
+	const auto F_init = 0xf0;
+	const auto F_lower_nibbel = F_init & 0x0f;
+	auto regs = MakeRegisters{.F=F_init}.get();
 
 	CHECK(regs.read_flag("Z") == true);
 	CHECK(regs.read_flag("N") == true);
 	CHECK(regs.read_flag("H") == true);
 	CHECK(regs.read_flag("C") == true);
+	CHECK((regs.read("F") & 0x0f) == F_lower_nibbel);
 
 	SECTION("Z") {
 		regs.set_flag("Z", false);
@@ -230,6 +238,7 @@ TEST_CASE("Registers' flags unset/read", "[registers]") {
 		CHECK(regs.read_flag("N") == true);
 		CHECK(regs.read_flag("H") == true);
 		CHECK(regs.read_flag("C") == true);
+		CHECK((regs.read("F") & 0x0f) == F_lower_nibbel);
 	}
 	SECTION("N") {
 		regs.set_flag("N", false);
@@ -237,6 +246,7 @@ TEST_CASE("Registers' flags unset/read", "[registers]") {
 		CHECK(regs.read_flag("N") == false);
 		CHECK(regs.read_flag("H") == true);
 		CHECK(regs.read_flag("C") == true);
+		CHECK((regs.read("F") & 0x0f) == F_lower_nibbel);
 	}
 	SECTION("H") {
 		regs.set_flag("H", false);
@@ -244,6 +254,7 @@ TEST_CASE("Registers' flags unset/read", "[registers]") {
 		CHECK(regs.read_flag("N") == true);
 		CHECK(regs.read_flag("H") == false);
 		CHECK(regs.read_flag("C") == true);
+		CHECK((regs.read("F") & 0x0f) == F_lower_nibbel);
 	}
 	SECTION("C") {
 		regs.set_flag("C", false);
@@ -251,6 +262,7 @@ TEST_CASE("Registers' flags unset/read", "[registers]") {
 		CHECK(regs.read_flag("N") == true);
 		CHECK(regs.read_flag("H") == true);
 		CHECK(regs.read_flag("C") == false);
+		CHECK((regs.read("F") & 0x0f) == F_lower_nibbel);
 	}
 }
 

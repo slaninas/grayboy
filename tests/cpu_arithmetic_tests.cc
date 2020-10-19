@@ -4,6 +4,9 @@
 
 #include "cpu.h"
 
+// TODO: Fuzzy testing where it makes sense, even in other test files
+// TODO: sed 's/nibbel/nibble/g' ?
+
 TEST_CASE("INC BC - 0x03", "[arithmetic]") {
 	// TODO: Check flags - they should stay the same for INC BC
 	// Increment BC three times from zero

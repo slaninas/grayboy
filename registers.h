@@ -220,7 +220,6 @@ struct MakeFlags {
 	std::optional<uint8_t> unused;
 
 	[[nodiscard]] auto get() {
-		std::cout << "MakeFlags::get()\n";
 		auto value = static_cast<uint8_t>(0x00);
 		value += static_cast<uint8_t>(Z.value_or(0x00)) << 7;
 		value += static_cast<uint8_t>(N.value_or(0x00)) << 6;

@@ -4,6 +4,7 @@
 
 #include "cartridge.h"
 #include "cpu.h"
+#include "registers.h"
 
 template<typename T>
 void p(const T& vec, const size_t num_values) {
@@ -40,5 +41,13 @@ int main(int argc, const char** argv) {
 	// regs.set_flag("Z", 1);
 	regs.set_flag("Z", 0);
 	regs.print();
+
+	[[maybe_unused]] auto flags = MakeFlags{}.get();
+	[[maybe_unused]] auto changed_flags= FlagsChanger{.C=1}.get(flags);
+
+	regs.write("F", changed_flags);
+	std::cout << "----------------------------------------\n";
+	regs.print();
+
 
 }

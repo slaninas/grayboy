@@ -246,7 +246,6 @@ struct MakeRegisters{
 //        const auto changed_regs = ChangeRegisters{.A=0x00}.get(old_regs);
 //        Do the same for flags
 
-// TODO: Reuse for other?
 struct MakeFlags {
 	std::optional<bool> Z;
 	std::optional<bool> N;
@@ -263,5 +262,23 @@ struct MakeFlags {
 		value += static_cast<uint8_t>(C.value_or(0x00)) << 4;
 		value += static_cast<uint8_t>(unused.value_or(0x00)) << 0;
 		return value;
+	}
+};
+
+struct FlagsChanger {
+	std::optional<bool> Z;
+	std::optional<bool> N;
+	std::optional<bool> H;
+	std::optional<bool> C;
+	std::optional<uint8_t> unused;
+
+	[[nodiscard]] auto get(const uint8_t orig_flags) {
+		auto Z_val = Z.value_or(static_cast<bool>(orig_flags & (1 << 7)));
+		auto N_val = N.value_or(static_cast<bool>(orig_flags & (1 << 6)));
+		auto H_val = H.value_or(static_cast<bool>(orig_flags & (1 << 5)));
+		auto C_val = C.value_or(static_cast<bool>(orig_flags & (1 << 4)));
+		auto unused_val = unused.value_or(static_cast<uint8_t>(orig_flags & 0x0F));
+
+		return MakeFlags{.Z=Z_val, .N=N_val, .H=H_val, .C=C_val, .unused=unused_val}.get();
 	}
 };

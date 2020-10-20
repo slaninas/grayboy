@@ -173,7 +173,65 @@ TEST_CASE("MakeFlags", "[registers]") {
 
 		flags = MakeFlags{.Z=0, .N=1, .H=0, .C=1, .unused=0xd}.get();
 		CHECK(flags == 0x5d);
+
+		// Same but using default 0 for some flags
+		flags = MakeFlags{.N=1, .C=1, .unused=0xd}.get();
+		CHECK(flags == 0x5d);
 	}
+}
+
+TEST_CASE("FlagsChanger", "[registers]") {
+	SECTION("Change one flag at the time") {
+		const auto orig_flags = MakeFlags{}.get();
+
+		auto changed_flags = FlagsChanger{.Z=1}.get(orig_flags);
+		CHECK(changed_flags == 0x80);
+
+		changed_flags = FlagsChanger{.N=1}.get(orig_flags);
+		CHECK(changed_flags == 0x40);
+
+		changed_flags = FlagsChanger{.H=1}.get(orig_flags);
+		CHECK(changed_flags == 0x20);
+
+		changed_flags = FlagsChanger{.C=1}.get(orig_flags);
+		CHECK(changed_flags == 0x10);
+
+		changed_flags = FlagsChanger{.unused=0xf}.get(orig_flags);
+		CHECK(changed_flags == 0x0f);
+	}
+
+	SECTION("More flags changed at once") {
+		SECTION("From all unset flags") {
+			const auto orig_flags = MakeFlags{}.get();
+			auto changed_flags = FlagsChanger{.Z=1, .N=1, .H=1, .C=1, .unused=0xf}.get(orig_flags);
+			CHECK(changed_flags == 0xff);
+
+			changed_flags = FlagsChanger{.Z=1, .N=0, .H=0, .C=1, .unused=0xe}.get(orig_flags);
+			CHECK(changed_flags == 0x9e);
+
+			changed_flags = FlagsChanger{.Z=1}.get(orig_flags);
+			CHECK(changed_flags == 0x80);
+
+			changed_flags = FlagsChanger{.unused=0xf}.get(orig_flags);
+			CHECK(changed_flags == 0x0f);
+		}
+
+		SECTION("From all set flags") {
+			const auto orig_flags = static_cast<uint8_t>(0xff);
+			auto changed_flags = FlagsChanger{.Z=0, .N=0, .H=0, .C=0, .unused=0xf}.get(orig_flags);
+			CHECK(changed_flags == 0x0f);
+
+			changed_flags = FlagsChanger{.Z=1, .N=0, .H=0, .C=1, .unused=0xe}.get(orig_flags);
+			CHECK(changed_flags == 0x9e);
+
+			changed_flags = FlagsChanger{.Z=0}.get(orig_flags);
+			CHECK(changed_flags == 0x7f);
+
+			changed_flags = FlagsChanger{.unused=0xa}.get(orig_flags);
+			CHECK(changed_flags == 0xfa);
+		}
+	}
+
 }
 
 TEST_CASE("Registers' flags set/read", "[registers]") {

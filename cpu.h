@@ -68,6 +68,23 @@ public:
 					regs_.write("F", updated_flags+F_orig_lower_nibble);
 				}
 				break;
+			case 0x05:
+				{
+					const auto B_old = regs_.read("B");
+					const auto B_new = static_cast<uint8_t>(B_old - 1);
+					regs_.write("B", B_new);
+
+					const auto Z = B_new == 0x00;
+					const auto N = true;
+					// From https://stackoverflow.com/questions/57817729/half-carry-flag-emulating-the-gba
+					// TODO: How does it work? Is it correct?
+					const auto H = (B_old & 0x0F) - 1 < 0;;
+
+					const auto updated_flags = MakeFlags{.Z=Z, .N=N, .H=H, .C=regs_.read_flag("C")}.get();
+					const auto F_orig_lower_nibble = regs_.read("F") & 0x0f;
+					regs_.write("F", updated_flags+F_orig_lower_nibble);
+				}
+				break;
 			default:
 				throw std::runtime_error("Opcode not implemented yet.");
 				break;
@@ -102,6 +119,7 @@ private:
 		{"LD (BC), A", 0x02, 1, 2},
 		{"INC BC", 0x03, 1, 2},
 		{"INC B", 0x04, 1, 1},
+		{"DEC B", 0x05, 1, 1},
 	};
 
 	const Instruction& find_by_opcode(const uint16_t opcode) {

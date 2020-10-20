@@ -205,7 +205,7 @@ struct MakeRegisters{
 			if (A.has_value() && (AF.value() & 0xFF00) >> 8 != A.value()) {
 				throw std::logic_error("Value in AF register doesn't correspond to the value in A");
 			}
-			if (F.has_value() && (AF.value() & 0x00FF) != B.value()) {
+			if (F.has_value() && (AF.value() & 0x00FF) != F.value()) {
 				throw std::logic_error("Value in AF register doesn't correspond to the value in F");
 			}
 		}
@@ -223,7 +223,7 @@ struct MakeRegisters{
 			if (D.has_value() && (DE.value() & 0xFF00) >> 8 != D.value()) {
 				throw std::logic_error("Value in BC register doesn't correspond to the value in D");
 			}
-			if (D.has_value() && (DE.value() & 0x00FF) != E.value()) {
+			if (E.has_value() && (DE.value() & 0x00FF) != E.value()) {
 				throw std::logic_error("Value in BC register doesn't correspond to the value in E");
 			}
 		}

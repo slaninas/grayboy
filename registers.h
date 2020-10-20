@@ -252,13 +252,16 @@ struct MakeFlags {
 	std::optional<bool> N;
 	std::optional<bool> H;
 	std::optional<bool> C;
+	std::optional<uint8_t> unused;
 
-	auto get() {
+	[[nodiscard]] auto get() {
+		std::cout << "MakeFlags::get()\n";
 		auto value = static_cast<uint8_t>(0x00);
 		value += static_cast<uint8_t>(Z.value_or(0x00)) << 7;
 		value += static_cast<uint8_t>(N.value_or(0x00)) << 6;
 		value += static_cast<uint8_t>(H.value_or(0x00)) << 5;
 		value += static_cast<uint8_t>(C.value_or(0x00)) << 4;
+		value += static_cast<uint8_t>(unused.value_or(0x00)) << 0;
 		return value;
 	}
 };

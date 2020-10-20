@@ -165,14 +165,14 @@ TEST_CASE("MakeFlags", "[registers]") {
 	}
 
 	SECTION("More flags set at once") {
-		auto flags = MakeFlags{.Z=1, .N=1, .H=0, .C=0}.get();
-		CHECK(flags == 0xc0);
+		auto flags = MakeFlags{.Z=1, .N=1, .H=0, .C=0, .unused=0xf}.get();
+		CHECK(flags == 0xcf);
 
-		flags = MakeFlags{.Z=1, .N=1, .H=1, .C=1}.get();
-		CHECK(flags == 0xf0);
+		flags = MakeFlags{.Z=1, .N=1, .H=1, .C=1, .unused=0xe}.get();
+		CHECK(flags == 0xfe);
 
-		flags = MakeFlags{.Z=0, .N=1, .H=0, .C=1}.get();
-		CHECK(flags == 0x50);
+		flags = MakeFlags{.Z=0, .N=1, .H=0, .C=1, .unused=0xd}.get();
+		CHECK(flags == 0x5d);
 	}
 }
 

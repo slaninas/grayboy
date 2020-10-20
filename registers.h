@@ -198,45 +198,11 @@ struct MakeRegisters{
 		return registers;
 	}
 
-	// TODO: Do not allow settings 8bit register when assocciated 16bit register was set and vice versa, it will make the code easier
-	// TODO: Use asserts instead of exceptions
 	void check_consistency() {
-		if (AF.has_value()) {
-			if (A.has_value() && (AF.value() & 0xFF00) >> 8 != A.value()) {
-				throw std::logic_error("Value in AF register doesn't correspond to the value in A");
-			}
-			if (F.has_value() && (AF.value() & 0x00FF) != F.value()) {
-				throw std::logic_error("Value in AF register doesn't correspond to the value in F");
-			}
-		}
-
-		if (BC.has_value()) {
-			if (B.has_value() && (BC.value() & 0xFF00) >> 8 != B.value()) {
-				throw std::logic_error("Value in BC register doesn't correspond to the value in B");
-			}
-			if (C.has_value() && (BC.value() & 0x00FF) != C.value()) {
-				throw std::logic_error("Value in BC register doesn't correspond to the value in C");
-			}
-		}
-
-		if (DE.has_value()) {
-			if (D.has_value() && (DE.value() & 0xFF00) >> 8 != D.value()) {
-				throw std::logic_error("Value in BC register doesn't correspond to the value in D");
-			}
-			if (E.has_value() && (DE.value() & 0x00FF) != E.value()) {
-				throw std::logic_error("Value in BC register doesn't correspond to the value in E");
-			}
-		}
-
-		if (HL.has_value()) {
-			if (H.has_value() && (HL.value() & 0xFF00) >> 8 != H.value()) {
-				throw std::logic_error("Value in BC register doesn't correspond to the value in H");
-			}
-			if (L.has_value() && (HL.value() & 0x00FF) != L.value()) {
-				throw std::logic_error("Value in BC register doesn't correspond to the value in L");
-			}
-		}
-
+		assert(!(AF.has_value() && (A.has_value() || F.has_value())) && "You can't set AF and A (or F) at the same time");
+		assert(!(BC.has_value() && (B.has_value() || C.has_value())) && "You can't set BC and B (or C) at the same time");
+		assert(!(DE.has_value() && (D.has_value() || E.has_value())) && "You can't set AF and D (or E) at the same time");
+		assert(!(HL.has_value() && (H.has_value() || L.has_value())) && "You can't set HL and H (or L) at the same time");
 	}
 
 };

@@ -240,6 +240,7 @@ struct MakeRegisters{
 /// TODO: Add something like ChangeRegisters that will use existing registers + will change given registers,
 //        const auto old_regs = MakeRegisters{...}.get();
 //        const auto changed_regs = ChangeRegisters{.A=0x00}.get(old_regs);
+//        Do the same for flags
 
 // TODO: Reuse for other?
 struct MakeFlags {

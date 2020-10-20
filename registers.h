@@ -53,6 +53,7 @@ public:
 
 	template<size_t kSize>
 	[[nodiscard]] auto read_flag(const char(&flag_name)[kSize]) const {
+		// TODO: Use static_assert
 		assert((kSize == 2) && "Flags are only one letter (+ \n), you cannot address them by more letters.");
 		const auto flag = std::string_view{flag_name};
 		if (flag == "Z") return static_cast<bool>(read("F") & (1 << 7));
@@ -65,6 +66,7 @@ public:
 
 	template<size_t kSize>
 	void set_flag(const char(&flag_name)[kSize], const bool value) {
+		// TODO: Use static_assert
 		assert((kSize == 2) && "Flags are only one letter (+ \n), you cannot address them by more letters.");
 		const char flag = flag_name[0];
 		const auto F_value = read("F");
@@ -196,6 +198,8 @@ struct MakeRegisters{
 		return registers;
 	}
 
+	// TODO: Do not allow settings 8bit register when assocciated 16bit register was set and vice versa, it will make the code easier
+	// TODO: Use asserts instead of exceptions
 	void check_consistency() {
 		if (AF.has_value()) {
 			if (A.has_value() && (AF.value() & 0xFF00) >> 8 != A.value()) {
@@ -237,7 +241,7 @@ struct MakeRegisters{
 
 };
 
-/// TODO: Add something like ChangeRegisters that will use existing registers + will change given registers,
+/// TODO: Add something like RegistersChanger that will use existing registers + will change given registers,
 //        const auto old_regs = MakeRegisters{...}.get();
 //        const auto changed_regs = ChangeRegisters{.A=0x00}.get(old_regs);
 //        Do the same for flags

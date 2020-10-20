@@ -57,7 +57,7 @@ public:
 					const auto B_new = static_cast<uint8_t>(B_old + 1);
 					regs_.write("B", B_new);
 
-					// TODO: Put this flafs settings into method, add unit tests for it
+					// TODO: Put this flags settings into method, add unit tests for it
 					// Flags
 					const auto Z = B_new == 0x00;
 					const auto N = false;

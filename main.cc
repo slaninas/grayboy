@@ -35,18 +35,7 @@ int main(int argc, const char** argv) {
 	auto memory = std::array<uint8_t, 1 << 16>{0x01, 0xAB, 0xCB};
 	auto cpu = Cpu{std::move(memory)};
 
-	auto regs = MakeRegisters{.F=0xff}.get();
-	// auto regs = MakeRegisters{.F=0x00}.get();
-	regs.print();
-	// regs.set_flag("Z", 1);
-	regs.set_flag("Z", 0);
-	regs.print();
-
-	[[maybe_unused]] auto flags = MakeFlags{}.get();
-	[[maybe_unused]] auto changed_flags= FlagsChanger{.C=1}.get(flags);
-
-	regs.write("F", changed_flags);
-	std::cout << "----------------------------------------\n";
+	auto regs = MakeRegisters{.AF=0x11fe, .F=0xff}.get();
 	regs.print();
 
 

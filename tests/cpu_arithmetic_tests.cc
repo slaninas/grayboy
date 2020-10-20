@@ -123,3 +123,5 @@ TEST_CASE("DEC B - 0x05", "[arithmetic]") {
 	}
 
 }
+
+// TODO: Start using FlagsChanger

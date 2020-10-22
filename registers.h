@@ -208,10 +208,52 @@ struct MakeRegisters{
 
 };
 
-/// TODO: Add something like RegistersChanger that will use existing registers + will change given registers,
-//        const auto old_regs = MakeRegisters{...}.get();
-//        const auto changed_regs = ChangeRegisters{.A=0x00}.get(old_regs);
-//        Do the same for flags
+// TODO: Merge from MakeRegisters or inherit?
+struct RegistersChanger{
+	std::optional<uint16_t> AF;
+	std::optional<uint8_t> A;
+	std::optional<uint8_t> F;
+	std::optional<uint16_t> BC;
+	std::optional<uint8_t> B;
+	std::optional<uint8_t> C;
+	std::optional<uint16_t> DE;
+	std::optional<uint8_t> D;
+	std::optional<uint8_t> E;
+	std::optional<uint16_t> HL;
+	std::optional<uint8_t> H;
+	std::optional<uint8_t> L;
+	std::optional<uint16_t> PC;
+	std::optional<uint16_t> SP;
+
+
+	auto get(const Registers& registers) {
+		check_consistency();
+		auto changed_regs = registers;
+		if (AF.has_value()) changed_regs.write("AF", AF.value());
+		if (A.has_value()) changed_regs.write("A", A.value());
+		if (F.has_value()) changed_regs.write("F", F.value());
+		if (BC.has_value()) changed_regs.write("BC", BC.value());
+		if (B.has_value()) changed_regs.write("B", B.value());
+		if (C.has_value()) changed_regs.write("C", C.value());
+		if (DE.has_value()) changed_regs.write("DE", DE.value());
+		if (D.has_value()) changed_regs.write("D", D.value());
+		if (E.has_value()) changed_regs.write("E", E.value());
+		if (HL.has_value()) changed_regs.write("HL", HL.value());
+		if (H.has_value()) changed_regs.write("H", H.value());
+		if (L.has_value()) changed_regs.write("L", L.value());
+		if (PC.has_value()) changed_regs.write("PC", PC.value());
+		if (SP.has_value()) changed_regs.write("SP", SP.value());
+		return changed_regs;
+	}
+
+	void check_consistency() {
+		assert(!(AF.has_value() && (A.has_value() || F.has_value())) && "You can't change AF and A (or F) at the same time");
+		assert(!(BC.has_value() && (B.has_value() || C.has_value())) && "You can't change BC and B (or C) at the same time");
+		assert(!(DE.has_value() && (D.has_value() || E.has_value())) && "You can't change AF and D (or E) at the same time");
+		assert(!(HL.has_value() && (H.has_value() || L.has_value())) && "You can't change HL and H (or L) at the same time");
+	}
+
+};
 
 struct MakeFlags {
 	std::optional<bool> Z;

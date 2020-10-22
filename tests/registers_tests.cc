@@ -7,6 +7,145 @@
 // TODO: Add more (copy/move ctor/assignment) for Registers class
 // TODO: Add test for MakeRegisters, test even the incorrect use (e.g. MakeRegisters{.AF=0x0000, .A=0x11}
 
+TEST_CASE("MakeRegisters", "[registers]") {
+
+	SECTION("One register set only") {
+
+		const auto regs = MakeRegisters{.F=0xa}.get();
+
+		CHECK(regs.read("A") == 0x0);
+		CHECK(regs.read("F") == 0xa);
+		CHECK(regs.read("BC") == 0x00);
+		CHECK(regs.read("DE") == 0x00);
+		CHECK(regs.read("HL") == 0x00);
+		CHECK(regs.read("PC") == 0x00);
+		CHECK(regs.read("SP") == 0x00);
+
+	}
+
+	SECTION("More registers set at once") {
+		const auto regs = MakeRegisters{.AF=0xab, .BC=0xcd, .DE=0xef, .HL=0x12, .PC=0x34, .SP=0x56}.get();
+		CHECK(regs.read("AF") == 0xab);
+		CHECK(regs.read("BC") == 0xcd);
+		CHECK(regs.read("DE") == 0xef);
+		CHECK(regs.read("HL") == 0x12);
+		CHECK(regs.read("PC") == 0x34);
+		CHECK(regs.read("SP") == 0x56);
+	}
+}
+
+TEST_CASE("RegistersChanger", "[registers]") {
+	const auto orig_regs = getRandomRegisters();
+	auto changed_regs = RegistersChanger{}.get(orig_regs);
+	CHECK_THAT(changed_regs.dump(), RegistersCompare{orig_regs});
+
+	changed_regs = RegistersChanger{.D=0xd}.get(orig_regs);
+	CHECK(changed_regs.read("AF") == orig_regs.read("AF"));
+	CHECK(changed_regs.read("BC") == orig_regs.read("BC"));
+	CHECK(changed_regs.read("D") == 0xd);
+	CHECK(changed_regs.read("E") == orig_regs.read("E"));
+	CHECK(changed_regs.read("HL") == orig_regs.read("HL"));
+	CHECK(changed_regs.read("PC") == orig_regs.read("PC"));
+	CHECK(changed_regs.read("SP") == orig_regs.read("SP"));
+
+	changed_regs = RegistersChanger{.AF=0xcd, .BC=0xfe, .DE=0x12, .HL=0x56, .PC=0x87, .SP=0x43}.get(orig_regs);
+	CHECK(changed_regs.read("AF") == 0xcd);
+	CHECK(changed_regs.read("BC") == 0xfe);
+	CHECK(changed_regs.read("DE") == 0x12);
+	CHECK(changed_regs.read("HL") == 0x56);
+	CHECK(changed_regs.read("PC") == 0x87);
+	CHECK(changed_regs.read("SP") == 0x43);
+
+}
+
+TEST_CASE("MakeFlags", "[registers]") {
+	SECTION("One flag set only") {
+		auto flags = MakeFlags{}.get();
+		CHECK(flags == 0x00);
+
+		flags = MakeFlags{.Z=1}.get();
+		CHECK(flags == 0x80);
+
+		flags = MakeFlags{.N=1}.get();
+		CHECK(flags == 0x40);
+
+		flags = MakeFlags{.H=1}.get();
+		CHECK(flags == 0x20);
+
+		flags = MakeFlags{.C=1}.get();
+		CHECK(flags == 0x10);
+	}
+
+	SECTION("More flags set at once") {
+		auto flags = MakeFlags{.Z=1, .N=1, .H=0, .C=0, .unused=0xf}.get();
+		CHECK(flags == 0xcf);
+
+		flags = MakeFlags{.Z=1, .N=1, .H=1, .C=1, .unused=0xe}.get();
+		CHECK(flags == 0xfe);
+
+		flags = MakeFlags{.Z=0, .N=1, .H=0, .C=1, .unused=0xd}.get();
+		CHECK(flags == 0x5d);
+
+		// Same but using default 0 for some flags
+		flags = MakeFlags{.N=1, .C=1, .unused=0xd}.get();
+		CHECK(flags == 0x5d);
+	}
+}
+
+TEST_CASE("FlagsChanger", "[registers]") {
+	SECTION("Change one flag at the time") {
+		const auto orig_flags = MakeFlags{}.get();
+
+		auto changed_flags = FlagsChanger{.Z=1}.get(orig_flags);
+		CHECK(changed_flags == 0x80);
+
+		changed_flags = FlagsChanger{.N=1}.get(orig_flags);
+		CHECK(changed_flags == 0x40);
+
+		changed_flags = FlagsChanger{.H=1}.get(orig_flags);
+		CHECK(changed_flags == 0x20);
+
+		changed_flags = FlagsChanger{.C=1}.get(orig_flags);
+		CHECK(changed_flags == 0x10);
+
+		changed_flags = FlagsChanger{.unused=0xf}.get(orig_flags);
+		CHECK(changed_flags == 0x0f);
+	}
+
+	SECTION("More flags changed at once") {
+		SECTION("From all unset flags") {
+			const auto orig_flags = MakeFlags{}.get();
+			auto changed_flags = FlagsChanger{.Z=1, .N=1, .H=1, .C=1, .unused=0xf}.get(orig_flags);
+			CHECK(changed_flags == 0xff);
+
+			changed_flags = FlagsChanger{.Z=1, .N=0, .H=0, .C=1, .unused=0xe}.get(orig_flags);
+			CHECK(changed_flags == 0x9e);
+
+			changed_flags = FlagsChanger{.Z=1}.get(orig_flags);
+			CHECK(changed_flags == 0x80);
+
+			changed_flags = FlagsChanger{.unused=0xf}.get(orig_flags);
+			CHECK(changed_flags == 0x0f);
+		}
+
+		SECTION("From all set flags") {
+			const auto orig_flags = static_cast<uint8_t>(0xff);
+			auto changed_flags = FlagsChanger{.Z=0, .N=0, .H=0, .C=0, .unused=0xf}.get(orig_flags);
+			CHECK(changed_flags == 0x0f);
+
+			changed_flags = FlagsChanger{.Z=1, .N=0, .H=0, .C=1, .unused=0xe}.get(orig_flags);
+			CHECK(changed_flags == 0x9e);
+
+			changed_flags = FlagsChanger{.Z=0}.get(orig_flags);
+			CHECK(changed_flags == 0x7f);
+
+			changed_flags = FlagsChanger{.unused=0xa}.get(orig_flags);
+			CHECK(changed_flags == 0xfa);
+		}
+	}
+
+}
+
 TEST_CASE("Registers initialization", "[registers]") {
 	SECTION("Default initialization") {
 		auto regs = Registers{};
@@ -146,93 +285,6 @@ TEST_CASE("Registers write", "[registers]") {
 	}
 }
 
-TEST_CASE("MakeFlags", "[registers]") {
-	SECTION("One flag set only") {
-		auto flags = MakeFlags{}.get();
-		CHECK(flags == 0x00);
-
-		flags = MakeFlags{.Z=1}.get();
-		CHECK(flags == 0x80);
-
-		flags = MakeFlags{.N=1}.get();
-		CHECK(flags == 0x40);
-
-		flags = MakeFlags{.H=1}.get();
-		CHECK(flags == 0x20);
-
-		flags = MakeFlags{.C=1}.get();
-		CHECK(flags == 0x10);
-	}
-
-	SECTION("More flags set at once") {
-		auto flags = MakeFlags{.Z=1, .N=1, .H=0, .C=0, .unused=0xf}.get();
-		CHECK(flags == 0xcf);
-
-		flags = MakeFlags{.Z=1, .N=1, .H=1, .C=1, .unused=0xe}.get();
-		CHECK(flags == 0xfe);
-
-		flags = MakeFlags{.Z=0, .N=1, .H=0, .C=1, .unused=0xd}.get();
-		CHECK(flags == 0x5d);
-
-		// Same but using default 0 for some flags
-		flags = MakeFlags{.N=1, .C=1, .unused=0xd}.get();
-		CHECK(flags == 0x5d);
-	}
-}
-
-TEST_CASE("FlagsChanger", "[registers]") {
-	SECTION("Change one flag at the time") {
-		const auto orig_flags = MakeFlags{}.get();
-
-		auto changed_flags = FlagsChanger{.Z=1}.get(orig_flags);
-		CHECK(changed_flags == 0x80);
-
-		changed_flags = FlagsChanger{.N=1}.get(orig_flags);
-		CHECK(changed_flags == 0x40);
-
-		changed_flags = FlagsChanger{.H=1}.get(orig_flags);
-		CHECK(changed_flags == 0x20);
-
-		changed_flags = FlagsChanger{.C=1}.get(orig_flags);
-		CHECK(changed_flags == 0x10);
-
-		changed_flags = FlagsChanger{.unused=0xf}.get(orig_flags);
-		CHECK(changed_flags == 0x0f);
-	}
-
-	SECTION("More flags changed at once") {
-		SECTION("From all unset flags") {
-			const auto orig_flags = MakeFlags{}.get();
-			auto changed_flags = FlagsChanger{.Z=1, .N=1, .H=1, .C=1, .unused=0xf}.get(orig_flags);
-			CHECK(changed_flags == 0xff);
-
-			changed_flags = FlagsChanger{.Z=1, .N=0, .H=0, .C=1, .unused=0xe}.get(orig_flags);
-			CHECK(changed_flags == 0x9e);
-
-			changed_flags = FlagsChanger{.Z=1}.get(orig_flags);
-			CHECK(changed_flags == 0x80);
-
-			changed_flags = FlagsChanger{.unused=0xf}.get(orig_flags);
-			CHECK(changed_flags == 0x0f);
-		}
-
-		SECTION("From all set flags") {
-			const auto orig_flags = static_cast<uint8_t>(0xff);
-			auto changed_flags = FlagsChanger{.Z=0, .N=0, .H=0, .C=0, .unused=0xf}.get(orig_flags);
-			CHECK(changed_flags == 0x0f);
-
-			changed_flags = FlagsChanger{.Z=1, .N=0, .H=0, .C=1, .unused=0xe}.get(orig_flags);
-			CHECK(changed_flags == 0x9e);
-
-			changed_flags = FlagsChanger{.Z=0}.get(orig_flags);
-			CHECK(changed_flags == 0x7f);
-
-			changed_flags = FlagsChanger{.unused=0xa}.get(orig_flags);
-			CHECK(changed_flags == 0xfa);
-		}
-	}
-
-}
 
 TEST_CASE("Registers' flags set/read", "[registers]") {
 	const auto F_init = 0x0f;

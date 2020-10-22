@@ -188,9 +188,8 @@ TEST_CASE("Registers read", "[registers]") {
 }
 
 TEST_CASE("Registers write", "[registers]") {
-		// Fill array with something
-	auto regs = MakeRegisters{.AF=0x2301, .BC=0x6745, .DE=0xab89, .HL=0xdecd, .PC=0xaaf0, .SP=0xccbb}.get();
-
+	const auto orig_regs = getRandomRegisters();
+	auto regs = orig_regs;
 
 	// NOTE: Do not test it this way, how it's internally isn't important but it's important what read should produce same value as write wrote
 	// SECTION("Write AF") {
@@ -203,17 +202,17 @@ TEST_CASE("Registers write", "[registers]") {
 	SECTION("AF") {
 		SECTION("AF") {
 			regs.write("AF", 0xabcd);
-			const auto correct_regs = MakeRegisters{.AF=0xabcd, .BC=0x6745, .DE=0xab89, .HL=0xdecd, .PC=0xaaf0, .SP=0xccbb}.get();
+			const auto correct_regs = RegistersChanger{.AF=0xabcd}.get(orig_regs);
 			CHECK_THAT(regs, RegistersCompare{correct_regs});
 		}
 		SECTION("A") {
-			regs.write("A", 0xab);
-			const auto correct_regs = MakeRegisters{.AF=0xab01, .BC=0x6745, .DE=0xab89, .HL=0xdecd, .PC=0xaaf0, .SP=0xccbb}.get();
+			regs.write("A", 0x12);
+			const auto correct_regs = RegistersChanger{.A=0x12}.get(orig_regs);
 			CHECK_THAT(regs, RegistersCompare{correct_regs});
 		}
 		SECTION("F") {
-			regs.write("F", 0xab);
-			const auto correct_regs = MakeRegisters{.AF=0x23ab, .BC=0x6745, .DE=0xab89, .HL=0xdecd, .PC=0xaaf0, .SP=0xccbb}.get();
+			regs.write("F", 0x56);
+			const auto correct_regs = RegistersChanger{.F=0x56}.get(orig_regs);
 			CHECK_THAT(regs, RegistersCompare{correct_regs});
 		}
 	}
@@ -221,17 +220,17 @@ TEST_CASE("Registers write", "[registers]") {
 	SECTION("BC") {
 		SECTION("BC") {
 			regs.write("BC", 0xbcde);
-			const auto correct_regs = MakeRegisters{.AF=0x2301, .BC=0xbcde, .DE=0xab89, .HL=0xdecd, .PC=0xaaf0, .SP=0xccbb}.get();
+			const auto correct_regs = RegistersChanger{.BC=0xbcde}.get(orig_regs);
 			CHECK_THAT(regs, RegistersCompare{correct_regs});
 		}
 		SECTION("B") {
 			regs.write("B", 0xbe);
-			const auto correct_regs = MakeRegisters{.AF=0x2301, .BC=0xbe45, .DE=0xab89, .HL=0xdecd, .PC=0xaaf0, .SP=0xccbb}.get();
+			const auto correct_regs = RegistersChanger{.B=0xbe}.get(orig_regs);
 			CHECK_THAT(regs, RegistersCompare{correct_regs});
 		}
 		SECTION("C") {
 			regs.write("C", 0xce);
-			const auto correct_regs = MakeRegisters{.AF=0x2301, .BC=0x67ce, .DE=0xab89, .HL=0xdecd, .PC=0xaaf0, .SP=0xccbb}.get();
+			const auto correct_regs = RegistersChanger{.C=0xce}.get(orig_regs);
 			CHECK_THAT(regs, RegistersCompare{correct_regs});
 		}
 	}
@@ -239,17 +238,17 @@ TEST_CASE("Registers write", "[registers]") {
 	SECTION("DE") {
 		SECTION("DE") {
 			regs.write("DE", 0xdefa);
-			const auto correct_regs = MakeRegisters{.AF=0x2301, .BC=0x6745, .DE=0xdefa, .HL=0xdecd, .PC=0xaaf0, .SP=0xccbb}.get();
+			const auto correct_regs = RegistersChanger{.DE=0xdefa}.get(orig_regs);
 			CHECK_THAT(regs, RegistersCompare{correct_regs});
 		}
 		SECTION("D") {
 			regs.write("D", 0xde);
-			const auto correct_regs = MakeRegisters{.AF=0x2301, .BC=0x6745, .DE=0xde89, .HL=0xdecd, .PC=0xaaf0, .SP=0xccbb}.get();
+			const auto correct_regs = RegistersChanger{.D=0xde}.get(orig_regs);
 			CHECK_THAT(regs, RegistersCompare{correct_regs});
 		}
 		SECTION("E") {
 			regs.write("E", 0xef);
-			const auto correct_regs = MakeRegisters{.AF=0x2301, .BC=0x6745, .DE=0xabef, .HL=0xdecd, .PC=0xaaf0, .SP=0xccbb}.get();
+			const auto correct_regs = RegistersChanger{.E=0xef}.get(orig_regs);
 			CHECK_THAT(regs, RegistersCompare{correct_regs});
 		}
 	}
@@ -257,34 +256,151 @@ TEST_CASE("Registers write", "[registers]") {
 	SECTION("HL") {
 		SECTION("HL") {
 			regs.write("HL", 0xfedc);
-			const auto correct_regs = MakeRegisters{.AF=0x2301, .BC=0x6745, .DE=0xab89, .HL=0xfedc, .PC=0xaaf0, .SP=0xccbb}.get();
+			const auto correct_regs = RegistersChanger{.HL=0xfedc}.get(orig_regs);
 			CHECK_THAT(regs, RegistersCompare{correct_regs});
 		}
 		SECTION("H") {
 			regs.write("H", 0xfd);
-			const auto correct_regs = MakeRegisters{.AF=0x2301, .BC=0x6745, .DE=0xab89, .HL=0xfdcd, .PC=0xaaf0, .SP=0xccbb}.get();
+			const auto correct_regs = RegistersChanger{.H=0xfd}.get(orig_regs);
 			CHECK_THAT(regs, RegistersCompare{correct_regs});
 		}
 		SECTION("L") {
 			regs.write("L", 0xab);
-			const auto correct_regs = MakeRegisters{.AF=0x2301, .BC=0x6745, .DE=0xab89, .HL=0xdeab, .PC=0xaaf0, .SP=0xccbb}.get();
+			const auto correct_regs = RegistersChanger{.L=0xab}.get(orig_regs);
 			CHECK_THAT(regs, RegistersCompare{correct_regs});
 		}
 	}
 
 	SECTION("PC") {
 		regs.write("PC", 0xfbcd);
-		const auto correct_regs = MakeRegisters{.AF=0x2301, .BC=0x6745, .DE=0xab89, .HL=0xdecd, .PC=0xfbcd, .SP=0xccbb}.get();
+		const auto correct_regs = RegistersChanger{.PC=0xfbcd}.get(orig_regs);
 		CHECK_THAT(regs, RegistersCompare{correct_regs});
 	}
 
 	SECTION("SP") {
 		regs.write("SP", 0xbfde);
-		const auto correct_regs = MakeRegisters{.AF=0x2301, .BC=0x6745, .DE=0xab89, .HL=0xdecd, .PC=0xaaf0, .SP=0xbfde}.get();
+		const auto correct_regs = RegistersChanger{.SP=0xbfde}.get(orig_regs);
 		CHECK_THAT(regs, RegistersCompare{correct_regs});
 	}
 }
 
+TEST_CASE("Registers' flags set/unset", "[registers]") {
+	const auto orig_regs = getRandomRegisters();
+	const auto orig_flags = orig_regs.read("F");
+	auto regs = orig_regs;
+
+	SECTION("Z") {
+		SECTION ("Set to true") {
+			regs.set_flag("Z", true);
+			const auto correct_flags = FlagsChanger{.Z=1}.get(orig_flags);
+			const auto correct_regs = RegistersChanger{.F=correct_flags}.get(orig_regs);
+
+			CHECK(regs.read_flag("Z") == true);
+			CHECK_THAT(regs, RegistersCompare{correct_regs});
+
+			regs.set_flag("Z", true);
+			CHECK(regs.read_flag("Z") == true);
+			CHECK_THAT(regs, RegistersCompare{correct_regs});
+		}
+
+		SECTION("Set false") {
+			regs.set_flag("Z", false);
+			const auto correct_flags = FlagsChanger{.Z=0}.get(orig_flags);
+			const auto correct_regs = RegistersChanger{.F=correct_flags}.get(orig_regs);
+
+			CHECK(regs.read_flag("Z") == false);
+			CHECK_THAT(regs, RegistersCompare{correct_regs});
+
+			regs.set_flag("Z", false);
+			CHECK(regs.read_flag("Z") == false);
+			CHECK_THAT(regs, RegistersCompare{correct_regs});
+		}
+	}
+
+	SECTION("N") {
+		SECTION ("Set to true") {
+			regs.set_flag("N", true);
+			const auto correct_flags = FlagsChanger{.N=1}.get(orig_flags);
+			const auto correct_regs = RegistersChanger{.F=correct_flags}.get(orig_regs);
+
+			CHECK(regs.read_flag("N") == true);
+			CHECK_THAT(regs, RegistersCompare{correct_regs});
+
+			regs.set_flag("N", true);
+			CHECK(regs.read_flag("N") == true);
+			CHECK_THAT(regs, RegistersCompare{correct_regs});
+		}
+
+		SECTION("Set false") {
+			regs.set_flag("N", false);
+			const auto correct_flags = FlagsChanger{.N=0}.get(orig_flags);
+			const auto correct_regs = RegistersChanger{.F=correct_flags}.get(orig_regs);
+
+			CHECK(regs.read_flag("N") == false);
+			CHECK_THAT(regs, RegistersCompare{correct_regs});
+
+			regs.set_flag("N", false);
+			CHECK(regs.read_flag("N") == false);
+			CHECK_THAT(regs, RegistersCompare{correct_regs});
+		}
+	}
+
+	SECTION("H") {
+		SECTION ("Set to true") {
+			regs.set_flag("H", true);
+			const auto correct_flags = FlagsChanger{.H=1}.get(orig_flags);
+			const auto correct_regs = RegistersChanger{.F=correct_flags}.get(orig_regs);
+
+			CHECK(regs.read_flag("H") == true);
+			CHECK_THAT(regs, RegistersCompare{correct_regs});
+
+			regs.set_flag("H", true);
+			CHECK(regs.read_flag("H") == true);
+			CHECK_THAT(regs, RegistersCompare{correct_regs});
+		}
+
+		SECTION("Set false") {
+			regs.set_flag("H", false);
+			const auto correct_flags = FlagsChanger{.H=0}.get(orig_flags);
+			const auto correct_regs = RegistersChanger{.F=correct_flags}.get(orig_regs);
+
+			CHECK(regs.read_flag("H") == false);
+			CHECK_THAT(regs, RegistersCompare{correct_regs});
+
+			regs.set_flag("H", false);
+			CHECK(regs.read_flag("H") == false);
+			CHECK_THAT(regs, RegistersCompare{correct_regs});
+		}
+	}
+
+	SECTION("C") {
+		SECTION ("Set to true") {
+			regs.set_flag("C", true);
+			const auto correct_flags = FlagsChanger{.C=1}.get(orig_flags);
+			const auto correct_regs = RegistersChanger{.F=correct_flags}.get(orig_regs);
+
+			CHECK(regs.read_flag("C") == true);
+			CHECK_THAT(regs, RegistersCompare{correct_regs});
+
+			regs.set_flag("C", true);
+			CHECK(regs.read_flag("C") == true);
+			CHECK_THAT(regs, RegistersCompare{correct_regs});
+		}
+
+		SECTION("Set false") {
+			regs.set_flag("C", false);
+			const auto correct_flags = FlagsChanger{.C=0}.get(orig_flags);
+			const auto correct_regs = RegistersChanger{.F=correct_flags}.get(orig_regs);
+
+			CHECK(regs.read_flag("C") == false);
+			CHECK_THAT(regs, RegistersCompare{correct_regs});
+
+			regs.set_flag("C", false);
+			CHECK(regs.read_flag("C") == false);
+			CHECK_THAT(regs, RegistersCompare{correct_regs});
+		}
+	}
+}
 
 TEST_CASE("Registers' flags set/read", "[registers]") {
 	const auto F_init = 0x0f;
@@ -298,7 +414,7 @@ TEST_CASE("Registers' flags set/read", "[registers]") {
 	CHECK((regs.read("F") & 0x0f) == F_lower_nibble);
 
 	SECTION("Z") {
-		regs.set_flag("Z", false);
+		regs.set_flag("Z", true);
 		CHECK(regs.read_flag("Z") == true);
 		CHECK(regs.read_flag("N") == false);
 		CHECK(regs.read_flag("H") == false);
@@ -306,7 +422,7 @@ TEST_CASE("Registers' flags set/read", "[registers]") {
 		CHECK((regs.read("F") & 0x0f) == F_lower_nibble);
 	}
 	SECTION("N") {
-		regs.set_flag("N", false);
+		regs.set_flag("N", true);
 		CHECK(regs.read_flag("Z") == false);
 		CHECK(regs.read_flag("N") == true);
 		CHECK(regs.read_flag("H") == false);
@@ -314,7 +430,7 @@ TEST_CASE("Registers' flags set/read", "[registers]") {
 		CHECK((regs.read("F") & 0x0f) == F_lower_nibble);
 	}
 	SECTION("H") {
-		regs.set_flag("H", false);
+		regs.set_flag("H", true);
 		CHECK(regs.read_flag("Z") == false);
 		CHECK(regs.read_flag("N") == false);
 		CHECK(regs.read_flag("H") == true);
@@ -322,7 +438,7 @@ TEST_CASE("Registers' flags set/read", "[registers]") {
 		CHECK((regs.read("F") & 0x0f) == F_lower_nibble);
 	}
 	SECTION("C") {
-		regs.set_flag("C", false);
+		regs.set_flag("C", true);
 		CHECK(regs.read_flag("Z") == false);
 		CHECK(regs.read_flag("N") == false);
 		CHECK(regs.read_flag("H") == false);

@@ -74,16 +74,20 @@ public:
 
 		switch (flag) {
 			case 'Z':
-				write("F", value ? F_value | (1 << 7) : F_value ^ (1 << 7));
+				if (value) write("F", F_value | 1 << 7);
+				else if(F_value & (1 << 7)) write("F", F_value ^ (1 << 7));
 				break;
 			case 'N':
-				write("F", value ? F_value | (1 << 6) : F_value ^ (1 << 6));
+				if (value) write("F", F_value | 1 << 6);
+				else if(F_value & (1 << 6)) write("F", F_value ^ (1 << 6));
 				break;
 			case 'H':
-				write("F", value ? F_value | (1 << 5) : F_value ^ (1 << 5));
+				if (value) write("F", F_value | 1 << 5);
+				else if(F_value & (1 << 5)) write("F", F_value ^ (1 << 5));
 				break;
 			case 'C':
-				write("F", value ? F_value | (1 << 4) : F_value ^ (1 << 4));
+				if (value) write("F", F_value | 1 << 4);
+				else if(F_value & (1 << 4)) write("F", F_value ^ (1 << 4));
 				break;
 
 			default:

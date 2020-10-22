@@ -11,7 +11,6 @@
 #include "cpu.h"
 #include "memory.h"
 
-// TODO: Add random content generation for memory and registers
 template<typename T>
 void p(const T& cont, const size_t num_elements) {
 	std::cout << std::hex;
@@ -51,7 +50,6 @@ private:
 
 
 // TODO: Use random memory/registers in following tests:
-// cpu_arithmetic_tests.cc
 // cpu_ld_tests.cc
 // cpu_misc_tests.cc
 // registers_tests.cc

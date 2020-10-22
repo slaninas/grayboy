@@ -288,14 +288,14 @@ TEST_CASE("Registers write", "[registers]") {
 
 TEST_CASE("Registers' flags set/read", "[registers]") {
 	const auto F_init = 0x0f;
-	const auto F_lower_nibbel = F_init & 0x0f;
+	const auto F_lower_nibble = F_init & 0x0f;
 	auto regs = MakeRegisters{.F=F_init}.get();
 
 	CHECK(regs.read_flag("Z") == false);
 	CHECK(regs.read_flag("N") == false);
 	CHECK(regs.read_flag("H") == false);
 	CHECK(regs.read_flag("C") == false);
-	CHECK((regs.read("F") & 0x0f) == F_lower_nibbel);
+	CHECK((regs.read("F") & 0x0f) == F_lower_nibble);
 
 	SECTION("Z") {
 		regs.set_flag("Z", false);
@@ -303,7 +303,7 @@ TEST_CASE("Registers' flags set/read", "[registers]") {
 		CHECK(regs.read_flag("N") == false);
 		CHECK(regs.read_flag("H") == false);
 		CHECK(regs.read_flag("C") == false);
-		CHECK((regs.read("F") & 0x0f) == F_lower_nibbel);
+		CHECK((regs.read("F") & 0x0f) == F_lower_nibble);
 	}
 	SECTION("N") {
 		regs.set_flag("N", false);
@@ -311,7 +311,7 @@ TEST_CASE("Registers' flags set/read", "[registers]") {
 		CHECK(regs.read_flag("N") == true);
 		CHECK(regs.read_flag("H") == false);
 		CHECK(regs.read_flag("C") == false);
-		CHECK((regs.read("F") & 0x0f) == F_lower_nibbel);
+		CHECK((regs.read("F") & 0x0f) == F_lower_nibble);
 	}
 	SECTION("H") {
 		regs.set_flag("H", false);
@@ -319,7 +319,7 @@ TEST_CASE("Registers' flags set/read", "[registers]") {
 		CHECK(regs.read_flag("N") == false);
 		CHECK(regs.read_flag("H") == true);
 		CHECK(regs.read_flag("C") == false);
-		CHECK((regs.read("F") & 0x0f) == F_lower_nibbel);
+		CHECK((regs.read("F") & 0x0f) == F_lower_nibble);
 	}
 	SECTION("C") {
 		regs.set_flag("C", false);
@@ -327,20 +327,20 @@ TEST_CASE("Registers' flags set/read", "[registers]") {
 		CHECK(regs.read_flag("N") == false);
 		CHECK(regs.read_flag("H") == false);
 		CHECK(regs.read_flag("C") == true);
-		CHECK((regs.read("F") & 0x0f) == F_lower_nibbel);
+		CHECK((regs.read("F") & 0x0f) == F_lower_nibble);
 	}
 }
 
 TEST_CASE("Registers' flags unset/read", "[registers]") {
 	const auto F_init = 0xf0;
-	const auto F_lower_nibbel = F_init & 0x0f;
+	const auto F_lower_nibble = F_init & 0x0f;
 	auto regs = MakeRegisters{.F=F_init}.get();
 
 	CHECK(regs.read_flag("Z") == true);
 	CHECK(regs.read_flag("N") == true);
 	CHECK(regs.read_flag("H") == true);
 	CHECK(regs.read_flag("C") == true);
-	CHECK((regs.read("F") & 0x0f) == F_lower_nibbel);
+	CHECK((regs.read("F") & 0x0f) == F_lower_nibble);
 
 	SECTION("Z") {
 		regs.set_flag("Z", false);
@@ -348,7 +348,7 @@ TEST_CASE("Registers' flags unset/read", "[registers]") {
 		CHECK(regs.read_flag("N") == true);
 		CHECK(regs.read_flag("H") == true);
 		CHECK(regs.read_flag("C") == true);
-		CHECK((regs.read("F") & 0x0f) == F_lower_nibbel);
+		CHECK((regs.read("F") & 0x0f) == F_lower_nibble);
 	}
 	SECTION("N") {
 		regs.set_flag("N", false);
@@ -356,7 +356,7 @@ TEST_CASE("Registers' flags unset/read", "[registers]") {
 		CHECK(regs.read_flag("N") == false);
 		CHECK(regs.read_flag("H") == true);
 		CHECK(regs.read_flag("C") == true);
-		CHECK((regs.read("F") & 0x0f) == F_lower_nibbel);
+		CHECK((regs.read("F") & 0x0f) == F_lower_nibble);
 	}
 	SECTION("H") {
 		regs.set_flag("H", false);
@@ -364,7 +364,7 @@ TEST_CASE("Registers' flags unset/read", "[registers]") {
 		CHECK(regs.read_flag("N") == true);
 		CHECK(regs.read_flag("H") == false);
 		CHECK(regs.read_flag("C") == true);
-		CHECK((regs.read("F") & 0x0f) == F_lower_nibbel);
+		CHECK((regs.read("F") & 0x0f) == F_lower_nibble);
 	}
 	SECTION("C") {
 		regs.set_flag("C", false);
@@ -372,7 +372,7 @@ TEST_CASE("Registers' flags unset/read", "[registers]") {
 		CHECK(regs.read_flag("N") == true);
 		CHECK(regs.read_flag("H") == true);
 		CHECK(regs.read_flag("C") == false);
-		CHECK((regs.read("F") & 0x0f) == F_lower_nibbel);
+		CHECK((regs.read("F") & 0x0f) == F_lower_nibble);
 	}
 }
 

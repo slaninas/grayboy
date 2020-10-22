@@ -4,7 +4,8 @@
 
 class Memory {
 public:
-	using ArrayType = std::array<uint8_t, 1 << 16>;
+	static const size_t Elements = 1 << 16;
+	using ArrayType = std::array<uint8_t, Elements>;
 
 	Memory() = default;
 	Memory(const ArrayType& array) : array_{array} {}

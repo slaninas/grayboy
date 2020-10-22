@@ -2,8 +2,7 @@
 
 #include "memory.h"
 
-// #include "test_utils.h"
-//
+#include "test_utils.h"
 
 TEST_CASE("Initialization", "[memory]") {
 	auto mem = Memory{};
@@ -40,9 +39,8 @@ TEST_CASE("MemoryChanger", "[memory]") {
 	}
 }
 
-// TODO: Randomly create memory values, compary only changed
 TEST_CASE("Read/Write", "[memory]") {
-	const auto orig_mem = Memory{};
+	const auto orig_mem = Memory{getRandomMemoryArray()};
 	auto mem = orig_mem;
 
 	mem.write(0x00, 0xea);
@@ -59,5 +57,4 @@ TEST_CASE("Read/Write", "[memory]") {
 
 	const auto correct_mem = MemoryChanger{{{0x00, 0xea}, {0x01, 0xbc}, {0x02, 0x43}, {0x03, 0xfe}}}.get(orig_mem);
 	CHECK(mem.dump() == correct_mem.dump());
-
 }

@@ -2,18 +2,28 @@
 
 #include "catch2/catch.hpp"
 
-#include<sstream>
+#include <sstream>
+#include <iostream>
 
-#include "cpu.h"
+// TODO: Add script that runs all tests given number of times with different --rng-seed
+
+// TODO: Fix - don't use .../
+#include "../cpu.h"
+#include "memory.h"
+
+template<typename T>
+void p(const T& cont, const size_t num_elements) {
+	std::cout << std::hex;
+	for (size_t i = 0; i < std::min(cont.size(), num_elements); ++i) {
+		std::cout << (int)cont[i] << '\n';
+	}
+	std::cout << std::dec;
+}
+
 
 template<typename T>
 void p(const T& cont) {
-	std::cout << std::hex;
-	for (const auto& el : cont) {
-		std::cout << (int)el << ' ';
-	}
-	std::cout << '\n';
-	std::cout << std::dec;
+	p(cont, cont.size());
 }
 
 class RegistersCompare : public Catch::MatcherBase<Registers> {
@@ -38,3 +48,17 @@ private:
 	const Registers registers_;
 };
 
+template<size_t kSize>
+auto getRandomArray() {
+	auto array = std::array<uint8_t, kSize>{};
+	for (size_t i = 0; i < kSize; ++i) {
+		array[i] = std::rand();
+	};
+	return array;
+}
+
+auto getRandomMemoryArray() {
+	// TODO: Why this doesn't work? It can't find Memory but it's included
+	// return getRandomArray<Memory::Elements>();
+	return getRandomArray<1<<16>();
+}

@@ -23,6 +23,10 @@ public:
 	Cpu(const MemoryType& memory) :
 		memory_{memory}
 	{}
+	Cpu(const MemoryType& memory, const Registers& regs) :
+		memory_{memory},
+		regs_{regs}
+	{}
 
 
 	void clear_registers() {
@@ -109,10 +113,8 @@ public:
 
 
 private:
-	Registers regs_ = {};
-	// uint8_t flags_;
-
 	MemoryType memory_ = {};
+	Registers regs_ = {};
 
 	std::vector<Instruction> instructions_ = {
 		{"NOP", 0x00, 1, 1},

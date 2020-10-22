@@ -70,5 +70,8 @@ auto getRandomMemory() {
 
 auto getRandomRegisters() {
 	return Registers{getRandomArray<Registers::ArrayElements>()};
+}
 
+auto getRandomFlags() {
+	return static_cast<uint8_t>(std::rand());
 }

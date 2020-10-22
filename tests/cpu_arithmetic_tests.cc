@@ -10,22 +10,23 @@
 TEST_CASE("INC BC - 0x03", "[arithmetic]") {
 	// TODO: Check flags - they should stay the same for INC BC
 	// Increment BC three times from zero
-	const auto memory = Memory{{0x03, 0x03, 0x03}};
-	auto cpu = Cpu{memory};
+	const auto memory = MemoryChanger{{{0x00, 0x03}, {0x01, 0x03}, {0x02, 0x03}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.BC=0x00, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{memory, orig_regs};
 
 	auto cycles = cpu.execute_next();
 	CHECK(cycles == 2);
-	auto correct_registers = MakeRegisters{.BC=0x01, .PC=0x01}.get();
+	auto correct_registers = RegistersChanger{.BC=0x01, .PC=0x01}.get(orig_regs);
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
 
 	cycles = cpu.execute_next();
 	CHECK(cycles == 2);
-	correct_registers = MakeRegisters{.BC=0x02, .PC=0x02}.get();
+	correct_registers = RegistersChanger{.BC=0x02, .PC=0x02}.get(orig_regs);
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
 
 	cycles = cpu.execute_next();
 	CHECK(cycles == 2);
-	correct_registers = MakeRegisters{.BC=0x03, .PC=0x03}.get();
+	correct_registers = RegistersChanger{.BC=0x03, .PC=0x03}.get(orig_regs);
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
 }
 

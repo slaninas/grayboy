@@ -48,6 +48,13 @@ private:
 	const Registers registers_;
 };
 
+
+// TODO: Use random memory/registers in following tests:
+// cpu_arithmetic_tests.cc
+// cpu_ld_tests.cc
+// cpu_misc_tests.cc
+// registers_tests.cc
+
 template<size_t kSize>
 auto getRandomArray() {
 	auto array = std::array<uint8_t, kSize>{};

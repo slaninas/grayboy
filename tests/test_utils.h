@@ -50,7 +50,6 @@ private:
 
 
 // TODO: Use random memory/registers in following tests:
-// cpu_ld_tests.cc
 // cpu_misc_tests.cc
 // registers_tests.cc
 

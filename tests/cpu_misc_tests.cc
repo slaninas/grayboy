@@ -5,30 +5,33 @@
 #include "cpu.h"
 
 TEST_CASE("NOP - 0x00", "[misc]") {
-	auto cpu = Cpu{{}};
 
-	// Fill registers with some values, we care about PC here
-	const auto regs = MakeRegisters{.AF=0xAF, .BC=0xCB, .DE=0xDE, .HL=0x12, .PC=0x00, .SP=0x43}.get();
-	cpu.registers() = regs;
 
 	SECTION("Running with PC=0x00, NOP should just increase PC by one") {
-		auto cycles = cpu.execute_next();
-		CHECK(cycles ==  1);
-		auto correct_registers = regs;
-		correct_registers.write("PC", 0x01);
+		const auto orig_memory = MemoryChanger{{{0x00, 0x00}}}.get(getRandomMemory());
+		const auto orig_regs = RegistersChanger{.PC=0x00}.get(getRandomRegisters());
+		auto cpu = Cpu{orig_memory, orig_regs};
+
+		const auto cycles = cpu.execute_next();
+		CHECK(cycles == 1);
+
+		const auto correct_registers = RegistersChanger{.PC=0x01}.get(orig_regs);;
 
 		CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
-		CHECK(cpu.memory_dump() == Cpu::MemoryType{}.dump());
+		CHECK(cpu.memory_dump() == orig_memory.dump());
 	}
 
 	SECTION("Running with PC=0xBE, NOP should just increase PC by one") {
-		cpu.registers().write("PC", 0xBE);
-		auto cycles = cpu.execute_next();
-		CHECK(cycles ==  1);
-		auto correct_registers = regs;
-		correct_registers.write("PC", 0xBF);
+		const auto orig_memory = MemoryChanger{{{0xBE, 0x00}}}.get(getRandomMemory());
+		const auto orig_regs = RegistersChanger{.PC=0xBE}.get(getRandomRegisters());
+		auto cpu = Cpu{orig_memory, orig_regs};
+
+		const auto cycles = cpu.execute_next();
+		CHECK(cycles == 1);
+
+		const auto correct_registers = RegistersChanger{.PC=0xBF}.get(orig_regs);;
 
 		CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
-		CHECK(cpu.memory_dump() == Cpu::MemoryType{}.dump());
+		CHECK(cpu.memory_dump() == orig_memory.dump());
 	}
 }

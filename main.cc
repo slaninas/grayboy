@@ -6,7 +6,6 @@
 #include "cartridge.h"
 #include "cpu.h"
 #include "registers.h"
-#include "tests/test_utils.h"
 
 
 int main(int argc, const char** argv) {
@@ -19,11 +18,4 @@ int main(int argc, const char** argv) {
 
 	auto cart = Cartridge{filename};
 	// cart.print_info();
-
-	auto a = getRandomArray<20>();
-
-	p(a);
-
-
-
 }

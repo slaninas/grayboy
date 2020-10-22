@@ -8,7 +8,7 @@
 // TODO: Add script that runs all tests given number of times with different --rng-seed
 
 // TODO: Fix - don't use .../
-#include "../cpu.h"
+#include "cpu.h"
 #include "memory.h"
 
 template<typename T>
@@ -58,7 +58,5 @@ auto getRandomArray() {
 }
 
 auto getRandomMemoryArray() {
-	// TODO: Why this doesn't work? It can't find Memory but it's included
-	// return getRandomArray<Memory::Elements>();
-	return getRandomArray<1<<16>();
+	return Memory{getRandomArray<Memory::Elements>()};
 }

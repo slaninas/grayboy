@@ -1,3 +1,4 @@
+// For debug
 #include <iostream>
 #include <vector>
 #include <array>
@@ -5,21 +6,8 @@
 #include "cartridge.h"
 #include "cpu.h"
 #include "registers.h"
+#include "tests/test_utils.h"
 
-template<typename T>
-void p(const T& vec, const size_t num_values) {
-	std::cout << std::hex;
-	for (size_t i = 0; i < num_values; ++i) {
-		std::cout << (int)vec[i] << ' ';
-	}
-	std::cout << '\n';
-	std::cout << std::dec;
-}
-
-template<typename T>
-void p(const T& vec) {
-	p(vec, vec.size());
-}
 
 int main(int argc, const char** argv) {
 	if (argc != 2) {
@@ -32,11 +20,10 @@ int main(int argc, const char** argv) {
 	auto cart = Cartridge{filename};
 	// cart.print_info();
 
-	auto memory = std::array<uint8_t, 1 << 16>{0x01, 0xAB, 0xCB};
-	auto cpu = Cpu{std::move(memory)};
+	auto a = getRandomArray<20>();
 
-	auto regs = MakeRegisters{.BC=0x11ff}.get();
-	regs.print();
+	p(a);
+
 
 
 }

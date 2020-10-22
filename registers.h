@@ -9,7 +9,8 @@
 // TODO: Use assert and run in debug instead of throwing when it makes sense
 class Registers{
 public:
-	using ArrayType = std::array<uint8_t, 12>;
+	static const size_t ArrayElements = 12;
+	using ArrayType = std::array<uint8_t, ArrayElements>;
 
 	Registers() = default;
 	// TODO: Remove this constructor, use MakeRegisters only

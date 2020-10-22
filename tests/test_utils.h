@@ -58,5 +58,5 @@ auto getRandomArray() {
 }
 
 auto getRandomMemory() {
-	return Memory{getRandomArray<Memory::Elements>()};
+	return Memory{getRandomArray<Memory::ArrayElements>()};
 }

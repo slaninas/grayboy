@@ -11,6 +11,7 @@
 #include "cpu.h"
 #include "memory.h"
 
+// TODO: Add random content generation for memory and registers
 template<typename T>
 void p(const T& cont, const size_t num_elements) {
 	std::cout << std::hex;

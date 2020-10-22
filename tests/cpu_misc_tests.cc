@@ -18,7 +18,7 @@ TEST_CASE("NOP - 0x00", "[misc]") {
 		correct_registers.write("PC", 0x01);
 
 		CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
-		CHECK(cpu.memory_dump() == Cpu::MemoryType{});
+		CHECK(cpu.memory_dump() == Cpu::MemoryType{}.dump());
 	}
 
 	SECTION("Running with PC=0xBE, NOP should just increase PC by one") {
@@ -29,6 +29,6 @@ TEST_CASE("NOP - 0x00", "[misc]") {
 		correct_registers.write("PC", 0xBF);
 
 		CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
-		CHECK(cpu.memory_dump() == Cpu::MemoryType{});
+		CHECK(cpu.memory_dump() == Cpu::MemoryType{}.dump());
 	}
 }

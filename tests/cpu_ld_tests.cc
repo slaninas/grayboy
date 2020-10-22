@@ -5,13 +5,16 @@
 
 TEST_CASE("LD BC, d16 - 0x01", "[ld]") {
 	// TODO: Check flags - they should stay the same for LD BC, d16
+
 	auto memory = Cpu::MemoryType{
-		0x01, 0xEE, 0xFF,
-		0x01, 0xAB, 0xCD,
-		0x01, 0x01, 0x00
+		{
+			0x01, 0xEE, 0xFF,
+			0x01, 0xAB, 0xCD,
+			0x01, 0x01, 0x00
+		}
 	};
 
-	auto cpu = Cpu{std::move(memory)};
+	auto cpu = Cpu{memory};
 
 	const auto empty_regs = Registers{};
 	// TODO: Check this in tests for registers
@@ -48,8 +51,8 @@ TEST_CASE("LD BC, d16 - 0x01", "[ld]") {
 TEST_CASE("LD (BC), A - 0x02", "[ld]") {
 	// TODO: Check flags - they should stay the same for LD (BC), A
 	// TODO: Add comparator for memory, use it
-	auto memory = Cpu::MemoryType{0x02};
-	auto cpu = Cpu{std::move(memory)};
+	auto memory = Cpu::MemoryType{{0x02}};
+	auto cpu = Cpu{memory};
 
 	SECTION("Copy A (0x12) from A into address held in BC (0x00)") {
 		cpu.registers().write("A", 0x12);
@@ -58,8 +61,8 @@ TEST_CASE("LD (BC), A - 0x02", "[ld]") {
 		const auto cycles = cpu.execute_next();
 		CHECK(cycles == 2);
 
-		const auto correct_memory = Cpu::MemoryType{0x12};
-		CHECK(cpu.memory_dump() == correct_memory);
+		const auto correct_memory = Cpu::MemoryType{{0x12}};
+		CHECK(cpu.memory_dump() == correct_memory.dump());
 
 		const auto correct_registers = MakeRegisters{.A=0x12, .BC=0x00, .PC=0x01}.get();
 		CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
@@ -72,8 +75,8 @@ TEST_CASE("LD (BC), A - 0x02", "[ld]") {
 		const auto cycles = cpu.execute_next();
 		CHECK(cycles == 2);
 
-		const auto correct_memory = Cpu::MemoryType{0x02, 0x00, 0x00, 0x00, 0xBC};
-		CHECK(cpu.memory_dump() == correct_memory);
+		const auto correct_memory = Cpu::MemoryType{{0x02, 0x00, 0x00, 0x00, 0xBC}};
+		CHECK(cpu.memory_dump() == correct_memory.dump());
 
 		const auto correct_registers = MakeRegisters{.A=0xBC, .BC=0x04, .PC=0x01}.get();
 		CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});

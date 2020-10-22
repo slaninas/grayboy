@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "registers.h"
+#include "memory.h"
 
 struct Instruction {
 	std::string mnemonic;
@@ -16,7 +17,7 @@ struct Instruction {
 // TODO: Add unit tests
 class Cpu {
 public:
-	using MemoryType = std::array<uint8_t, 1 << 16>;
+	using MemoryType = Memory;
 
 	// TODO: Make move possible?
 	Cpu(const MemoryType& memory) :
@@ -30,7 +31,7 @@ public:
 
 	[[nodiscard]] auto execute_next() {
 		const auto instruction_start = regs_.read("PC");
-		const auto opcode = memory_[instruction_start];
+		const auto opcode = memory_.read(instruction_start);
 
 		if (opcode == 0xBC) {
 			throw std::runtime_error("16-bit opcodes not implemented yet.");
@@ -42,11 +43,11 @@ public:
 			case 0x00:
 				break;
 			case 0x01:
-				regs_.write("B", memory_[instruction_start + 1]);
-				regs_.write("C", memory_[instruction_start + 2]);
+				regs_.write("B", memory_.read(instruction_start + 1));
+				regs_.write("C", memory_.read(instruction_start + 2));
 				break;
 			case 0x02:
-				memory_[regs_.read("BC")] = regs_.read("A");
+				memory_.write(regs_.read("BC"), regs_.read("A"));
 				break;
 			case 0x03:
 				regs_.write("BC", regs_.read("BC") + 1);
@@ -99,7 +100,7 @@ public:
 	}
 
 	[[nodiscard]] auto memory_dump() const {
-		return memory_;
+		return memory_.dump();
 	}
 
 	[[nodiscard]] auto& registers() {

@@ -10,7 +10,8 @@
 TEST_CASE("INC BC - 0x03", "[arithmetic]") {
 	// TODO: Check flags - they should stay the same for INC BC
 	// Increment BC three times from zero
-	auto cpu = Cpu{{0x03, 0x03, 0x03}};
+	const auto memory = Memory{{0x03, 0x03, 0x03}};
+	auto cpu = Cpu{memory};
 
 	auto cycles = cpu.execute_next();
 	CHECK(cycles == 2);
@@ -29,7 +30,7 @@ TEST_CASE("INC BC - 0x03", "[arithmetic]") {
 }
 
 TEST_CASE("INC B - 0x04", "[arithmetic]") {
-	auto cpu = Cpu{{0x04, 0x04, 0x04}};
+	auto cpu = Cpu{Memory{{0x04, 0x04, 0x04}}};
 	const auto F_init = 0xff;
 	const auto F_low_nibbel = F_init & 0x0f;
 	cpu.registers().write("F", F_init);
@@ -83,7 +84,7 @@ TEST_CASE("INC B - 0x04", "[arithmetic]") {
 }
 
 TEST_CASE("DEC B - 0x05", "[arithmetic]") {
-	auto cpu = Cpu{{0x05, 0x05, 0x05}};
+	auto cpu = Cpu{Memory{{0x05, 0x05, 0x05}}};
 	const auto F_init = 0xff;
 	const auto F_low_nibbel = F_init & 0x0f;
 	cpu.registers().write("F", F_init);

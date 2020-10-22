@@ -57,6 +57,6 @@ auto getRandomArray() {
 	return array;
 }
 
-auto getRandomMemoryArray() {
+auto getRandomMemory() {
 	return Memory{getRandomArray<Memory::Elements>()};
 }

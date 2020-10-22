@@ -40,7 +40,7 @@ TEST_CASE("MemoryChanger", "[memory]") {
 }
 
 TEST_CASE("Read/Write", "[memory]") {
-	const auto orig_mem = getRandomMemoryArray();
+	const auto orig_mem = getRandomMemory();
 	auto mem = orig_mem;
 
 	mem.write(0x00, 0xea);

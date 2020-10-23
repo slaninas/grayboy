@@ -103,6 +103,14 @@ public:
 					regs_.set_flag("C", static_cast<bool>(msb));
 				}
 				break;
+			case 0x08:
+				{
+					const auto address = static_cast<uint16_t>((memory_.read(instruction_start + 1) << 8) + memory_.read(instruction_start + 2));
+					const auto SP = regs_.read("SP");
+					memory_.write(address, static_cast<uint8_t>(SP & 0x00ff));
+					memory_.write(address + 1, static_cast<uint8_t>((SP & 0xff00) >> 8));
+				}
+				break;
 			default:
 				// TODO: Use hex instead of dec
 				throw std::runtime_error("Opcode " + std::to_string(opcode) + "(dec) not implemented yet.");
@@ -139,6 +147,7 @@ private:
 		{"DEC B", 0x05, 1, 1},
 		{"LD B, d8", 0x06, 2, 2},
 		{"RLCA", 0x07, 1, 1},
+		{"LD (a16), SP", 0x08, 3, 5},
 	};
 
 	const Instruction& find_by_opcode(const uint16_t opcode) {

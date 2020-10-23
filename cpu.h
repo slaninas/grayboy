@@ -89,6 +89,20 @@ public:
 			case 0x06:
 				regs_.write("B", memory_.read(instruction_start + 1));
 				break;
+
+			case 0x07:
+				{
+					const auto A = regs_.read("A");
+					const auto msb = (A & (1 << 7)) >> 7;
+					const auto A_new = static_cast<uint8_t>((A << 1) + msb);
+					regs_.write("A", A_new);
+
+					regs_.set_flag("Z", false);
+					regs_.set_flag("N", false);
+					regs_.set_flag("H", false);
+					regs_.set_flag("C", static_cast<bool>(msb));
+				}
+				break;
 			default:
 				// TODO: Use hex instead of dec
 				throw std::runtime_error("Opcode " + std::to_string(opcode) + "(dec) not implemented yet.");
@@ -124,6 +138,7 @@ private:
 		{"INC B", 0x04, 1, 1},
 		{"DEC B", 0x05, 1, 1},
 		{"LD B, d8", 0x06, 2, 2},
+		{"RLCA", 0x07, 1, 1},
 	};
 
 	const Instruction& find_by_opcode(const uint16_t opcode) {

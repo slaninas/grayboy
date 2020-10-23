@@ -86,6 +86,9 @@ public:
 					regs_.set_flag("H", H);
 				}
 				break;
+			case 0x06:
+				regs_.write("B", memory_.read(instruction_start + 1));
+				break;
 			default:
 				// TODO: Use hex instead of dec
 				throw std::runtime_error("Opcode " + std::to_string(opcode) + "(dec) not implemented yet.");
@@ -120,6 +123,7 @@ private:
 		{"INC BC", 0x03, 1, 2},
 		{"INC B", 0x04, 1, 1},
 		{"DEC B", 0x05, 1, 1},
+		{"LD B, d8", 0x06, 2, 2},
 	};
 
 	const Instruction& find_by_opcode(const uint16_t opcode) {

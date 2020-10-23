@@ -87,7 +87,8 @@ public:
 				}
 				break;
 			default:
-				throw std::runtime_error("Opcode not implemented yet.");
+				// TODO: Use hex instead of dec
+				throw std::runtime_error("Opcode " + std::to_string(opcode) + "(dec) not implemented yet.");
 				break;
 		}
 

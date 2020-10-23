@@ -7,7 +7,6 @@
 // TODO: Fuzzy testing where it makes sense, even in other test files
 
 TEST_CASE("INC BC - 0x03", "[arithmetic]") {
-	// TODO: Check flags - they should stay the same for INC BC
 	// Increment BC three times from zero
 	const auto memory = MemoryChanger{{{0x00, 0x03}, {0x01, 0x03}, {0x02, 0x03}}}.get(getRandomMemory());
 	const auto orig_regs = RegistersChanger{.BC=0x00, .PC=0x00}.get(getRandomRegisters());

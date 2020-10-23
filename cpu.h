@@ -62,15 +62,12 @@ public:
 					const auto B_new = static_cast<uint8_t>(B_old + 1);
 					regs_.write("B", B_new);
 
-					// TODO: Put this flags settings into method, add unit tests for it
-					// Flags
-					const auto Z = B_new == 0x00;
-					const auto N = false;
+					// TODO: Move into a function
 					const auto H = (B_old & 0x08) != 0 && (B_new & 0x08) == 0;
 
-					const auto updated_flags = MakeFlags{.Z=Z, .N=N, .H=H, .C=regs_.read_flag("C")}.get();
-					const auto F_orig_lower_nibble = regs_.read("F") & 0x0f;
-					regs_.write("F", updated_flags+F_orig_lower_nibble);
+					regs_.set_flag("Z", B_new == 0x00);
+					regs_.set_flag("N", false);
+					regs_.set_flag("H", H);
 				}
 				break;
 			case 0x05:
@@ -79,15 +76,14 @@ public:
 					const auto B_new = static_cast<uint8_t>(B_old - 1);
 					regs_.write("B", B_new);
 
-					const auto Z = B_new == 0x00;
-					const auto N = true;
+					// TODO: Move into a function
 					// From https://stackoverflow.com/questions/57817729/half-carry-flag-emulating-the-gba
 					// TODO: How does it work? Is it correct?
 					const auto H = (B_old & 0x0F) - 1 < 0;;
 
-					const auto updated_flags = MakeFlags{.Z=Z, .N=N, .H=H, .C=regs_.read_flag("C")}.get();
-					const auto F_orig_lower_nibble = regs_.read("F") & 0x0f;
-					regs_.write("F", updated_flags+F_orig_lower_nibble);
+					regs_.set_flag("Z", B_new == 0x00);
+					regs_.set_flag("N", true);
+					regs_.set_flag("H", H);
 				}
 				break;
 			default:

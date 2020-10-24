@@ -137,3 +137,17 @@ TEST_CASE("ADD HL, BC - 0x09", "[arithmetic]") {
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
+
+TEST_CASE("DEC BC - 0x0b", "[arithmetic]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x0b}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.BC=0xffee, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+	cpu.registers().print();
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 2);
+
+	const auto correct_regs = RegistersChanger{.BC=0xffed, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}

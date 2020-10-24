@@ -148,6 +148,9 @@ public:
 					regs_.write("A", memory_.read(address));
 				}
 				break;
+			case 0x0b:
+				regs_.write("BC", regs_.read("BC") - 1);
+				break;
 			default:
 				// TODO: Use hex instead of dec
 				throw std::runtime_error("Opcode " + std::to_string(opcode) + "(dec) not implemented yet.");
@@ -187,6 +190,7 @@ private:
 		{"LD (a16), SP", 0x08, 3, 5},
 		{"ADD HL, BC", 0x09, 1, 2},
 		{"LD A, (BC)", 0x0a, 1, 2},
+		{"DEC BC", 0x0b, 1, 2},
 	};
 
 	const Instruction& find_by_opcode(const uint16_t opcode) {

@@ -36,19 +36,36 @@ public:
 	}
 
 
+	// TODO: Are (half) carries correct?
 	// Detect half-carry for addition, see https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/
 	[[nodiscard]] auto half_carry_add_8bit(const uint16_t a, const uint16_t b) const {
-		return (((a & 0xf) + (b & 0xf)) & 0x10) == 0x10;
+		return (((a & 0xf) + (b & 0xf)) & 0x10) > 0;
 	}
 	[[nodiscard]] auto half_carry_add_16bit(const uint16_t a, const uint16_t b) const {
-		return (((a & 0x0f00) + (b & 0x0f00)) & 0x1000) == 0x1000;
+		return (((a & 0x0fff) + (b & 0x0fff)) & 0x1000) > 0;
 	}
 
 	[[nodiscard]] auto carry_add_8bit(const uint16_t a, const uint16_t b) const {
-		return (((a & 0xff) + (b & 0xff)) & 0x100) == 0x100;
+		return (((a & 0xff) + (b & 0xff)) & 0x100) > 0;
 	}
 	[[nodiscard]] auto carry_add_16bit(const uint16_t a, const uint16_t b) const {
-		return (((a & 0xffff) + (b & 0xffff)) & 0x10000) == 0x10000;
+		return (((a & 0xffff) + (b & 0xffff)) & 0x10000) > 0;
+	}
+
+	// https://www.reddit.com/r/EmuDev/comments/4clh23/trouble_with_halfcarrycarry_flag/
+	[[nodiscard]] auto half_carry_sub_8bit(const uint16_t a, const uint16_t b) const {
+		return ((a & 0x0f) - (b & 0x0f)) < 0;
+	}
+
+	[[nodiscard]] auto half_carry_sub_16bit(const uint16_t a, const uint16_t b) const {
+		return ((a & 0x0fff) - (b & 0xfff)) < 0;
+	}
+
+	[[nodiscard]] auto carry_sub_8bit(const uint16_t a, const uint16_t b) const {
+		return ((a & 0xff) - (b & 0xff)) < 0;
+	}
+	[[nodiscard]] auto carry_sub_16bit(const uint16_t a, const uint16_t b) const {
+		return ((a & 0xffff) - (b & 0xffff)) < 0;
 	}
 
 	[[nodiscard]] auto execute_next() {

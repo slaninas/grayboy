@@ -38,10 +38,10 @@ public:
 
 	// Detect half-carry for addition, see https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/
 	auto half_carry_add_8bit(const uint16_t a, const uint16_t b) const {
-		return (((a & 0xff) + (b & 0xff)) & 0x10) == 0x10;
+		return (((a & 0xf) + (b & 0xf)) & 0x10) == 0x10;
 	}
 	auto half_carry_add_16bit(const uint16_t a, const uint16_t b) const {
-		return (((a & 0xff00) + (b & 0xff00)) & 0x1000) == 0x1000;
+		return (((a & 0x0f00) + (b & 0x0f00)) & 0x1000) == 0x1000;
 	}
 
 	[[nodiscard]] auto execute_next() {

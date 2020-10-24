@@ -11,6 +11,9 @@ TEST_CASE("Half-carry 8bit", "[cpu_utils]") {
 	result = cpu.half_carry_add_8bit(0x0f, 0x01);
 	CHECK(result == true);
 
+	result = cpu.half_carry_add_8bit(0xff, 0x01);
+	CHECK(result == true);
+
 	result = cpu.half_carry_add_8bit(0x07, 0x08);
 	CHECK(result == false);
 
@@ -28,6 +31,9 @@ TEST_CASE("Half-carry 16bit", "[cpu_utils]") {
 	CHECK(result == false);
 
 	result = cpu.half_carry_add_16bit(0x0f00, 0x0100);
+	CHECK(result == true);
+
+	result = cpu.half_carry_add_16bit(0xff00, 0x0100);
 	CHECK(result == true);
 
 	result = cpu.half_carry_add_16bit(0x0700, 0x0800);

@@ -127,7 +127,6 @@ TEST_CASE("ADD HL, BC - 0x09", "[arithmetic]") {
 	const auto orig_memory = MemoryChanger{{{0x00, 0x09}}}.get(getRandomMemory());
 	const auto orig_regs = RegistersChanger{.BC=0xffee, .HL=0xabcd,.PC=0x00}.get(getRandomRegisters());
 	auto cpu = Cpu{orig_memory, orig_regs};
-	cpu.registers().print();
 
 	const auto cycles = cpu.execute_next();
 	CHECK(cycles == 2);
@@ -142,12 +141,25 @@ TEST_CASE("DEC BC - 0x0b", "[arithmetic]") {
 	const auto orig_memory = MemoryChanger{{{0x00, 0x0b}}}.get(getRandomMemory());
 	const auto orig_regs = RegistersChanger{.BC=0xffee, .PC=0x00}.get(getRandomRegisters());
 	auto cpu = Cpu{orig_memory, orig_regs};
-	cpu.registers().print();
 
 	const auto cycles = cpu.execute_next();
 	CHECK(cycles == 2);
 
 	const auto correct_regs = RegistersChanger{.BC=0xffed, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("INC C - 0x0c", "[arithmetic]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x0c}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.C=0xffee, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+
+	const auto correct_flags = FlagsChanger{.Z=0, .N=0, .H=0}.get(orig_regs.read("F"));
+	const auto correct_regs = RegistersChanger{.F=correct_flags, .C=0xffef, .PC=0x01}.get(orig_regs);
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }

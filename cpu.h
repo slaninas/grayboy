@@ -73,11 +73,11 @@ public:
 					const auto B_new = static_cast<uint8_t>(B_old + 1);
 					regs_.write("B", B_new);
 
-					// TODO: Move into a function
-					const auto H = (B_old & 0x08) != 0 && (B_new & 0x08) == 0;
 
 					regs_.set_flag("Z", B_new == 0x00);
 					regs_.set_flag("N", false);
+
+					const auto H = half_carry_add_8bit(B_old, 1);
 					regs_.set_flag("H", H);
 				}
 				break;

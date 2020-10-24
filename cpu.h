@@ -129,6 +129,19 @@ public:
 					memory_.write(address + 1, static_cast<uint8_t>((SP & 0xff00) >> 8));
 				}
 				break;
+			case 0x09:
+				{
+					const auto BC = regs_.read("BC");
+					const auto HL_old = regs_.read("HL");
+					const auto HL_new = static_cast<uint16_t>(HL_old + BC);
+
+					regs_.write("HL", HL_new);
+
+					regs_.set_flag("N", 0);
+					regs_.set_flag("H", half_carry_add_16bit(HL_old, BC));
+					regs_.set_flag("C", carry_add_16bit(HL_old, BC));
+				}
+				break;
 			default:
 				// TODO: Use hex instead of dec
 				throw std::runtime_error("Opcode " + std::to_string(opcode) + "(dec) not implemented yet.");
@@ -166,6 +179,7 @@ private:
 		{"LD B, d8", 0x06, 2, 2},
 		{"RLCA", 0x07, 1, 1},
 		{"LD (a16), SP", 0x08, 3, 5},
+		{"ADD HL, BC", 0x09, 1, 2},
 	};
 
 	const Instruction& find_by_opcode(const uint16_t opcode) {

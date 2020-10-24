@@ -19,6 +19,8 @@ class Cpu {
 public:
 	using MemoryType = Memory;
 
+	Cpu() = default;
+
 	// TODO: Make move possible?
 	Cpu(const MemoryType& memory) :
 		memory_{memory}

@@ -35,6 +35,15 @@ public:
 		regs_.clear();
 	}
 
+
+	// Detect half-carry for addition, see https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/
+	auto half_carry_add_8bit(const uint16_t a, const uint16_t b) const {
+		return (((a & 0xff) + (b & 0xff)) & 0x10) == 0x10;
+	}
+	auto half_carry_add_16bit(const uint16_t a, const uint16_t b) const {
+		return (((a & 0xff00) + (b & 0xff00)) & 0x1000) == 0x1000;
+	}
+
 	[[nodiscard]] auto execute_next() {
 		const auto instruction_start = regs_.read("PC");
 		const auto opcode = memory_.read(instruction_start);

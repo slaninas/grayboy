@@ -193,6 +193,12 @@ public:
 					regs_.set_flag("H", half_carry_sub_8bit(C_old, 1));
 				}
 				break;
+			case 0x0e:
+				{
+					const auto value = memory_.read(instruction_start + 1);
+					regs_.write("C", value);
+				}
+				break;
 			default:
 				// TODO: Use hex instead of dec
 				throw std::runtime_error("Opcode " + std::to_string(opcode) + "(dec) not implemented yet.");
@@ -236,6 +242,7 @@ private:
 		{"DEC BC", 0x0b, 1, 2},
 		{"INC C", 0x0c, 1, 1},
 		{"DEC C", 0x0d, 1, 1},
+		{"LD C, d8", 0x0e, 2, 2},
 	};
 
 	const Instruction& find_by_opcode(const uint16_t opcode) {

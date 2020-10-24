@@ -129,3 +129,17 @@ TEST_CASE("LD A, (BC) - 0x0a", "[ld]") {
 
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
+
+TEST_CASE("LD C, d8 - 0x0e", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x0e}, {0x01, 0xfedc}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 2);
+
+	const auto correct_regs = RegistersChanger{.C=0xfedc, .PC=0x02}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}

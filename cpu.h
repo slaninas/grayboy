@@ -199,6 +199,19 @@ public:
 					regs_.write("C", value);
 				}
 				break;
+			case 0x0f:
+				{
+					const auto A = regs_.read("A");
+					const auto lsb = (A & (1 << 0)) >> 0;
+					const auto A_new = static_cast<uint8_t>((A >> 1) + (lsb << 7));
+					regs_.write("A", A_new);
+
+					regs_.set_flag("Z", false);
+					regs_.set_flag("N", false);
+					regs_.set_flag("H", false);
+					regs_.set_flag("C", static_cast<bool>(lsb));
+				}
+				break;
 			default:
 				// TODO: Use hex instead of dec
 				throw std::runtime_error("Opcode " + std::to_string(opcode) + "(dec) not implemented yet.");
@@ -243,6 +256,7 @@ private:
 		{"INC C", 0x0c, 1, 1},
 		{"DEC C", 0x0d, 1, 1},
 		{"LD C, d8", 0x0e, 2, 2},
+		{"RRCA", 0x0f, 1, 1},
 	};
 
 	const Instruction& find_by_opcode(const uint16_t opcode) {

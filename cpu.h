@@ -36,6 +36,7 @@ public:
 	}
 
 
+	// TODO: Merge (half) carries somehow?
 	// TODO: Are (half) carries correct?
 	// Detect half-carry for addition, see https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/
 	[[nodiscard]] auto half_carry_add_8bit(const uint16_t a, const uint16_t b) const {

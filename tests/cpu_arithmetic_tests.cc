@@ -152,14 +152,14 @@ TEST_CASE("DEC BC - 0x0b", "[arithmetic]") {
 
 TEST_CASE("INC C - 0x0c", "[arithmetic]") {
 	const auto orig_memory = MemoryChanger{{{0x00, 0x0c}}}.get(getRandomMemory());
-	const auto orig_regs = RegistersChanger{.C=0xffee, .PC=0x00}.get(getRandomRegisters());
+	const auto orig_regs = RegistersChanger{.C=0xee, .PC=0x00}.get(getRandomRegisters());
 	auto cpu = Cpu{orig_memory, orig_regs};
 
 	const auto cycles = cpu.execute_next();
 	CHECK(cycles == 1);
 
 	const auto correct_flags = FlagsChanger{.Z=0, .N=0, .H=0}.get(orig_regs.read("F"));
-	const auto correct_regs = RegistersChanger{.F=correct_flags, .C=0xffef, .PC=0x01}.get(orig_regs);
+	const auto correct_regs = RegistersChanger{.F=correct_flags, .C=0xef, .PC=0x01}.get(orig_regs);
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }

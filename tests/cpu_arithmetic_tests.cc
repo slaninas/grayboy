@@ -163,3 +163,17 @@ TEST_CASE("INC C - 0x0c", "[arithmetic]") {
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
+
+TEST_CASE("DEC C - 0x0d", "[arithmetic]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x0d}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.C=0x01, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+
+	const auto correct_flags = FlagsChanger{.Z=1, .N=1, .H=0}.get(orig_regs.read("F"));
+	const auto correct_regs = RegistersChanger{.F=correct_flags, .C=0x00, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}

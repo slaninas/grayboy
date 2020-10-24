@@ -2,7 +2,7 @@
 
 #include "cpu.h"
 
-TEST_CASE("Half-carry 8bit", "[cpu_utils]") {
+TEST_CASE("Half-carry Addition 8bit", "[cpu_utils]") {
 	const auto cpu = Cpu{};
 
 	auto result = cpu.half_carry_add_8bit(0x00, 0x00);
@@ -24,7 +24,7 @@ TEST_CASE("Half-carry 8bit", "[cpu_utils]") {
 	CHECK(result == true);
 }
 
-TEST_CASE("Half-carry 16bit", "[cpu_utils]") {
+TEST_CASE("Half-carry Addition 16bit", "[cpu_utils]") {
 	const auto cpu = Cpu{};
 
 	auto result = cpu.half_carry_add_8bit(0x0000, 0x0000);

@@ -171,6 +171,7 @@ public:
 				break;
 			case 0x0c:
 				{
+					// TODO: Put it into a method, call it where possible
 					const auto C_old = regs_.read("C");
 					const auto C_new = static_cast<uint8_t>(C_old + 1);
 

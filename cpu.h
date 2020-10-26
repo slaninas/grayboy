@@ -112,14 +112,9 @@ public:
 					const auto B_new = static_cast<uint8_t>(B_old - 1);
 					regs_.write("B", B_new);
 
-					// TODO: Move into a function
-					// From https://stackoverflow.com/questions/57817729/half-carry-flag-emulating-the-gba
-					// TODO: How does it work? Is it correct?
-					const auto H = (B_old & 0x0F) - 1 < 0;;
-
 					regs_.set_flag("Z", B_new == 0x00);
 					regs_.set_flag("N", true);
-					regs_.set_flag("H", H);
+					regs_.set_flag("H", half_carry_sub_8bit(B_old, 1));
 				}
 				break;
 			case 0x06:

@@ -249,12 +249,10 @@ private:
 	void instruction_inc(const char(&reg_name)[kSize]) {
 		constexpr auto reg_name_size = kSize - 1; // Subtract \0 at the end
 		// 8bit increment
-		if constexpr (reg_name_size  == 1) {
+		if constexpr (reg_name_size == 1) {
 			const auto old_value = regs_.read(reg_name);
-			std::cout << "old_value " << old_value << '\n';
 			const auto new_value = static_cast<uint8_t>(old_value + 1);
 			regs_.write(reg_name, new_value);
-
 
 			regs_.set_flag("Z", new_value == 0x00);
 			regs_.set_flag("N", false);

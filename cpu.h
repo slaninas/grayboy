@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <iostream>
+#include <cassert>
 
 #include "registers.h"
 #include "memory.h"
@@ -93,18 +94,7 @@ public:
 				regs_.write("BC", regs_.read("BC") + 1);
 				break;
 			case 0x04:
-				{
-					const auto B_old = regs_.read("B");
-					const auto B_new = static_cast<uint8_t>(B_old + 1);
-					regs_.write("B", B_new);
-
-
-					regs_.set_flag("Z", B_new == 0x00);
-					regs_.set_flag("N", false);
-
-					const auto H = half_carry_add_8bit(B_old, 1);
-					regs_.set_flag("H", H);
-				}
+				instruction_inc("B");
 				break;
 			case 0x05:
 				{
@@ -166,15 +156,7 @@ public:
 				break;
 			case 0x0c:
 				{
-					// TODO: Put it into a method, call it where possible
-					const auto C_old = regs_.read("C");
-					const auto C_new = static_cast<uint8_t>(C_old + 1);
-
-					regs_.write("C", C_new);
-
-					regs_.set_flag("Z", C_new == 0x00);
-					regs_.set_flag("N", false);
-					regs_.set_flag("H", half_carry_add_8bit(C_old, 1));
+					instruction_inc("C");
 				}
 				break;
 			case 0x0d:
@@ -261,6 +243,29 @@ private:
 			throw std::runtime_error("Opcode " + std::to_string(opcode) + " (dec) not found");
 		}
 		return *res;
+	}
+
+	template<size_t kSize>
+	void instruction_inc(const char(&reg_name)[kSize]) {
+		constexpr auto reg_name_size = kSize - 1; // Subtract \0 at the end
+		// 8bit increment
+		if constexpr (reg_name_size  == 1) {
+			const auto old_value = regs_.read(reg_name);
+			std::cout << "old_value " << old_value << '\n';
+			const auto new_value = static_cast<uint8_t>(old_value + 1);
+			regs_.write(reg_name, new_value);
+
+
+			regs_.set_flag("Z", new_value == 0x00);
+			regs_.set_flag("N", false);
+
+			const auto H = half_carry_add_8bit(old_value, 1);
+			regs_.set_flag("H", H);
+		}
+		// 16bit increment
+		else {
+			assert(false && "Not implemented yet");
+		}
 	}
 
 

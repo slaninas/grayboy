@@ -178,6 +178,9 @@ public:
 				regs_.write("D", memory_.read(instruction_start + 1));
 				regs_.write("E", memory_.read(instruction_start + 2));
 				break;
+			case 0x12: // LD (DE), A
+				memory_.write(regs_.read("DE"), regs_.read("A"));
+				break;
 			default:
 				// TODO: Use hex instead of dec
 				throw std::runtime_error("Opcode " + std::to_string(opcode) + "(dec) not implemented yet.");
@@ -225,6 +228,7 @@ private:
 		{"RRCA", 0x0f, 1, 1},
 		// {"STOP", 0x10, 2, 1},
 		{"LD DE, d16", 0x11, 3, 3},
+		{"LD (DE), A", 0x12, 1, 2},
 	};
 
 	const Instruction& find_by_opcode(const uint16_t opcode) {

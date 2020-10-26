@@ -159,3 +159,18 @@ TEST_CASE("LD DE, d16 - 0x11", "[ld]") {
 	CHECK_THAT(cpu.registers_dump(), RegistersCompare{correct_registers});
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
+
+TEST_CASE("LD (DE), A - 0x12", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x12}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.A=0x12, .DE=0xde, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 2);
+
+	const auto correct_memory = MemoryChanger{{{0xde, 0x12}}}.get(orig_memory);
+	CHECK(cpu.memory_dump() == correct_memory.dump());
+
+	const auto correct_registers = RegistersChanger{.PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+}

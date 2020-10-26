@@ -81,30 +81,30 @@ public:
 		const auto instruction = find_by_opcode(opcode);
 
 		switch(opcode) {
-			case 0x00:
+			case 0x00: // NOP
 				break;
-			case 0x01:
+			case 0x01: // LD BC, d16
 				regs_.write("B", memory_.read(instruction_start + 1));
 				regs_.write("C", memory_.read(instruction_start + 2));
 				break;
-			case 0x02:
+			case 0x02: // LD (BC), A
 				memory_.write(regs_.read("BC"), regs_.read("A"));
 				break;
-			case 0x03:
+			case 0x03: // INC BC
 				regs_.write("BC", regs_.read("BC") + 1);
 				break;
-			case 0x04:
+			case 0x04: // INC B
 				instruction_inc("B");
 				break;
-			case 0x05:
+			case 0x05: // DEC B
 				instruction_dec("B");
 				break;
-			case 0x06:
+			case 0x06: // LD B, d8
 				regs_.write("B", memory_.read(instruction_start + 1));
 				break;
-
-			case 0x07:
+			case 0x07: // RLCA
 				{
+					// TODO: Put into method
 					const auto A = regs_.read("A");
 					const auto msb = (A & (1 << 7)) >> 7;
 					const auto A_new = static_cast<uint8_t>((A << 1) + msb);
@@ -116,16 +116,18 @@ public:
 					regs_.set_flag("C", static_cast<bool>(msb));
 				}
 				break;
-			case 0x08:
+			case 0x08: // LD (a16), SP
 				{
+					// TODO: Put into method
 					const auto address = static_cast<uint16_t>((memory_.read(instruction_start + 1) << 8) + memory_.read(instruction_start + 2));
 					const auto SP = regs_.read("SP");
 					memory_.write(address, static_cast<uint8_t>(SP & 0x00ff));
 					memory_.write(address + 1, static_cast<uint8_t>((SP & 0xff00) >> 8));
 				}
 				break;
-			case 0x09:
+			case 0x09: // ADD HL, BC
 				{
+					// TODO: Put into method
 					const auto BC = regs_.read("BC");
 					const auto HL_old = regs_.read("HL");
 					const auto HL_new = static_cast<uint16_t>(HL_old + BC);
@@ -137,29 +139,30 @@ public:
 					regs_.set_flag("C", carry_add_16bit(HL_old, BC));
 				}
 				break;
-			case 0xa:
+			case 0xa: // LD A, (BC)
 				{
 					const auto address = regs_.read("BC");
 					regs_.write("A", memory_.read(address));
 				}
 				break;
-			case 0x0b:
+			case 0x0b: // DEC BC
 				regs_.write("BC", regs_.read("BC") - 1);
 				break;
-			case 0x0c:
+			case 0x0c: // INC C
 				instruction_inc("C");
 				break;
-			case 0x0d:
+			case 0x0d: // DEC C
 				instruction_dec("C");
 				break;
-			case 0x0e:
+			case 0x0e: // LD C, d8
 				{
 					const auto value = memory_.read(instruction_start + 1);
 					regs_.write("C", value);
 				}
 				break;
-			case 0x0f:
+			case 0x0f: // RRCA
 				{
+					// TODO: Put into method
 					const auto A = regs_.read("A");
 					const auto lsb = (A & (1 << 0)) >> 0;
 					const auto A_new = static_cast<uint8_t>((A >> 1) + (lsb << 7));

@@ -134,9 +134,30 @@ public:
 				regs_.write("SP", regs_.read("SP") + 1);
 				break;
 
+			// Increment
 			case 0x04: // INC B
 				instruction_inc("B");
 				break;
+			case 0x14: // INC D
+				instruction_inc("D");
+				break;
+			case 0x24: // INC H
+				instruction_inc("H");
+				break;
+			case 0x34: // INC (HL)
+				// TODO: Use instruction_inc method?
+				{
+					const auto address = regs_.read("HL");
+					const auto old_value = memory_.read(address);
+					const auto new_value = static_cast<uint8_t>(old_value + 1);
+					memory_.write(address, new_value);
+
+					regs_.set_flag("Z", new_value == 0x00);
+					regs_.set_flag("N", false);
+					regs_.set_flag("H", half_carry_add_8bit(old_value, 1));
+				}
+				break;
+
 			case 0x05: // DEC B
 				instruction_dec("B");
 				break;
@@ -264,14 +285,19 @@ private:
 		{"LD DE, d16", 0x11, 3, 3},
 		{"LD (DE), A", 0x12, 1, 2},
 		{"INC DE", 0x13, 1, 2},
+		{"INC D", 0x14, 1, 1},
 
+		// TODO: JR NZ, s8 - 0x20
 		{"LD HL, d16", 0x21, 3, 3},
 		{"LD (HL+), A", 0x22, 1, 2},
 		{"INC HL", 0x23, 1, 2},
-		{"INC SP", 0x33, 1, 2},
+		{"INC H", 0x24, 1, 1},
 
+		// TODO: JR NC, s8 - 0x30
 		{"LD SP, d16", 0x31, 3, 3},
 		{"LD (HL-), A", 0x32, 1, 2},
+		{"INC SP", 0x33, 1, 2},
+		{"INC (HL)", 0x34, 1, 3},
 
 
 

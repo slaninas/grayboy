@@ -113,6 +113,90 @@ TEST_CASE("INC B - 0x04", "[arithmetic]") {
 	}
 
 }
+// TODO: Add memory check for INC instructions, it should not change
+TEST_CASE("INC D - 0x14", "[arithmetic]") {
+	const auto memory = MemoryChanger{{{0x00, 0x14}, {0x01, 0x14}, {0x02, 0x14}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.D=0x00, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{memory, orig_regs};
+
+	SECTION("From zero to three") {
+		auto cycles = cpu.execute_next();
+		CHECK(cycles == 1);
+		auto correct_flags = FlagsChanger{.Z=0, .N=0, .H=0}.get(orig_regs.read("F"));
+		auto correct_registers = RegistersChanger{.F=correct_flags, .D=0x01, .PC=0x01}.get(orig_regs);
+		CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+
+		cycles = cpu.execute_next();
+		CHECK(cycles == 1);
+		correct_flags = FlagsChanger{.Z=0, .N=0, .H=0}.get(correct_flags);
+		correct_registers = RegistersChanger{.F=correct_flags, .D=0x02, .PC=0x02}.get(correct_registers);
+		CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+
+		cycles = cpu.execute_next();
+		CHECK(cycles == 1);
+		correct_flags = FlagsChanger{.Z=0, .N=0, .H=0}.get(correct_flags);
+		correct_registers = RegistersChanger{.F=correct_flags, .D=0x03, .PC=0x03}.get(correct_registers);
+		CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+	}
+}
+
+TEST_CASE("INC H - 0x24", "[arithmetic]") {
+	const auto memory = MemoryChanger{{{0x00, 0x24}, {0x01, 0x24}, {0x02, 0x24}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.H=0x00, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{memory, orig_regs};
+
+	SECTION("From zero to three") {
+		auto cycles = cpu.execute_next();
+		CHECK(cycles == 1);
+		auto correct_flags = FlagsChanger{.Z=0, .N=0, .H=0}.get(orig_regs.read("F"));
+		auto correct_registers = RegistersChanger{.F=correct_flags, .H=0x01, .PC=0x01}.get(orig_regs);
+		CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+
+		cycles = cpu.execute_next();
+		CHECK(cycles == 1);
+		correct_flags = FlagsChanger{.Z=0, .N=0, .H=0}.get(correct_flags);
+		correct_registers = RegistersChanger{.F=correct_flags, .H=0x02, .PC=0x02}.get(correct_registers);
+		CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+
+		cycles = cpu.execute_next();
+		CHECK(cycles == 1);
+		correct_flags = FlagsChanger{.Z=0, .N=0, .H=0}.get(correct_flags);
+		correct_registers = RegistersChanger{.F=correct_flags, .H=0x03, .PC=0x03}.get(correct_registers);
+		CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+	}
+}
+
+TEST_CASE("INC (HL) - 0x34", "[arithmetic]") {
+	const auto memory = MemoryChanger{{{0x00, 0x34}, {0x01, 0x34}, {0x02, 0x34}, {0x1234, 0x00}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.HL=0x1234, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{memory, orig_regs};
+
+	SECTION("From zero to three") {
+		auto cycles = cpu.execute_next();
+		CHECK(cycles == 3);
+		auto correct_flags = FlagsChanger{.Z=0, .N=0, .H=0}.get(orig_regs.read("F"));
+		auto correct_registers = RegistersChanger{.F=correct_flags, .PC=0x01}.get(orig_regs);
+		CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+		auto correct_memory = MemoryChanger{{{0x1234, 0x01}}}.get(memory);
+		CHECK(cpu.memory_dump() == correct_memory.dump());
+
+		cycles = cpu.execute_next();
+		CHECK(cycles == 3);
+		correct_flags = FlagsChanger{.Z=0, .N=0, .H=0}.get(correct_flags);
+		correct_registers = RegistersChanger{.F=correct_flags, .PC=0x02}.get(correct_registers);
+		CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+		correct_memory = MemoryChanger{{{0x1234, 0x02}}}.get(memory);
+		CHECK(cpu.memory_dump() == correct_memory.dump());
+
+		cycles = cpu.execute_next();
+		CHECK(cycles == 3);
+		correct_flags = FlagsChanger{.Z=0, .N=0, .H=0}.get(correct_flags);
+		correct_registers = RegistersChanger{.F=correct_flags, .PC=0x03}.get(correct_registers);
+		CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+		correct_memory = MemoryChanger{{{0x1234, 0x03}}}.get(memory);
+		CHECK(cpu.memory_dump() == correct_memory.dump());
+	}
+}
 
 TEST_CASE("DEC B - 0x05", "[arithmetic]") {
 	const auto memory = MemoryChanger{{{0x00, 0x05}, {0x01, 0x05}, {0x02, 0x05}}}.get(getRandomMemory());

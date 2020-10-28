@@ -83,10 +83,27 @@ public:
 		switch(opcode) {
 			case 0x00: // NOP
 				break;
+
+			// Load 16bit value into 16bit register
 			case 0x01: // LD BC, d16
-				regs_.write("B", memory_.read(instruction_start + 1));
-				regs_.write("C", memory_.read(instruction_start + 2));
+				regs_.write("C", memory_.read(instruction_start + 1));
+				regs_.write("B", memory_.read(instruction_start + 2));
 				break;
+			case 0x11: // LD DE, d16
+				regs_.write("E", memory_.read(instruction_start + 1));
+				regs_.write("D", memory_.read(instruction_start + 2));
+				break;
+			case 0x21: // LD HL, d16
+				regs_.write("L", memory_.read(instruction_start + 1));
+				regs_.write("H", memory_.read(instruction_start + 2));
+				break;
+			case 0x31: // LD SP, d16
+				{
+					auto value = static_cast<uint16_t>(memory_.read(instruction_start + 1) + (memory_.read(instruction_start + 2) << 8));
+					regs_.write("SP", value);
+				}
+				break;
+
 			case 0x02: // LD (BC), A
 				memory_.write(regs_.read("BC"), regs_.read("A"));
 				break;
@@ -172,27 +189,6 @@ public:
 					regs_.set_flag("N", false);
 					regs_.set_flag("H", false);
 					regs_.set_flag("C", static_cast<bool>(lsb));
-				}
-				break;
-			// Load 16bit value into 16bit register
-			case 0x11: // LD DE, d16
-				regs_.write("D", memory_.read(instruction_start + 1));
-				regs_.write("E", memory_.read(instruction_start + 2));
-				break;
-			case 0x21: // LD HL, d16
-				regs_.write("H", memory_.read(instruction_start + 1));
-				regs_.write("L", memory_.read(instruction_start + 2));
-				break;
-			case 0x31: // LD SP, d16
-				{
-					std::cout << std::hex;
-					auto value = static_cast<uint16_t>(memory_.read(instruction_start + 1));
-					std::cout << "value: " << (int)value << '\n';
-					value <<= 8;
-					std::cout << "value: " << (int)value << '\n';
-					value += memory_.read(instruction_start + 2);
-					std::cout << "value: " << (int)value << '\n';
-					regs_.write("SP", value);
 				}
 				break;
 

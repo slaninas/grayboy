@@ -17,7 +17,7 @@ TEST_CASE("LD BC, d16 - 0x01", "[ld]") {
 		const auto cycles = cpu.execute_next();
 		CHECK(cycles == 3);
 
-		const auto correct_registers = RegistersChanger{.BC=0xEEFF, .PC=0x03}.get(orig_regs);
+		const auto correct_registers = RegistersChanger{.BC=0xFFEE, .PC=0x03}.get(orig_regs);
 		CHECK_THAT(cpu.registers_dump(), RegistersCompare{correct_registers});
 		CHECK(cpu.memory_dump() == orig_memory.dump());
 	}
@@ -27,7 +27,7 @@ TEST_CASE("LD BC, d16 - 0x01", "[ld]") {
 		const auto cycles = cpu.execute_next();
 		CHECK(cycles == 3);
 
-		const auto correct_registers = RegistersChanger{.BC=0xABCD, .PC=0x06}.get(orig_regs);
+		const auto correct_registers = RegistersChanger{.BC=0xCDAB, .PC=0x06}.get(orig_regs);
 		CHECK_THAT(cpu.registers_dump(), RegistersCompare{correct_registers});
 		CHECK(cpu.memory_dump() == orig_memory.dump());
 	}
@@ -37,7 +37,7 @@ TEST_CASE("LD BC, d16 - 0x01", "[ld]") {
 		const auto cycles = cpu.execute_next();
 		CHECK(cycles == 3);
 
-		const auto correct_registers = RegistersChanger{.BC=0x0100, .PC=0x09}.get(orig_regs);
+		const auto correct_registers = RegistersChanger{.BC=0x0001, .PC=0x09}.get(orig_regs);
 		CHECK_THAT(cpu.registers_dump(), RegistersCompare{correct_registers});
 		CHECK(cpu.memory_dump() == orig_memory.dump());
 	}
@@ -54,7 +54,7 @@ TEST_CASE("LD DE, d16 - 0x11", "[ld]") {
 	const auto cycles = cpu.execute_next();
 	CHECK(cycles == 3);
 
-	const auto correct_registers = RegistersChanger{.DE=0xabcd, .PC=0x03}.get(orig_regs);
+	const auto correct_registers = RegistersChanger{.DE=0xcdab, .PC=0x03}.get(orig_regs);
 	CHECK_THAT(cpu.registers_dump(), RegistersCompare{correct_registers});
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
@@ -70,7 +70,7 @@ TEST_CASE("LD HL, d16 - 0x21", "[ld]") {
 	const auto cycles = cpu.execute_next();
 	CHECK(cycles == 3);
 
-	const auto correct_registers = RegistersChanger{.HL=0x1234, .PC=0x03}.get(orig_regs);
+	const auto correct_registers = RegistersChanger{.HL=0x3412, .PC=0x03}.get(orig_regs);
 	CHECK_THAT(cpu.registers_dump(), RegistersCompare{correct_registers});
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
@@ -86,7 +86,7 @@ TEST_CASE("LD SP, d16 - 0x31", "[ld]") {
 	const auto cycles = cpu.execute_next();
 	CHECK(cycles == 3);
 
-	const auto correct_registers = RegistersChanger{.PC=0x03, .SP=0xdfea}.get(orig_regs);
+	const auto correct_registers = RegistersChanger{.PC=0x03, .SP=0xeadf}.get(orig_regs);
 	CHECK_THAT(cpu.registers_dump(), RegistersCompare{correct_registers});
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }

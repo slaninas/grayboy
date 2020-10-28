@@ -104,9 +104,22 @@ public:
 				}
 				break;
 
+			// Load A into an address stored in given register
 			case 0x02: // LD (BC), A
 				memory_.write(regs_.read("BC"), regs_.read("A"));
 				break;
+			case 0x12: // LD (DE), A
+				memory_.write(regs_.read("DE"), regs_.read("A"));
+				break;
+			case 0x22: // LD (HL+), A
+				memory_.write(regs_.read("HL"), regs_.read("A"));
+				regs_.write("HL", regs_.read("HL") + 1);
+				break;
+			case 0x32: // LD (HL-), A
+				memory_.write(regs_.read("HL"), regs_.read("A"));
+				regs_.write("HL", regs_.read("HL") - 1);
+				break;
+
 			case 0x03: // INC BC
 				regs_.write("BC", regs_.read("BC") + 1);
 				break;
@@ -191,10 +204,6 @@ public:
 					regs_.set_flag("C", static_cast<bool>(lsb));
 				}
 				break;
-
-			case 0x12: // LD (DE), A
-				memory_.write(regs_.read("DE"), regs_.read("A"));
-				break;
 			default:
 				// TODO: Use hex instead of dec
 				throw std::runtime_error("Opcode " + std::to_string(opcode) + "(dec) not implemented yet.");
@@ -240,13 +249,15 @@ private:
 		{"DEC C", 0x0d, 1, 1},
 		{"LD C, d8", 0x0e, 2, 2},
 		{"RRCA", 0x0f, 1, 1},
-		// {"STOP", 0x10, 2, 1},
+		// TODO: {"STOP", 0x10, 2, 1},
 		{"LD DE, d16", 0x11, 3, 3},
 		{"LD (DE), A", 0x12, 1, 2},
 
 		{"LD HL, d16", 0x21, 3, 3},
+		{"LD (HL+), A", 0x22, 1, 2},
 
 		{"LD SP, d16", 0x31, 3, 3},
+		{"LD (HL-), A", 0x32, 1, 2},
 
 
 

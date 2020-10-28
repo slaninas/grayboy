@@ -120,9 +120,20 @@ public:
 				regs_.write("HL", regs_.read("HL") - 1);
 				break;
 
+			// Increment 16bit register
 			case 0x03: // INC BC
 				regs_.write("BC", regs_.read("BC") + 1);
 				break;
+			case 0x13: // INC DE
+				regs_.write("DE", regs_.read("DE") + 1);
+				break;
+			case 0x23: // INC HL
+				regs_.write("HL", regs_.read("HL") + 1);
+				break;
+			case 0x33: // INC SP
+				regs_.write("SP", regs_.read("SP") + 1);
+				break;
+
 			case 0x04: // INC B
 				instruction_inc("B");
 				break;
@@ -252,9 +263,12 @@ private:
 		// TODO: {"STOP", 0x10, 2, 1},
 		{"LD DE, d16", 0x11, 3, 3},
 		{"LD (DE), A", 0x12, 1, 2},
+		{"INC DE", 0x13, 1, 2},
 
 		{"LD HL, d16", 0x21, 3, 3},
 		{"LD (HL+), A", 0x22, 1, 2},
+		{"INC HL", 0x23, 1, 2},
+		{"INC SP", 0x33, 1, 2},
 
 		{"LD SP, d16", 0x31, 3, 3},
 		{"LD (HL-), A", 0x32, 1, 2},

@@ -174,10 +174,28 @@ public:
 					regs_.set_flag("C", static_cast<bool>(lsb));
 				}
 				break;
+			// Load 16bit value into 16bit register
 			case 0x11: // LD DE, d16
 				regs_.write("D", memory_.read(instruction_start + 1));
 				regs_.write("E", memory_.read(instruction_start + 2));
 				break;
+			case 0x21: // LD HL, d16
+				regs_.write("H", memory_.read(instruction_start + 1));
+				regs_.write("L", memory_.read(instruction_start + 2));
+				break;
+			case 0x31: // LD SP, d16
+				{
+					std::cout << std::hex;
+					auto value = static_cast<uint16_t>(memory_.read(instruction_start + 1));
+					std::cout << "value: " << (int)value << '\n';
+					value <<= 8;
+					std::cout << "value: " << (int)value << '\n';
+					value += memory_.read(instruction_start + 2);
+					std::cout << "value: " << (int)value << '\n';
+					regs_.write("SP", value);
+				}
+				break;
+
 			case 0x12: // LD (DE), A
 				memory_.write(regs_.read("DE"), regs_.read("A"));
 				break;
@@ -229,6 +247,13 @@ private:
 		// {"STOP", 0x10, 2, 1},
 		{"LD DE, d16", 0x11, 3, 3},
 		{"LD (DE), A", 0x12, 1, 2},
+
+		{"LD HL, d16", 0x21, 3, 3},
+
+		{"LD SP, d16", 0x31, 3, 3},
+
+
+
 	};
 	// TODO: Add [[nodiscard]]
 	const Instruction& find_by_opcode(const uint16_t opcode) {

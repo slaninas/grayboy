@@ -251,8 +251,8 @@ private:
 
 
 	};
-	// TODO: Add [[nodiscard]]
-	const Instruction& find_by_opcode(const uint16_t opcode) {
+
+	[[nodiscard]] const Instruction& find_by_opcode(const uint16_t opcode) {
 		auto res = std::find_if(begin(instructions_), end(instructions_), [opcode](const auto& instruction) { return instruction.opcode ==  opcode; });
 		if (res == end(instructions_)) {
 			throw std::runtime_error("Opcode " + std::to_string(opcode) + " (dec) not found");

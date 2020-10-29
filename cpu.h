@@ -443,6 +443,27 @@ private:
 				return 2;
 			}
 		},
+		{"LD E, d8", 0x1e, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto value = memory.read(PC + 1);
+				regs.write("E", value);
+				return 2;
+			}
+		},
+		{"LD L, d8", 0x2e, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto value = memory.read(PC + 1);
+				regs.write("L", value);
+				return 2;
+			}
+		},
+		{"LD A, d8", 0x3e, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto value = memory.read(PC + 1);
+				regs.write("A", value);
+				return 2;
+			}
+		},
 
 		// Decrement 16bit
 		{"DEC BC", 0x0b, 1,

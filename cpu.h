@@ -79,6 +79,26 @@ void instruction_inc_fn(const char(&reg_name)[kSize], Registers& regs) {
 		assert(false && "Not implemented yet");
 	}
 }
+
+template<size_t kSize>
+void instruction_dec_fn(const char(&reg_name)[kSize], Registers& regs) {
+	constexpr auto reg_name_size = kSize - 1; // Subtract \0 at the end
+	// 8bit
+	if constexpr (reg_name_size == 1) {
+		const auto old_value = regs.read(reg_name);
+		const auto new_value = static_cast<uint8_t>(old_value - 1);
+		regs.write(reg_name, new_value);
+
+		regs.set_flag("Z", new_value == 0x00);
+		regs.set_flag("N", true);
+		regs.set_flag("H", half_carry_sub_8bit(old_value, 1));
+	}
+	// 16bit
+	else {
+		assert(false && "Not implemented yet");
+	}
+}
+
 // Make exceptions asserts and run in debug
 // TODO: Add unit tests
 class Cpu {
@@ -122,9 +142,6 @@ public:
 
 		switch(opcode) {
 
-			case 0x05: // DEC B
-				instruction_dec("B");
-				break;
 			case 0x06: // LD B, d8
 				regs_.write("B", memory_.read(instruction_start + 1));
 				break;
@@ -173,12 +190,6 @@ public:
 				break;
 			case 0x0b: // DEC BC
 				regs_.write("BC", regs_.read("BC") - 1);
-				break;
-			case 0x0c: // INC C
-				instruction_inc("C");
-				break;
-			case 0x0d: // DEC C
-				instruction_dec("C");
 				break;
 			case 0x0e: // LD C, d8
 				{
@@ -229,15 +240,12 @@ private:
 
 	// See https://meganesulli.com/generate-gb-opcodes/
 	std::vector<Instruction> instructions_ = {
-		{"DEC B", 0x05, 1, 1},
 		{"LD B, d8", 0x06, 2, 2},
 		{"RLCA", 0x07, 1, 1},
 		{"LD (a16), SP", 0x08, 3, 5},
 		{"ADD HL, BC", 0x09, 1, 2},
 		{"LD A, (BC)", 0x0a, 1, 2},
 		{"DEC BC", 0x0b, 1, 2},
-		{"INC C", 0x0c, 1, 1},
-		{"DEC C", 0x0d, 1, 1},
 		{"LD C, d8", 0x0e, 2, 2},
 		{"RRCA", 0x0f, 1, 1},
 		// TODO: {"STOP", 0x10, 2, 1},
@@ -348,13 +356,19 @@ private:
 				return 1;
 			}
 		},
-		{"INC B", 0x14, 1,
+		{"INC C", 0x0c, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_inc_fn("C", regs);
+				return 1;
+			}
+		},
+		{"INC D", 0x14, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				instruction_inc_fn("D", regs);
 				return 1;
 			}
 		},
-		{"INC B", 0x24, 1,
+		{"INC H", 0x24, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				instruction_inc_fn("H", regs);
 				return 1;
@@ -372,6 +386,20 @@ private:
 					regs.set_flag("N", false);
 					regs.set_flag("H", half_carry_add_8bit(old_value, 1));
 				return 3;
+			}
+		},
+
+		// Decrement 8bit
+		{"DEC B", 0x05, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_dec_fn("B", regs);
+				return 1;
+			}
+		},
+		{"DEC C", 0xd, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_dec_fn("C", regs);
+				return 1;
 			}
 		},
 

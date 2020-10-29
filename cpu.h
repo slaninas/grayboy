@@ -11,13 +11,6 @@ struct Instruction {
 	std::string mnemonic;
 	uint16_t opcode;
 	uint8_t size;
-	uint8_t cycles;
-};
-
-struct InstructionNew {
-	std::string mnemonic;
-	uint16_t opcode;
-	uint8_t size;
 	std::function<uint8_t(Registers&, Memory&, const uint16_t&)> run;
 
 	auto operator()(Registers& regs, Memory& mem, const uint16_t& PC) const {
@@ -124,31 +117,16 @@ public:
 
 
 	[[nodiscard]] auto execute_next() {
-		const auto instruction_start = regs_.read("PC");
-		const auto opcode = memory_.read(instruction_start);
+		const auto PC = regs_.read("PC");
+		const auto opcode = memory_.read(PC);
 
 		if (opcode == 0xBC) {
 			throw std::runtime_error("16-bit opcodes not implemented yet.");
 		}
 
-		const auto instructionNew = find_by_opcodeNew(opcode);
-		// TODO: Remove this if and move this check into find_by_opcode
-		if (instructionNew != end(instructionsNew_)) {
-			auto cycles = (*instructionNew)(regs_, memory_, regs_.read("PC"));
-			return cycles;
-		}
-
 		const auto instruction = find_by_opcode(opcode);
-
-		switch(opcode) {
-			default:
-				// TODO: Use hex instead of dec
-				throw std::runtime_error("Opcode " + std::to_string(opcode) + "(dec) not implemented yet.");
-				break;
-		}
-
-		regs_.write("PC", regs_.read("PC") + instruction.size);
-		return instruction.cycles;
+		const auto cycles = instruction(regs_, memory_, PC);
+		return cycles;
 	}
 
 	[[nodiscard]] auto registers_dump() const {
@@ -170,12 +148,6 @@ private:
 
 	// See https://meganesulli.com/generate-gb-opcodes/
 	std::vector<Instruction> instructions_ = {
-
-
-
-	};
-
-	std::vector<InstructionNew> instructionsNew_ = {
 		// TODO: {"STOP", 0x10, 2, 1},
 		// TODO: JR NZ, s8 - 0x20
 		// TODO: JR NC, s8 - 0x30
@@ -422,55 +394,5 @@ private:
 		}
 		return *res;
 	}
-
-	// TODO: Return const instruction& not iterator
-	[[nodiscard]] const decltype(instructionsNew_)::iterator find_by_opcodeNew(const uint16_t opcode) {
-		auto res = std::find_if(begin(instructionsNew_), end(instructionsNew_), [opcode](const auto& instruction) { return instruction.opcode ==  opcode; });
-		// TODO: Return back when new instructions class is fully used and the old one is removed
-		// if (res == end(instructionsNew_)) {
-			// throw std::runtime_error("Opcode " + std::to_string(opcode) + " (dec) not found");
-		// }
-		// TD<decltype(res)> td;
-		return res;
-	}
-
-	template<size_t kSize>
-	void instruction_inc(const char(&reg_name)[kSize]) {
-		constexpr auto reg_name_size = kSize - 1; // Subtract \0 at the end
-		// 8bit
-		if constexpr (reg_name_size == 1) {
-			const auto old_value = regs_.read(reg_name);
-			const auto new_value = static_cast<uint8_t>(old_value + 1);
-			regs_.write(reg_name, new_value);
-
-			regs_.set_flag("Z", new_value == 0x00);
-			regs_.set_flag("N", false);
-			regs_.set_flag("H", half_carry_add_8bit(old_value, 1));
-		}
-		// 16bit
-		else {
-			assert(false && "Not implemented yet");
-		}
-	}
-
-	template<size_t kSize>
-	void instruction_dec(const char(&reg_name)[kSize]) {
-		constexpr auto reg_name_size = kSize - 1; // Subtract \0 at the end
-		// 8bit
-		if constexpr (reg_name_size == 1) {
-			const auto old_value = regs_.read(reg_name);
-			const auto new_value = static_cast<uint8_t>(old_value - 1);
-			regs_.write(reg_name, new_value);
-
-			regs_.set_flag("Z", new_value == 0x00);
-			regs_.set_flag("N", true);
-			regs_.set_flag("H", half_carry_sub_8bit(old_value, 1));
-		}
-		// 16bit
-		else {
-			assert(false && "Not implemented yet");
-		}
-	}
-
 
 };

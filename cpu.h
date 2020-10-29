@@ -94,6 +94,22 @@ void instruction_dec_fn(const char(&reg_name)[kSize], Registers& regs) {
 	}
 }
 
+template<size_t kDestSize, size_t kSecondRegNameSize>
+void instruction_add(const char(&dest_name)[kDestSize], const char(&second_reg_name)[kSecondRegNameSize], Registers& regs) {
+	static_assert(kDestSize == kSecondRegNameSize, "Add for 8bit + 16bit or vice versa not implemented.");
+
+	const auto second_reg = regs.read(second_reg_name);
+	const auto dest_old = regs.read(dest_name);
+	const auto dest_new = static_cast<decltype(second_reg)>(dest_old + second_reg);
+
+	regs.write(dest_name, dest_new);
+
+	regs.set_flag("N", 0);
+	regs.set_flag("H", half_carry_add_16bit(dest_old, second_reg));
+	regs.set_flag("C", carry_add_16bit(dest_old, second_reg));
+}
+
+
 // Make exceptions asserts and run in debug
 // TODO: Add unit tests
 class Cpu {
@@ -445,60 +461,25 @@ private:
 		// TODO: Put these adds into method
 		{"Add HL, BC", 0x09, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
-					// TODO: Put into method
-					const auto BC = regs.read("BC");
-					const auto HL_old = regs.read("HL");
-					const auto HL_new = static_cast<uint16_t>(HL_old + BC);
-
-					regs.write("HL", HL_new);
-
-					regs.set_flag("N", 0);
-					regs.set_flag("H", half_carry_add_16bit(HL_old, BC));
-					regs.set_flag("C", carry_add_16bit(HL_old, BC));
+				instruction_add("HL", "BC", regs);
 				return 2;
 			}
 		},
 		{"Add HL, DE", 0x19, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
-					// TODO: Put into method
-					const auto DE = regs.read("DE");
-					const auto HL_old = regs.read("HL");
-					const auto HL_new = static_cast<uint16_t>(HL_old + DE);
-
-					regs.write("HL", HL_new);
-
-					regs.set_flag("N", 0);
-					regs.set_flag("H", half_carry_add_16bit(HL_old, DE));
-					regs.set_flag("C", carry_add_16bit(HL_old, DE));
+				instruction_add("HL", "DE", regs);
 				return 2;
 			}
 		},
 		{"Add HL, HL", 0x29, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
-					// TODO: Put into method
-					const auto HL_old = regs.read("HL");
-					const auto HL_new = static_cast<uint16_t>(HL_old * 2);
-
-					regs.write("HL", HL_new);
-
-					regs.set_flag("N", 0);
-					regs.set_flag("H", half_carry_add_16bit(HL_old, HL_old));
-					regs.set_flag("C", carry_add_16bit(HL_old, HL_old));
+				instruction_add("HL", "HL", regs);
 				return 2;
 			}
 		},
 		{"Add HL, SP", 0x39, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
-					// TODO: Put into method
-					const auto SP = regs.read("SP");
-					const auto HL_old = regs.read("HL");
-					const auto HL_new = static_cast<uint16_t>(HL_old + SP);
-
-					regs.write("HL", HL_new);
-
-					regs.set_flag("N", 0);
-					regs.set_flag("H", half_carry_add_16bit(HL_old, SP));
-					regs.set_flag("C", carry_add_16bit(HL_old, SP));
+				instruction_add("HL", "SP", regs);
 				return 2;
 			}
 		},

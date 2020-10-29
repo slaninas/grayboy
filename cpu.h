@@ -578,6 +578,14 @@ private:
 				return 1;
 			}
 		},
+		{"CCF", 0x3f, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				regs.set_flag("N", false);
+				regs.set_flag("H", false);
+				regs.set_flag("C", !regs.read_flag("C"));
+				return 1;
+			}
+		},
 		// -------------------- End of ungrouped instructions ----------------------
 
 		// Add 16bit

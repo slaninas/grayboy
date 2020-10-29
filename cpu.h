@@ -568,6 +568,16 @@ private:
 				return 1;
 			}
 		},
+		{"CPL", 0x2f, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto A = regs.read("A");
+				const auto A_new = A ^ 0xff;
+				regs.write("A", A_new);
+				regs.set_flag("N", true);
+				regs.set_flag("H", true);
+				return 1;
+			}
+		},
 		// -------------------- End of ungrouped instructions ----------------------
 
 		// Add 16bit

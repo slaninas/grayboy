@@ -377,6 +377,29 @@ private:
 				return 2;
 			}
 		},
+		{"LD A, (DE)", 0x1a, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto address = regs.read("DE");
+				regs.write("A", memory.read(address));
+				return 2;
+			}
+		},
+		{"LD A, (HL+)", 0x2a, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto address = regs.read("HL");
+				regs.write("A", memory.read(address));
+				regs.write("HL", address + 1);
+				return 2;
+			}
+		},
+		{"LD A, (HL-)", 0x3a, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto address = regs.read("HL");
+				regs.write("A", memory.read(address));
+				regs.write("HL", address - 1);
+				return 2;
+			}
+		},
 		{"LD C, d8", 0x0e, 2,
 			[](auto& regs, auto& memory, const auto& PC) {
 				const auto value = memory.read(PC + 1);

@@ -298,6 +298,48 @@ TEST_CASE("LD A, (BC) - 0x0a", "[ld]") {
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
 
+TEST_CASE("LD A, (DE) - 0x1a", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x1a}, {0x1234, 0x8734}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.DE=0x1234, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 2);
+
+	const auto correct_regs = RegistersChanger{.A=0x8734, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("LD A, (HL+) - 0x2a", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x2a}, {0x40ac, 0xdfbc}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.HL=0x40ac, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 2);
+
+	const auto correct_regs = RegistersChanger{.A=0xdfbc, .HL=0x40ad, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("LD A, (HL-) - 0x3a", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x3a}, {0x40ac, 0xdfbc}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.HL=0x40ac, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 2);
+
+	const auto correct_regs = RegistersChanger{.A=0xdfbc, .HL=0x40ab, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
 TEST_CASE("LD C, d8 - 0x0e", "[ld]") {
 	const auto orig_memory = MemoryChanger{{{0x00, 0x0e}, {0x01, 0xfedc}}}.get(getRandomMemory());
 	const auto orig_regs = RegistersChanger{.PC=0x00}.get(getRandomRegisters());

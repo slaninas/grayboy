@@ -101,38 +101,6 @@ public:
 		const auto instruction = find_by_opcode(opcode);
 
 		switch(opcode) {
-			case 0x00: // NOP
-				break;
-
-			// Load A into an address stored in given register
-			case 0x02: // LD (BC), A
-				memory_.write(regs_.read("BC"), regs_.read("A"));
-				break;
-			case 0x12: // LD (DE), A
-				memory_.write(regs_.read("DE"), regs_.read("A"));
-				break;
-			case 0x22: // LD (HL+), A
-				memory_.write(regs_.read("HL"), regs_.read("A"));
-				regs_.write("HL", regs_.read("HL") + 1);
-				break;
-			case 0x32: // LD (HL-), A
-				memory_.write(regs_.read("HL"), regs_.read("A"));
-				regs_.write("HL", regs_.read("HL") - 1);
-				break;
-
-			// Increment 16bit register
-			case 0x03: // INC BC
-				regs_.write("BC", regs_.read("BC") + 1);
-				break;
-			case 0x13: // INC DE
-				regs_.write("DE", regs_.read("DE") + 1);
-				break;
-			case 0x23: // INC HL
-				regs_.write("HL", regs_.read("HL") + 1);
-				break;
-			case 0x33: // INC SP
-				regs_.write("SP", regs_.read("SP") + 1);
-				break;
 
 			// Increment
 			case 0x04: // INC B
@@ -335,6 +303,60 @@ private:
 				const auto value = static_cast<uint16_t>(memory.read(PC + 1) + (memory.read(PC + 2) << 8));
 				regs.write("SP", value);
 				return 3;
+			}
+		},
+
+		// Load A into an address stored in given register
+		{"LD (BC), A", 0x02, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				memory.write(regs.read("BC"), regs.read("A"));
+				return 2;
+			}
+		},
+		{"LD (DE), A", 0x12, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				memory.write(regs.read("DE"), regs.read("A"));
+				return 2;
+			}
+		},
+		{"LD (HL+), A", 0x22, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				memory.write(regs.read("HL"), regs.read("A"));
+				regs.write("HL", regs.read("HL") + 1);
+				return 2;
+			}
+		},
+		{"LD (HL-), A", 0x32, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				memory.write(regs.read("HL"), regs.read("A"));
+				regs.write("HL", regs.read("HL") - 1);
+				return 2;
+			}
+		},
+
+		// Increment 16bit register
+		{"INC BC", 0x03, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				regs.write("BC", regs.read("BC") + 1);
+				return 2;
+			}
+		},
+		{"INC DE", 0x13, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				regs.write("DE", regs.read("DE") + 1);
+				return 2;
+			}
+		},
+		{"INC HL", 0x23, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				regs.write("HL", regs.read("HL") + 1);
+				return 2;
+			}
+		},
+		{"INC SP", 0x33, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				regs.write("SP", regs.read("SP") + 1);
+				return 2;
 			}
 		},
 

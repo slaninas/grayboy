@@ -141,76 +141,6 @@ public:
 		const auto instruction = find_by_opcode(opcode);
 
 		switch(opcode) {
-
-			case 0x06: // LD B, d8
-				regs_.write("B", memory_.read(instruction_start + 1));
-				break;
-			case 0x07: // RLCA
-				{
-					// TODO: Put into method
-					const auto A = regs_.read("A");
-					const auto msb = (A & (1 << 7)) >> 7;
-					const auto A_new = static_cast<uint8_t>((A << 1) + msb);
-					regs_.write("A", A_new);
-
-					regs_.set_flag("Z", false);
-					regs_.set_flag("N", false);
-					regs_.set_flag("H", false);
-					regs_.set_flag("C", static_cast<bool>(msb));
-				}
-				break;
-			case 0x08: // LD (a16), SP
-				{
-					// TODO: Put into method
-					const auto address = static_cast<uint16_t>((memory_.read(instruction_start + 1) << 8) + memory_.read(instruction_start + 2));
-					const auto SP = regs_.read("SP");
-					memory_.write(address, static_cast<uint8_t>(SP & 0x00ff));
-					memory_.write(address + 1, static_cast<uint8_t>((SP & 0xff00) >> 8));
-				}
-				break;
-			case 0x09: // ADD HL, BC
-				{
-					// TODO: Put into method
-					const auto BC = regs_.read("BC");
-					const auto HL_old = regs_.read("HL");
-					const auto HL_new = static_cast<uint16_t>(HL_old + BC);
-
-					regs_.write("HL", HL_new);
-
-					regs_.set_flag("N", 0);
-					regs_.set_flag("H", half_carry_add_16bit(HL_old, BC));
-					regs_.set_flag("C", carry_add_16bit(HL_old, BC));
-				}
-				break;
-			case 0xa: // LD A, (BC)
-				{
-					const auto address = regs_.read("BC");
-					regs_.write("A", memory_.read(address));
-				}
-				break;
-			case 0x0b: // DEC BC
-				regs_.write("BC", regs_.read("BC") - 1);
-				break;
-			case 0x0e: // LD C, d8
-				{
-					const auto value = memory_.read(instruction_start + 1);
-					regs_.write("C", value);
-				}
-				break;
-			case 0x0f: // RRCA
-				{
-					// TODO: Put into method
-					const auto A = regs_.read("A");
-					const auto lsb = (A & (1 << 0)) >> 0;
-					const auto A_new = static_cast<uint8_t>((A >> 1) + (lsb << 7));
-					regs_.write("A", A_new);
-
-					regs_.set_flag("Z", false);
-					regs_.set_flag("N", false);
-					regs_.set_flag("H", false);
-					regs_.set_flag("C", static_cast<bool>(lsb));
-				}
-				break;
 			default:
 				// TODO: Use hex instead of dec
 				throw std::runtime_error("Opcode " + std::to_string(opcode) + "(dec) not implemented yet.");
@@ -240,25 +170,15 @@ private:
 
 	// See https://meganesulli.com/generate-gb-opcodes/
 	std::vector<Instruction> instructions_ = {
-		{"LD B, d8", 0x06, 2, 2},
-		{"RLCA", 0x07, 1, 1},
-		{"LD (a16), SP", 0x08, 3, 5},
-		{"ADD HL, BC", 0x09, 1, 2},
-		{"LD A, (BC)", 0x0a, 1, 2},
-		{"DEC BC", 0x0b, 1, 2},
-		{"LD C, d8", 0x0e, 2, 2},
-		{"RRCA", 0x0f, 1, 1},
-		// TODO: {"STOP", 0x10, 2, 1},
-
-		// TODO: JR NZ, s8 - 0x20
-
-		// TODO: JR NC, s8 - 0x30
 
 
 
 	};
 
 	std::vector<InstructionNew> instructionsNew_ = {
+		// TODO: {"STOP", 0x10, 2, 1},
+		// TODO: JR NZ, s8 - 0x20
+		// TODO: JR NC, s8 - 0x30
 		{"NOP", 0x00, 1,
 			[]([[maybe_unused]] auto& regs, [[maybe_unused]] auto& mem, [[maybe_unused]] const auto& PC) {
 				return 1;
@@ -396,10 +316,100 @@ private:
 				return 1;
 			}
 		},
-		{"DEC C", 0xd, 1,
+		{"DEC C", 0x0d, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				instruction_dec_fn("C", regs);
 				return 1;
+			}
+		},
+
+		// Load into 8bit
+		{"LD B, d8", 0x06, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				regs.write("B", memory.read(PC + 1));
+				return 2;
+			}
+		},
+		{"LD A, (BC)", 0x0a, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto address = regs.read("BC");
+				regs.write("A", memory.read(address));
+				return 2;
+			}
+		},
+		{"LD C, d8", 0x0e, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto value = memory.read(PC + 1);
+				regs.write("C", value);
+				return 2;
+			}
+		},
+
+		// Decrement 16bit
+		{"DEC BC", 0x0b, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				regs.write("BC", regs.read("BC") - 1);
+				return 2;
+			}
+		},
+
+		// Other instructions, not grouped (yet)
+		{"RLCA", 0x07, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				// TODO: Put into method
+				const auto A = regs.read("A");
+				const auto msb = (A & (1 << 7)) >> 7;
+				const auto A_new = static_cast<uint8_t>((A << 1) + msb);
+				regs.write("A", A_new);
+
+				regs.set_flag("Z", false);
+				regs.set_flag("N", false);
+				regs.set_flag("H", false);
+				regs.set_flag("C", static_cast<bool>(msb));
+				return 1;
+			}
+		},
+		{"RRCA", 0x0f, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				// TODO: Put into method
+				const auto A = regs.read("A");
+				const auto lsb = (A & (1 << 0)) >> 0;
+				const auto A_new = static_cast<uint8_t>((A >> 1) + (lsb << 7));
+				regs.write("A", A_new);
+
+				regs.set_flag("Z", false);
+				regs.set_flag("N", false);
+				regs.set_flag("H", false);
+				regs.set_flag("C", static_cast<bool>(lsb));
+				return 1;
+			}
+		},
+		{"LD (a16), SP", 0x08, 3,
+			[](auto& regs, auto& memory, const auto& PC) {
+				// TODO: Put into method
+				const auto address = static_cast<uint16_t>((memory.read(PC + 1) << 8) + memory.read(PC + 2));
+				const auto SP = regs.read("SP");
+				memory.write(address, static_cast<uint8_t>(SP & 0x00ff));
+				memory.write(address + 1, static_cast<uint8_t>((SP & 0xff00) >> 8));
+				return 5;
+			}
+		},
+		// -------------------- End of ungrouped instructions ----------------------
+
+		// Add 16bit
+		{"Add HL, BC", 0x09, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+					// TODO: Put into method
+					const auto BC = regs.read("BC");
+					const auto HL_old = regs.read("HL");
+					const auto HL_new = static_cast<uint16_t>(HL_old + BC);
+
+					regs.write("HL", HL_new);
+
+					regs.set_flag("N", 0);
+					regs.set_flag("H", half_carry_add_16bit(HL_old, BC));
+					regs.set_flag("C", carry_add_16bit(HL_old, BC));
+				return 2;
 			}
 		},
 

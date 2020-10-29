@@ -442,6 +442,7 @@ private:
 		// -------------------- End of ungrouped instructions ----------------------
 
 		// Add 16bit
+		// TODO: Put these adds into method
 		{"Add HL, BC", 0x09, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 					// TODO: Put into method
@@ -454,6 +455,50 @@ private:
 					regs.set_flag("N", 0);
 					regs.set_flag("H", half_carry_add_16bit(HL_old, BC));
 					regs.set_flag("C", carry_add_16bit(HL_old, BC));
+				return 2;
+			}
+		},
+		{"Add HL, DE", 0x19, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+					// TODO: Put into method
+					const auto DE = regs.read("DE");
+					const auto HL_old = regs.read("HL");
+					const auto HL_new = static_cast<uint16_t>(HL_old + DE);
+
+					regs.write("HL", HL_new);
+
+					regs.set_flag("N", 0);
+					regs.set_flag("H", half_carry_add_16bit(HL_old, DE));
+					regs.set_flag("C", carry_add_16bit(HL_old, DE));
+				return 2;
+			}
+		},
+		{"Add HL, HL", 0x29, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+					// TODO: Put into method
+					const auto HL_old = regs.read("HL");
+					const auto HL_new = static_cast<uint16_t>(HL_old * 2);
+
+					regs.write("HL", HL_new);
+
+					regs.set_flag("N", 0);
+					regs.set_flag("H", half_carry_add_16bit(HL_old, HL_old));
+					regs.set_flag("C", carry_add_16bit(HL_old, HL_old));
+				return 2;
+			}
+		},
+		{"Add HL, SP", 0x39, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+					// TODO: Put into method
+					const auto SP = regs.read("SP");
+					const auto HL_old = regs.read("HL");
+					const auto HL_new = static_cast<uint16_t>(HL_old + SP);
+
+					regs.write("HL", HL_new);
+
+					regs.set_flag("N", 0);
+					regs.set_flag("H", half_carry_add_16bit(HL_old, SP));
+					regs.set_flag("C", carry_add_16bit(HL_old, SP));
 				return 2;
 			}
 		},

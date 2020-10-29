@@ -391,6 +391,21 @@ private:
 				return 1;
 			}
 		},
+		{"RLA", 0x17, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				// TODO: Put into method
+				const auto A = regs.read("A");
+				const auto msb = (A & (1 << 7)) >> 7;
+				const auto A_new = static_cast<uint8_t>((A << 1) + regs.read_flag("C")); // Setting C here as bit 0, it's only difference from RLCA which uses msb
+				regs.write("A", A_new);
+
+				regs.set_flag("Z", false);
+				regs.set_flag("N", false);
+				regs.set_flag("H", false);
+				regs.set_flag("C", static_cast<bool>(msb));
+				return 1;
+			}
+		},
 		{"RRCA", 0x0f, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				// TODO: Put into method

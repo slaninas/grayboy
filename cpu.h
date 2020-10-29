@@ -295,6 +295,32 @@ private:
 				return 1;
 			}
 		},
+		{"DEC D", 0x15, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_dec_fn("D", regs);
+				return 1;
+			}
+		},
+		{"DEC H", 0x25, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_dec_fn("H", regs);
+				return 1;
+			}
+		},
+		{"DEC (HL)", 0x35, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				// TODO: Use instruction_dec function?
+				const auto address = regs.read("HL");
+				const auto old_value = memory.read(address);
+				const auto new_value = static_cast<uint8_t>(old_value - 1);
+				memory.write(address, new_value);
+
+				regs.set_flag("Z", new_value == 0x00);
+				regs.set_flag("N", true);
+				regs.set_flag("H", half_carry_sub_8bit(old_value, 1));
+				return 3;
+			}
+		},
 
 		// Load into 8bit
 		{"LD B, d8", 0x06, 2,

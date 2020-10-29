@@ -208,22 +208,24 @@ TEST_CASE("DEC B - 0x05", "[arithmetic]") {
 		auto cycles = cpu.execute_next();
 		CHECK(cycles == 1);
 
-		// C is unchanged, it's 1 just because it was 1 before
 		auto correct_flags = FlagsChanger{.Z=0, .N=1, .H=0,}.get(orig_regs.read("F"));
 		auto correct_registers = RegistersChanger{.F=correct_flags, .B=0x02, .PC=0x01}.get(orig_regs);
 		CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+		CHECK(cpu.memory_dump() == memory.dump());
 
 		cycles = cpu.execute_next();
 		CHECK(cycles == 1);
 		correct_flags = FlagsChanger{.Z=0, .N=1, .H=0,}.get(correct_flags);
 		correct_registers = RegistersChanger{.F=correct_flags, .B=0x01, .PC=0x02}.get(correct_registers);
 		CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+		CHECK(cpu.memory_dump() == memory.dump());
 
 		cycles = cpu.execute_next();
 		CHECK(cycles == 1);
 		correct_flags = FlagsChanger{.Z=1, .N=1, .H=0,}.get(correct_flags);
 		correct_registers = RegistersChanger{.F=correct_flags, .B=0x00, .PC=0x03}.get(correct_registers);
 		CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+		CHECK(cpu.memory_dump() == memory.dump());
 	}
 
 	// TODO: More half-carry tests
@@ -235,8 +237,97 @@ TEST_CASE("DEC B - 0x05", "[arithmetic]") {
 		const auto correct_flags = FlagsChanger{.Z=0, .N=1, .H=1,}.get(orig_regs.read("F"));
 		const auto correct_registers = RegistersChanger{.F=correct_flags, .B=0xef, .PC=0x01}.get(orig_regs);
 		CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+		CHECK(cpu.memory_dump() == memory.dump());
 	}
 
+}
+
+// TODO: Does catch2 have some templates? This code is repeated, just register name is changed
+TEST_CASE("DEC D - 0x15", "[arithmetic]") {
+	const auto memory = MemoryChanger{{{0x00, 0x15}, {0x01, 0x15}, {0x02, 0x15}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.D=0x03, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{memory, orig_regs};
+
+	auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+
+	auto correct_flags = FlagsChanger{.Z=0, .N=1, .H=0,}.get(orig_regs.read("F"));
+	auto correct_registers = RegistersChanger{.F=correct_flags, .D=0x02, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+	CHECK(cpu.memory_dump() == memory.dump());
+
+	cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+	correct_flags = FlagsChanger{.Z=0, .N=1, .H=0,}.get(correct_flags);
+	correct_registers = RegistersChanger{.F=correct_flags, .D=0x01, .PC=0x02}.get(correct_registers);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+	CHECK(cpu.memory_dump() == memory.dump());
+
+	cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+	correct_flags = FlagsChanger{.Z=1, .N=1, .H=0,}.get(correct_flags);
+	correct_registers = RegistersChanger{.F=correct_flags, .D=0x00, .PC=0x03}.get(correct_registers);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+	CHECK(cpu.memory_dump() == memory.dump());
+}
+
+TEST_CASE("DEC H - 0x25", "[arithmetic]") {
+	const auto memory = MemoryChanger{{{0x00, 0x25}, {0x01, 0x25}, {0x02, 0x25}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.H=0x03, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{memory, orig_regs};
+
+	auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+
+	auto correct_flags = FlagsChanger{.Z=0, .N=1, .H=0,}.get(orig_regs.read("F"));
+	auto correct_registers = RegistersChanger{.F=correct_flags, .H=0x02, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+	CHECK(cpu.memory_dump() == memory.dump());
+
+	cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+	correct_flags = FlagsChanger{.Z=0, .N=1, .H=0,}.get(correct_flags);
+	correct_registers = RegistersChanger{.F=correct_flags, .H=0x01, .PC=0x02}.get(correct_registers);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+	CHECK(cpu.memory_dump() == memory.dump());
+
+	cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+	correct_flags = FlagsChanger{.Z=1, .N=1, .H=0,}.get(correct_flags);
+	correct_registers = RegistersChanger{.F=correct_flags, .H=0x00, .PC=0x03}.get(correct_registers);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+	CHECK(cpu.memory_dump() == memory.dump());
+}
+
+TEST_CASE("DEC (HL) - 0x35", "[arithmetic]") {
+	const auto memory = MemoryChanger{{{0x00, 0x35}, {0x01, 0x35}, {0x02, 0x35}, {0xabcd, 0x03}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.HL=0xabcd, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{memory, orig_regs};
+
+	auto cycles = cpu.execute_next();
+	CHECK(cycles == 3);
+
+	auto correct_flags = FlagsChanger{.Z=0, .N=1, .H=0,}.get(orig_regs.read("F"));
+	auto correct_registers = RegistersChanger{.F=correct_flags, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+	auto correct_memory = MemoryChanger{{{0xabcd, 0x02}}}.get(memory);
+	CHECK(cpu.memory_dump() == correct_memory.dump());
+
+	cycles = cpu.execute_next();
+	CHECK(cycles == 3);
+	correct_flags = FlagsChanger{.Z=0, .N=1, .H=0,}.get(correct_flags);
+	correct_registers = RegistersChanger{.F=correct_flags, .PC=0x02}.get(correct_registers);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+	correct_memory = MemoryChanger{{{0xabcd, 0x01}}}.get(memory);
+	CHECK(cpu.memory_dump() == correct_memory.dump());
+
+	cycles = cpu.execute_next();
+	CHECK(cycles == 3);
+	correct_flags = FlagsChanger{.Z=1, .N=1, .H=0,}.get(correct_flags);
+	correct_registers = RegistersChanger{.F=correct_flags, .PC=0x03}.get(correct_registers);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+	correct_memory = MemoryChanger{{{0xabcd, 0x00}}}.get(memory);
+	CHECK(cpu.memory_dump() == correct_memory.dump());
 }
 
 

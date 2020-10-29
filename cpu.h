@@ -467,6 +467,28 @@ private:
 				return 3;
 			}
 		},
+		{"JR, Z s8", 0x28, 2,
+			[](auto& regs,  auto& memory, const auto& PC) {
+				const auto value = memory.read(PC + 1);
+				if (regs.read_flag("Z")) {
+					const auto PC_new = PC + value - 2; // Instruction size is 2 so it must be subtracted here in advance for Instruction to work properly
+					regs.write("PC", PC_new);
+					return 3;
+				}
+				return 2;
+			}
+		},
+		{"JR, C s8", 0x38, 2,
+			[](auto& regs,  auto& memory, const auto& PC) {
+				const auto value = memory.read(PC + 1);
+				if (regs.read_flag("C")) {
+					const auto PC_new = PC + value - 2; // Instruction size is 2 so it must be subtracted here in advance for Instruction to work properly
+					regs.write("PC", PC_new);
+					return 3;
+				}
+				return 2;
+			}
+		},
 
 
 	};

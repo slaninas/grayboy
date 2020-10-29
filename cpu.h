@@ -152,6 +152,7 @@ private:
 		// TODO: {"STOP", 0x10, 2, 1},
 		// TODO: JR NZ, s8 - 0x20
 		// TODO: JR NC, s8 - 0x30
+		// TODO: DAA - 0x27
 		{"NOP", 0x00, 1,
 			[]([[maybe_unused]] auto& regs, [[maybe_unused]] auto& mem, [[maybe_unused]] const auto& PC) {
 				return 1;
@@ -429,6 +430,12 @@ private:
 				memory.write(address, static_cast<uint8_t>(SP & 0x00ff));
 				memory.write(address + 1, static_cast<uint8_t>((SP & 0xff00) >> 8));
 				return 5;
+			}
+		},
+		{"SCF", 0x37, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				regs.set_flag("C", true);
+				return 1;
 			}
 		},
 		// -------------------- End of ungrouped instructions ----------------------

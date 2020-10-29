@@ -415,6 +415,24 @@ private:
 				return 2;
 			}
 		},
+		{"DEC DE", 0x1b, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				regs.write("DE", regs.read("DE") - 1);
+				return 2;
+			}
+		},
+		{"DEC HL", 0x2b, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				regs.write("HL", regs.read("HL") - 1);
+				return 2;
+			}
+		},
+		{"DEC SP", 0x3b, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				regs.write("SP", regs.read("SP") - 1);
+				return 2;
+			}
+		},
 
 		// Other instructions, not grouped (yet)
 		{"RLCA", 0x07, 1,

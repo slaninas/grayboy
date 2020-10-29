@@ -304,7 +304,7 @@ private:
 			}
 		},
 		{"INC (HL)", 0x34, 1,
-			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
 				// TODO: Use instruction_inc method?
 					const auto address = regs.read("HL");
 					const auto old_value = memory.read(address);
@@ -331,6 +331,24 @@ private:
 				return 1;
 			}
 		},
+		{"DEC E", 0x1d, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_dec_fn("E", regs);
+				return 1;
+			}
+		},
+		{"DEC L", 0x2d, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_dec_fn("L", regs);
+				return 1;
+			}
+		},
+		{"DEC A", 0x3d, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_dec_fn("A", regs);
+				return 1;
+			}
+		},
 		{"DEC D", 0x15, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				instruction_dec_fn("D", regs);
@@ -344,7 +362,7 @@ private:
 			}
 		},
 		{"DEC (HL)", 0x35, 1,
-			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
 				// TODO: Use instruction_dec function?
 				const auto address = regs.read("HL");
 				const auto old_value = memory.read(address);

@@ -14,6 +14,19 @@ struct Instruction {
 	uint8_t cycles;
 };
 
+struct InstructionNew {
+	std::string mnemonic;
+	uint16_t opcode;
+	uint8_t size;
+	std::function<uint8_t(Registers&, Memory&, const uint16_t&)> run;
+
+	auto operator()(Registers& regs, Memory& mem, const uint16_t& PC) const {
+		const auto cycles = run(regs, mem, PC);
+		regs.write("PC", PC + size);
+		return cycles;
+	}
+};
+
 // Make exceptions asserts and run in debug
 // TODO: Add unit tests
 class Cpu {
@@ -78,30 +91,17 @@ public:
 			throw std::runtime_error("16-bit opcodes not implemented yet.");
 		}
 
+		const auto instructionNew = find_by_opcodeNew(opcode);
+		// TODO: Remove this if and move this check into find_by_opcode
+		if (instructionNew != end(instructionsNew_)) {
+			auto cycles = (*instructionNew)(regs_, memory_, regs_.read("PC"));
+			return cycles;
+		}
+
 		const auto instruction = find_by_opcode(opcode);
 
 		switch(opcode) {
 			case 0x00: // NOP
-				break;
-
-			// Load 16bit value into 16bit register
-			case 0x01: // LD BC, d16
-				regs_.write("C", memory_.read(instruction_start + 1));
-				regs_.write("B", memory_.read(instruction_start + 2));
-				break;
-			case 0x11: // LD DE, d16
-				regs_.write("E", memory_.read(instruction_start + 1));
-				regs_.write("D", memory_.read(instruction_start + 2));
-				break;
-			case 0x21: // LD HL, d16
-				regs_.write("L", memory_.read(instruction_start + 1));
-				regs_.write("H", memory_.read(instruction_start + 2));
-				break;
-			case 0x31: // LD SP, d16
-				{
-					auto value = static_cast<uint16_t>(memory_.read(instruction_start + 1) + (memory_.read(instruction_start + 2) << 8));
-					regs_.write("SP", value);
-				}
 				break;
 
 			// Load A into an address stored in given register
@@ -265,8 +265,6 @@ private:
 
 	// See https://meganesulli.com/generate-gb-opcodes/
 	std::vector<Instruction> instructions_ = {
-		{"NOP", 0x00, 1, 1},
-		{"LD BC, d16", 0x01, 3, 3},
 		{"LD (BC), A", 0x02, 1, 2},
 		{"INC BC", 0x03, 1, 2},
 		{"INC B", 0x04, 1, 1},
@@ -303,12 +301,63 @@ private:
 
 	};
 
+	std::vector<InstructionNew> instructionsNew_ = {
+		{"NOP", 0x00, 1,
+			[]([[maybe_unused]] auto& regs, [[maybe_unused]] auto& mem, [[maybe_unused]] const auto& PC) {
+				return 1;
+			}
+		},
+
+		// Load 16bit value into 16bit register
+		{"LD BC, d16", 0x01, 3,
+			[](auto& regs, auto& memory, const auto& PC) {
+				regs.write("C", memory.read(PC + 1));
+				regs.write("B", memory.read(PC + 2));
+				return 3;
+			}
+		},
+		{"LD DE, d16", 0x11, 3,
+			[](auto& regs, auto& memory, const auto& PC) {
+				regs.write("E", memory.read(PC + 1));
+				regs.write("D", memory.read(PC + 2));
+				return 3;
+			}
+		},
+		{"LD HL, d16", 0x21, 3,
+			[](auto& regs, auto& memory, const auto& PC) {
+				regs.write("L", memory.read(PC + 1));
+				regs.write("H", memory.read(PC + 2));
+				return 3;
+			}
+		},
+		{"LD SP, d16", 0x31, 3,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto value = static_cast<uint16_t>(memory.read(PC + 1) + (memory.read(PC + 2) << 8));
+				regs.write("SP", value);
+				return 3;
+			}
+		},
+
+
+	};
+
 	[[nodiscard]] const Instruction& find_by_opcode(const uint16_t opcode) {
 		auto res = std::find_if(begin(instructions_), end(instructions_), [opcode](const auto& instruction) { return instruction.opcode ==  opcode; });
 		if (res == end(instructions_)) {
 			throw std::runtime_error("Opcode " + std::to_string(opcode) + " (dec) not found");
 		}
 		return *res;
+	}
+
+	// TODO: Return const instruction& not iterator
+	[[nodiscard]] const decltype(instructionsNew_)::iterator find_by_opcodeNew(const uint16_t opcode) {
+		auto res = std::find_if(begin(instructionsNew_), end(instructionsNew_), [opcode](const auto& instruction) { return instruction.opcode ==  opcode; });
+		// TODO: Return back when new instructions class is fully used and the old one is removed
+		// if (res == end(instructionsNew_)) {
+			// throw std::runtime_error("Opcode " + std::to_string(opcode) + " (dec) not found");
+		// }
+		// TD<decltype(res)> td;
+		return res;
 	}
 
 	template<size_t kSize>

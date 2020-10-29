@@ -14,9 +14,10 @@ struct Instruction {
 	uint8_t size;
 	std::function<uint8_t(Registers&, Memory&, const uint16_t&)> run;
 
-	auto operator()(Registers& regs, Memory& mem, const uint16_t& PC) const {
+	[[nodiscard]] auto operator()(Registers& regs, Memory& mem, const uint16_t& PC) const {
 		const auto cycles = run(regs, mem, PC);
-		regs.write("PC", PC + size);
+		const auto PC_new = regs.read("PC");
+		regs.write("PC", PC_new + size);
 		return cycles;
 	}
 };
@@ -456,6 +457,17 @@ private:
 				return 2;
 			}
 		},
+
+		// Jumps/calls
+		{"JR s8", 0x18, 2,
+			[](auto& regs,  auto& memory, const auto& PC) {
+				const auto value = memory.read(PC + 1);
+				const auto PC_new = PC + value - 2; // Instruction size is 2 so it must be subtracted here in advance for Instruction to work properly
+				regs.write("PC", PC_new);
+				return 3;
+			}
+		},
+
 
 	};
 

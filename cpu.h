@@ -329,6 +329,29 @@ private:
 				return 2;
 			}
 		},
+		{"LD D, d8", 0x16, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				regs.write("D", memory.read(PC + 1));
+				return 2;
+			}
+		},
+		{"LD H, d8", 0x26, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				regs.write("H", memory.read(PC + 1));
+				return 2;
+			}
+		},
+		// https://meganesulli.com/generate-gb-opcodes/ says it's 1 byte long instruction but it doesn't make sense, right?
+		// TODO: Is 3 cycles correct?
+		{"LD (HL), d8", 0x36, 1,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto address = regs.read("HL");
+				const auto value = memory.read(PC + 1);
+				memory.write(address, value);
+				return 3;
+			}
+		},
+
 		{"LD A, (BC)", 0x0a, 1,
 			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
 				const auto address = regs.read("BC");

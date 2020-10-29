@@ -122,30 +122,6 @@ public:
 
 		switch(opcode) {
 
-			// Increment
-			case 0x04: // INC B
-				instruction_inc("B");
-				break;
-			case 0x14: // INC D
-				instruction_inc("D");
-				break;
-			case 0x24: // INC H
-				instruction_inc("H");
-				break;
-			case 0x34: // INC (HL)
-				// TODO: Use instruction_inc method?
-				{
-					const auto address = regs_.read("HL");
-					const auto old_value = memory_.read(address);
-					const auto new_value = static_cast<uint8_t>(old_value + 1);
-					memory_.write(address, new_value);
-
-					regs_.set_flag("Z", new_value == 0x00);
-					regs_.set_flag("N", false);
-					regs_.set_flag("H", half_carry_add_8bit(old_value, 1));
-				}
-				break;
-
 			case 0x05: // DEC B
 				instruction_dec("B");
 				break;
@@ -253,9 +229,6 @@ private:
 
 	// See https://meganesulli.com/generate-gb-opcodes/
 	std::vector<Instruction> instructions_ = {
-		{"LD (BC), A", 0x02, 1, 2},
-		{"INC BC", 0x03, 1, 2},
-		{"INC B", 0x04, 1, 1},
 		{"DEC B", 0x05, 1, 1},
 		{"LD B, d8", 0x06, 2, 2},
 		{"RLCA", 0x07, 1, 1},
@@ -268,22 +241,10 @@ private:
 		{"LD C, d8", 0x0e, 2, 2},
 		{"RRCA", 0x0f, 1, 1},
 		// TODO: {"STOP", 0x10, 2, 1},
-		{"LD DE, d16", 0x11, 3, 3},
-		{"LD (DE), A", 0x12, 1, 2},
-		{"INC DE", 0x13, 1, 2},
-		{"INC D", 0x14, 1, 1},
 
 		// TODO: JR NZ, s8 - 0x20
-		{"LD HL, d16", 0x21, 3, 3},
-		{"LD (HL+), A", 0x22, 1, 2},
-		{"INC HL", 0x23, 1, 2},
-		{"INC H", 0x24, 1, 1},
 
 		// TODO: JR NC, s8 - 0x30
-		{"LD SP, d16", 0x31, 3, 3},
-		{"LD (HL-), A", 0x32, 1, 2},
-		{"INC SP", 0x33, 1, 2},
-		{"INC (HL)", 0x34, 1, 3},
 
 
 
@@ -380,6 +341,39 @@ private:
 			}
 		},
 
+		// 8bit increment
+		{"INC B", 0x04, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_inc_fn("B", regs);
+				return 1;
+			}
+		},
+		{"INC B", 0x14, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_inc_fn("D", regs);
+				return 1;
+			}
+		},
+		{"INC B", 0x24, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_inc_fn("H", regs);
+				return 1;
+			}
+		},
+		{"INC (HL)", 0x34, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				// TODO: Use instruction_inc method?
+					const auto address = regs.read("HL");
+					const auto old_value = memory.read(address);
+					const auto new_value = static_cast<uint8_t>(old_value + 1);
+					memory.write(address, new_value);
+
+					regs.set_flag("Z", new_value == 0x00);
+					regs.set_flag("N", false);
+					regs.set_flag("H", half_carry_add_8bit(old_value, 1));
+				return 3;
+			}
+		},
 
 	};
 

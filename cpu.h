@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <iostream>
+#include <sstream>
 #include <cassert>
 
 #include "registers.h"
@@ -390,7 +391,9 @@ private:
 	[[nodiscard]] const Instruction& find_by_opcode(const uint16_t opcode) {
 		auto res = std::find_if(begin(instructions_), end(instructions_), [opcode](const auto& instruction) { return instruction.opcode ==  opcode; });
 		if (res == end(instructions_)) {
-			throw std::runtime_error("Opcode " + std::to_string(opcode) + " (dec) not found");
+			auto stream = std::stringstream{};
+			stream << std::hex << opcode;
+			throw std::runtime_error("Opcode 0x" + stream.str() + " not found.");
 		}
 		return *res;
 	}

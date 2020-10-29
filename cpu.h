@@ -273,6 +273,24 @@ private:
 				return 1;
 			}
 		},
+		{"INC E", 0x1c, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_inc_fn("E", regs);
+				return 1;
+			}
+		},
+		{"INC L", 0x2c, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_inc_fn("L", regs);
+				return 1;
+			}
+		},
+		{"INC A", 0x3c, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_inc_fn("A", regs);
+				return 1;
+			}
+		},
 		{"INC D", 0x14, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				instruction_inc_fn("D", regs);

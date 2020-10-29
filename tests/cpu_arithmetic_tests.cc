@@ -453,6 +453,48 @@ TEST_CASE("INC C - 0x0c", "[arithmetic]") {
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
 
+TEST_CASE("INC E - 0x1c", "[arithmetic]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x1c}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.E=0xff, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+
+	const auto correct_flags = FlagsChanger{.Z=1, .N=0, .H=1}.get(orig_regs.read("F"));
+	const auto correct_regs = RegistersChanger{.F=correct_flags, .E=0x00, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("INC L - 0x2c", "[arithmetic]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x2c}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.L=0xaf, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+
+	const auto correct_flags = FlagsChanger{.Z=0, .N=0, .H=1}.get(orig_regs.read("F"));
+	const auto correct_regs = RegistersChanger{.F=correct_flags, .L=0xb0, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("INC A - 0x3c", "[arithmetic]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x3c}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.A=0xf7, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+
+	const auto correct_flags = FlagsChanger{.Z=0, .N=0, .H=0}.get(orig_regs.read("F"));
+	const auto correct_regs = RegistersChanger{.A=0xf8, .F=correct_flags, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
 TEST_CASE("DEC C - 0x0d", "[arithmetic]") {
 	const auto orig_memory = MemoryChanger{{{0x00, 0x0d}}}.get(getRandomMemory());
 	const auto orig_regs = RegistersChanger{.C=0x01, .PC=0x00}.get(getRandomRegisters());

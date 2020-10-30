@@ -565,3 +565,17 @@ TEST_CASE("ADD A, B - 0x80", "[arithmetic]") {
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
+
+TEST_CASE("ADD A, C - 0x81", "[arithmetic]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x81}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.A=0x12, .C=0x34, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+
+	const auto correct_flags = FlagsChanger{.Z=0, .N=0, .H=0}.get(orig_regs.read("F"));
+	const auto correct_regs = RegistersChanger{.A=0x46, .F=correct_flags, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}

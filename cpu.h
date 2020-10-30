@@ -1034,6 +1034,12 @@ private:
 				return 1;
 			}
 		},
+		{"ADD A, C", 0x81, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_add("A", "C", regs);
+				return 1;
+			}
+		},
 
 		// Jumps/calls
 		{"JR s8", 0x18, 2,

@@ -97,16 +97,33 @@ void instruction_dec_fn(const char(&reg_name)[kSize], Registers& regs) {
 template<size_t kDestSize, size_t kSecondRegNameSize>
 void instruction_add(const char(&dest_name)[kDestSize], const char(&second_reg_name)[kSecondRegNameSize], Registers& regs) {
 	static_assert(kDestSize == kSecondRegNameSize, "Add for 8bit + 16bit or vice versa not implemented.");
+	constexpr auto real_size = kDestSize - 1;
 
-	const auto second_reg = regs.read(second_reg_name);
-	const auto dest_old = regs.read(dest_name);
-	const auto dest_new = static_cast<decltype(second_reg)>(dest_old + second_reg);
+	// 8bit
+	if (real_size == 1) {
+		const auto second_reg = regs.read(second_reg_name);
+		const auto dest_old = regs.read(dest_name);
+		const auto dest_new = static_cast<decltype(second_reg)>(dest_old + second_reg);
 
-	regs.write(dest_name, dest_new);
+		regs.write(dest_name, dest_new);
 
-	regs.set_flag("N", 0);
-	regs.set_flag("H", half_carry_add_16bit(dest_old, second_reg));
-	regs.set_flag("C", carry_add_16bit(dest_old, second_reg));
+		regs.set_flag("Z", dest_new == 0); // TODO: This is the only difference between 8 and 16bit, merge rest?
+		regs.set_flag("N", 0);
+		regs.set_flag("H", half_carry_add_16bit(dest_old, second_reg));
+		regs.set_flag("C", carry_add_16bit(dest_old, second_reg));
+	}
+	// 16bit
+	else {
+		const auto second_reg = regs.read(second_reg_name);
+		const auto dest_old = regs.read(dest_name);
+		const auto dest_new = static_cast<decltype(second_reg)>(dest_old + second_reg);
+
+		regs.write(dest_name, dest_new);
+
+		regs.set_flag("N", 0);
+		regs.set_flag("H", half_carry_add_16bit(dest_old, second_reg));
+		regs.set_flag("C", carry_add_16bit(dest_old, second_reg));
+	}
 }
 
 
@@ -1007,6 +1024,14 @@ private:
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				instruction_add("HL", "SP", regs);
 				return 2;
+			}
+		},
+
+		// Add 8bit
+		{"ADD A, B", 0x80, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_add("A", "B", regs);
+				return 1;
 			}
 		},
 

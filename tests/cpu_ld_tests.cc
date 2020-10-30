@@ -587,3 +587,196 @@ TEST_CASE("LD C, A - 0x4f", "[ld]") {
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
+
+// This 0x5* opcodes tests are copy-pasted from previous 0x4* line
+TEST_CASE("LD D, B - 0x50", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x50}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.B=0x32, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+	const auto correct_regs = RegistersChanger{.D=0x32, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("LD D, C - 0x51", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x51}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.C=0x45, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+	const auto correct_regs = RegistersChanger{.D=0x45, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("LD D, D - 0x52", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x52}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+	const auto correct_regs = RegistersChanger{.PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("LD D, E - 0x53", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x53}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.E=0xee, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+	const auto correct_regs = RegistersChanger{.D=0xee, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("LD D, H - 0x54", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x54}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.H=0xff, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+	const auto correct_regs = RegistersChanger{.D=0xff, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("LD D, L - 0x55", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x55}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.L=0xed, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+	const auto correct_regs = RegistersChanger{.D=0xed, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("LD D, (HL) - 0x56", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x56}, {0xedfa, 0x34}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.HL=0xedfa, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 2);
+	const auto correct_regs = RegistersChanger{.D=0x34, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("LD D, A - 0x57", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x57}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.A=0x00, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+	const auto correct_regs = RegistersChanger{.D=0x00, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("LD E, B - 0x58", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x58}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.B=0x56, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+	const auto correct_regs = RegistersChanger{.E=0x56, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("LD E, C - 0x59", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x59}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.C=0xfe, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+	const auto correct_regs = RegistersChanger{.E=0xfe, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("LD E, D - 0x5a", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x5a}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.D=0x33, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+	const auto correct_regs = RegistersChanger{.E=0x33, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("LD E, E - 0x5b", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x5b}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+	const auto correct_regs = RegistersChanger{.PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("LD E, H - 0x5c", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x5c}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.H=0x10, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+	const auto correct_regs = RegistersChanger{.E=0x10, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("LD E, L - 0x5d", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x5d}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.L=0x5f, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+	const auto correct_regs = RegistersChanger{.E=0x5f, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("LD E, (HL) - 0x5e", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x5e}, {0x4321, 0xce}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.HL=0x4321, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 2);
+	const auto correct_regs = RegistersChanger{.E=0xce, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("LD E, A - 0x5f", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x5f}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.A=0x8f, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+	const auto correct_regs = RegistersChanger{.E=0x8f, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}

@@ -985,25 +985,25 @@ private:
 
 		// Add 16bit
 		// TODO: Put these adds into method
-		{"Add HL, BC", 0x09, 1,
+		{"ADD HL, BC", 0x09, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				instruction_add("HL", "BC", regs);
 				return 2;
 			}
 		},
-		{"Add HL, DE", 0x19, 1,
+		{"ADD HL, DE", 0x19, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				instruction_add("HL", "DE", regs);
 				return 2;
 			}
 		},
-		{"Add HL, HL", 0x29, 1,
+		{"ADD HL, HL", 0x29, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				instruction_add("HL", "HL", regs);
 				return 2;
 			}
 		},
-		{"Add HL, SP", 0x39, 1,
+		{"ADD HL, SP", 0x39, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				instruction_add("HL", "SP", regs);
 				return 2;

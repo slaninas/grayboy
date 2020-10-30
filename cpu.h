@@ -170,6 +170,7 @@ private:
 		// TODO: JR NZ, s8 - 0x20
 		// TODO: JR NC, s8 - 0x30
 		// TODO: DAA - 0x27
+		// TODO: HALT - 0x76
 		{"NOP", 0x00, 1,
 			[]([[maybe_unused]] auto& regs, [[maybe_unused]] auto& mem, [[maybe_unused]] const auto& PC) {
 				return 1;
@@ -749,6 +750,112 @@ private:
 		{"LD L, A", 0x6f, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				regs.write("L", regs.read("A"));
+				return 1;
+			}
+		},
+		{"LD (HL), B", 0x70, 1,
+			[](auto& regs,  auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto address = regs.read("HL");
+				const auto value = regs.read("B");
+				memory.write(address, value);
+				return 2;
+			}
+		},
+		{"LD (HL), C", 0x71, 1,
+			[](auto& regs,  auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto address = regs.read("HL");
+				const auto value = regs.read("C");
+				memory.write(address, value);
+				return 2;
+			}
+		},
+		{"LD (HL), D", 0x72, 1,
+			[](auto& regs,  auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto address = regs.read("HL");
+				const auto value = regs.read("D");
+				memory.write(address, value);
+				return 2;
+			}
+		},
+		{"LD (HL), E", 0x73, 1,
+			[](auto& regs,  auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto address = regs.read("HL");
+				const auto value = regs.read("E");
+				memory.write(address, value);
+				return 2;
+			}
+		},
+		{"LD (HL), H", 0x74, 1,
+			[](auto& regs,  auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto address = regs.read("HL");
+				const auto value = regs.read("H");
+				memory.write(address, value);
+				return 2;
+			}
+		},
+		{"LD (HL), L", 0x75, 1,
+			[](auto& regs,  auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto address = regs.read("HL");
+				const auto value = regs.read("L");
+				memory.write(address, value);
+				return 2;
+			}
+		},
+		{"LD (HL), A", 0x77, 1,
+			[](auto& regs,  auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto address = regs.read("HL");
+				const auto value = regs.read("A");
+				memory.write(address, value);
+				return 2;
+			}
+		},
+		{"LD A, B", 0x78, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				regs.write("A", regs.read("B"));
+				return 1;
+			}
+		},
+		{"LD A, C", 0x79, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				regs.write("A", regs.read("C"));
+				return 1;
+			}
+		},
+		{"LD A, D", 0x7a, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				regs.write("A", regs.read("D"));
+				return 1;
+			}
+		},
+		{"LD A, E", 0x7b, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				regs.write("A", regs.read("E"));
+				return 1;
+			}
+		},
+		{"LD A, H", 0x7c, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				regs.write("A", regs.read("H"));
+				return 1;
+			}
+		},
+		{"LD A, L", 0x7d, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				regs.write("A", regs.read("L"));
+				return 1;
+			}
+		},
+		{"LD A, (HL)", 0x7e, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto address = regs.read("HL");
+				const auto value = memory.read(address);
+				regs.write("A", value);
+				return 2;
+			}
+		},
+
+		{"LD A, A", 0x7f, 1,
+			[]([[maybe_unused]] auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				return 1;
 			}
 		},

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <cassert>
+#include <type_traits>
 
 #include "registers.h"
 #include "memory.h"
@@ -124,6 +125,36 @@ void instruction_add(const char(&dest_name)[kDestSize], const char(&second_reg_n
 		regs.set_flag("H", half_carry_add_16bit(dest_old, second_reg));
 		regs.set_flag("C", carry_add_16bit(dest_old, second_reg));
 	}
+}
+
+// TODO: Unit unit test for this
+template<size_t kDestSize, typename ValueType>
+void instruction_addc(const char(&dest_name)[kDestSize], const ValueType& value, Registers& regs) {
+	constexpr auto real_size = kDestSize - 1;
+	static_assert(real_size == 1, "Only 8bit add with carry supported.");
+	static_assert(std::is_same_v<ValueType, uint8_t>, "Only 8bit add with carry supported.");
+
+	const auto C = regs.read_flag("C");
+	const auto value_with_carry = static_cast<uint8_t>(value + C);
+	auto half_carry = half_carry_add_8bit(value, C);
+	auto carry = carry_add_8bit(value, C);
+
+	const auto dest_old = regs.read(dest_name);
+	const auto dest_new = dest_old + value_with_carry;
+	half_carry |= half_carry_add_8bit(dest_old, value_with_carry);
+	carry |= carry_add_8bit(dest_old, value_with_carry);
+
+	regs.write(dest_name, dest_new);
+	regs.set_flag("Z", dest_new == 0);
+	regs.set_flag("N", false);
+	regs.set_flag("H", half_carry);
+	regs.set_flag("C", carry);
+}
+
+// TODO: Unit unit test for this
+template<size_t kDestSize, size_t kSecondRegNameSize>
+void instruction_addc(const char(&dest_name)[kDestSize], const char(&second_reg_name)[kSecondRegNameSize], Registers& regs) {
+	instruction_addc(dest_name, regs.read(second_reg_name), regs);
 }
 
 
@@ -1084,6 +1115,58 @@ private:
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				instruction_add("A", "A", regs);
 				return 1;
+			}
+		},
+
+		// 8bit add with carry
+		{"ADC A, B", 0x88, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_addc("A", "B", regs);
+				return 2;
+			}
+		},
+		{"ADC A, C", 0x89, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_addc("A", "C", regs);
+				return 2;
+			}
+		},
+		{"ADC A, D", 0x8a, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_addc("A", "D", regs);
+				return 2;
+			}
+		},
+		{"ADC A, E", 0x8b, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_addc("A", "E", regs);
+				return 2;
+			}
+		},
+		{"ADC A, H", 0x8c, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_addc("A", "H", regs);
+				return 2;
+			}
+		},
+		{"ADC A, L", 0x8d, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_addc("A", "L", regs);
+				return 2;
+			}
+		},
+		{"ADC A, (HL)", 0x8e, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto address = regs.read("HL");
+				const auto value = memory.read(address);
+				instruction_addc("A", value, regs);
+				return 2;
+			}
+		},
+		{"ADC A, A", 0x8f, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_addc("A", "A", regs);
+				return 2;
 			}
 		},
 

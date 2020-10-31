@@ -100,7 +100,7 @@ void instruction_add(const char(&dest_name)[kDestSize], const char(&second_reg_n
 	constexpr auto real_size = kDestSize - 1;
 
 	// 8bit
-	if (real_size == 1) {
+	if constexpr (real_size == 1) {
 		const auto second_reg = regs.read(second_reg_name);
 		const auto dest_old = regs.read(dest_name);
 		const auto dest_new = static_cast<decltype(second_reg)>(dest_old + second_reg);

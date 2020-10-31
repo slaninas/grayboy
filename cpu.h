@@ -1040,6 +1040,52 @@ private:
 				return 1;
 			}
 		},
+		{"ADD A, D", 0x82, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_add("A", "D", regs);
+				return 1;
+			}
+		},
+		{"ADD A, E", 0x83, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_add("A", "E", regs);
+				return 1;
+			}
+		},
+		{"ADD A, H", 0x84, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_add("A", "H", regs);
+				return 1;
+			}
+		},
+		{"ADD A, L", 0x85, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_add("A", "L", regs);
+				return 1;
+			}
+		},
+		{"ADD A, (HL)", 0x86, 1,
+			[](auto& regs,  auto& memory, [[maybe_unused]] const auto& PC) {
+				// TODO: Put into function
+				const auto address = regs.read("HL");
+				const auto value = memory.read(address);
+				const auto A_old = regs.read("A");
+				const auto A_new = static_cast<uint8_t>(A_old + value);
+
+				regs.write("A", A_new);
+				regs.set_flag("Z", A_new == 0);
+				regs.set_flag("N", false);
+				regs.set_flag("H", half_carry_add_8bit(A_old, value));
+				regs.set_flag("C", carry_add_8bit(A_old, value));
+				return 2;
+			}
+		},
+		{"ADD A, L", 0x87, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_add("A", "A", regs);
+				return 1;
+			}
+		},
 
 		// Jumps/calls
 		{"JR s8", 0x18, 2,

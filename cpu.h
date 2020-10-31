@@ -95,6 +95,7 @@ void instruction_dec_fn(const char(&reg_name)[kSize], Registers& regs) {
 	}
 }
 
+
 template<size_t kDestSize, size_t kSecondRegNameSize>
 void instruction_add(const char(&dest_name)[kDestSize], const char(&second_reg_name)[kSecondRegNameSize], Registers& regs) {
 	static_assert(kDestSize == kSecondRegNameSize, "Add for 8bit + 16bit or vice versa not implemented.");
@@ -151,10 +152,32 @@ void instruction_addc(const char(&dest_name)[kDestSize], const ValueType& value,
 	regs.set_flag("C", carry);
 }
 
-// TODO: Unit unit test for this
 template<size_t kDestSize, size_t kSecondRegNameSize>
 void instruction_addc(const char(&dest_name)[kDestSize], const char(&second_reg_name)[kSecondRegNameSize], Registers& regs) {
 	instruction_addc(dest_name, regs.read(second_reg_name), regs);
+}
+
+// TODO: Unit unit test for this
+template<size_t kDestSize, typename ValueType>
+void instruction_sub(const char(&dest_name)[kDestSize], const ValueType& value, Registers& regs) {
+	constexpr auto real_size = kDestSize - 1;
+	static_assert(real_size == 1, "Only 8bit sub is supported.");
+	static_assert(std::is_same_v<ValueType, uint8_t>, "Only 8bit sub is supported.");
+
+	const auto dest_old = regs.read(dest_name);
+	const auto dest_new = dest_old - value;
+
+	regs.write(dest_name, dest_new);
+	regs.set_flag("Z", dest_new == 0);
+	regs.set_flag("N", true);
+	regs.set_flag("H", half_carry_sub_8bit(dest_old, value));
+	regs.set_flag("C", carry_sub_8bit(dest_old, value));
+}
+
+// TODO: Unit unit test for this
+template<size_t kDestSize, size_t kSecondRegNameSize>
+void instruction_sub(const char(&dest_name)[kDestSize], const char(&second_reg_name)[kSecondRegNameSize], Registers& regs) {
+	instruction_sub(dest_name, regs.read(second_reg_name), regs);
 }
 
 
@@ -1169,6 +1192,59 @@ private:
 				return 2;
 			}
 		},
+
+		// 8bit sub
+		{"SUB B", 0x90, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_sub("A", "B", regs);
+				return 1;
+			}
+		},
+		{"SUB C", 0x91, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_sub("A", "C", regs);
+				return 1;
+			}
+		},
+		{"SUB D", 0x92, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_sub("A", "D", regs);
+				return 1;
+			}
+		},
+		{"SUB E", 0x93, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_sub("A", "E", regs);
+				return 1;
+			}
+		},
+		{"SUB H", 0x94, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_sub("A", "H", regs);
+				return 1;
+			}
+		},
+		{"SUB L", 0x95, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_sub("A", "L", regs);
+				return 1;
+			}
+		},
+		{"SUB (HL)", 0x96, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto address = regs.read("HL");
+				const auto value = memory.read(address);
+				instruction_sub("A", value, regs);
+				return 1;
+			}
+		},
+		{"SUB A", 0x97, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_sub("A", "A", regs);
+				return 1;
+			}
+		},
+
 
 		// Jumps/calls
 		{"JR s8", 0x18, 2,

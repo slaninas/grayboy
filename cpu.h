@@ -1057,8 +1057,34 @@ private:
 			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
 				const auto SP = regs.read("SP");
 				const auto BC_new = static_cast<uint16_t>((memory.read(SP + 1) << 8) + memory.read(SP));
-
 				regs.write("BC", BC_new);
+				regs.write("SP", SP + 2);
+				return 3;
+			}
+		},
+		{"POP DE", 0xc2, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto SP = regs.read("SP");
+				const auto DE_new = static_cast<uint16_t>((memory.read(SP + 1) << 8) + memory.read(SP));
+				regs.write("DE", DE_new);
+				regs.write("SP", SP + 2);
+				return 3;
+			}
+		},
+		{"POP HL", 0xc3, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto SP = regs.read("SP");
+				const auto HL_new = static_cast<uint16_t>((memory.read(SP + 1) << 8) + memory.read(SP));
+				regs.write("HL", HL_new);
+				regs.write("SP", SP + 2);
+				return 3;
+			}
+		},
+		{"POP AF", 0xc4, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto SP = regs.read("SP");
+				const auto AF_new = static_cast<uint16_t>((memory.read(SP + 1) << 8) + memory.read(SP));
+				regs.write("AF", AF_new);
 				regs.write("SP", SP + 2);
 				return 3;
 			}

@@ -258,6 +258,50 @@ void instruction_xor(const char(&dest_name)[kDestSize], const char(&second_reg_n
 	instruction_xor(dest_name, regs.read(second_reg_name), regs);
 }
 
+template<size_t kDestSize, typename ValueType>
+void instruction_or(const char(&dest_name)[kDestSize], const ValueType& value, Registers& regs) {
+	constexpr auto real_size = kDestSize - 1;
+	static_assert(real_size == 1, "Only 8bit XOR supported.");
+	static_assert(std::is_same_v<ValueType, uint8_t>, "Only 8bit values supported.");
+
+	const auto dest_old = regs.read(dest_name);
+	const auto dest_new = static_cast<uint8_t>(dest_old | value);
+
+	regs.write(dest_name, dest_new);
+	regs.set_flag("Z", dest_new == 0);
+	regs.set_flag("N", false);
+	regs.set_flag("H", false);
+	regs.set_flag("C", false);
+
+}
+template<size_t kDestSize, size_t kSecondRegNameSize>
+void instruction_or(const char(&dest_name)[kDestSize], const char(&second_reg_name)[kSecondRegNameSize], Registers& regs) {
+	static_assert(kDestSize == kSecondRegNameSize, "Registers must be of a same size. And only 8bit are supported.");
+	instruction_or(dest_name, regs.read(second_reg_name), regs);
+}
+
+template<size_t kDestSize, typename ValueType>
+void instruction_cp(const char(&dest_name)[kDestSize], const ValueType& value, Registers& regs) {
+	constexpr auto real_size = kDestSize - 1;
+	static_assert(real_size == 1, "Only 8bit XOR supported.");
+	static_assert(std::is_same_v<ValueType, uint8_t>, "Only 8bit values supported.");
+
+	const auto dest_old = regs.read(dest_name);
+	const auto dest_new = static_cast<uint8_t>(dest_old - value);
+
+	// regs.write(dest_name, dest_new);
+	regs.set_flag("Z", dest_new == 0);
+	regs.set_flag("N", true);
+	regs.set_flag("H", half_carry_sub_8bit(dest_old, value));
+	regs.set_flag("C", carry_sub_8bit(dest_old, value));
+
+}
+template<size_t kDestSize, size_t kSecondRegNameSize>
+void instruction_cp(const char(&dest_name)[kDestSize], const char(&second_reg_name)[kSecondRegNameSize], Registers& regs) {
+	static_assert(kDestSize == kSecondRegNameSize, "Registers must be of a same size. And only 8bit are supported.");
+	instruction_cp(dest_name, regs.read(second_reg_name), regs);
+}
+
 // Make exceptions asserts and run in debug
 // TODO: Add unit tests
 class Cpu {
@@ -286,7 +330,7 @@ public:
 		const auto PC = regs_.read("PC");
 		const auto opcode = memory_.read(PC);
 
-		if (opcode == 0xBC) {
+		if (opcode == 0xCB) {
 			throw std::runtime_error("16-bit opcodes not implemented yet.");
 		}
 
@@ -1475,9 +1519,107 @@ private:
 				return 1;
 			}
 		},
-		{"AND B", 0xa0, 1,
+
+		// OR
+		{"OR B", 0xb0, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
-				instruction_xor("A", "B", regs);
+				instruction_or("A", "B", regs);
+				return 1;
+			}
+		},
+		{"OR C", 0xb1, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_or("A", "C", regs);
+				return 1;
+			}
+		},
+		{"OR D", 0xb2, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_or("A", "D", regs);
+				return 1;
+			}
+		},
+		{"OR E", 0xb3, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_or("A", "E", regs);
+				return 1;
+			}
+		},
+		{"OR H", 0xb4, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_or("A", "H", regs);
+				return 1;
+			}
+		},
+		{"OR L", 0xb5, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_or("A", "L", regs);
+				return 1;
+			}
+		},
+		{"OR (HL)", 0xb6, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto address = regs.read("HL");
+				const auto value = memory.read(address);
+				instruction_or("A", value, regs);
+				return 1;
+			}
+		},
+		{"OR A", 0xb7, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_or("A", "A", regs);
+				return 1;
+			}
+		},
+
+		// CP
+		{"CP B", 0xb8, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_cp("A", "B", regs);
+				return 1;
+			}
+		},
+		{"CP C", 0xb9, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_cp("A", "C", regs);
+				return 1;
+			}
+		},
+		{"CP D", 0xba, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_cp("A", "D", regs);
+				return 1;
+			}
+		},
+		{"CP E", 0xbb, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_cp("A", "E", regs);
+				return 1;
+			}
+		},
+		{"CP H", 0xbc, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_cp("A", "H", regs);
+				return 1;
+			}
+		},
+		{"CP L", 0xbd, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_cp("A", "L", regs);
+				return 1;
+			}
+		},
+		{"CP (HL)", 0xbe, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto address = regs.read("HL");
+				const auto value = memory.read(address);
+				instruction_cp("A", value, regs);
+				return 1;
+			}
+		},
+		{"CP A", 0xbf, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_cp("A", "A", regs);
 				return 1;
 			}
 		},

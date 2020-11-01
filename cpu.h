@@ -1626,6 +1626,8 @@ private:
 
 
 		// Jumps/calls
+		// NOTE: Because the PC is incremented by instruction size in Instruction::operator() and these jumps/calls manipulate PC,
+		//       These instructions have to subtract their instruction size from PC to compensate for that.
 		{"JR s8", 0x18, 2,
 			[](auto& regs,  auto& memory, const auto& PC) {
 				const auto value = memory.read(PC + 1);
@@ -1652,6 +1654,19 @@ private:
 					const auto PC_new = PC + value - 2; // Instruction size is 2 so it must be subtracted here in advance for Instruction to work properly
 					regs.write("PC", PC_new);
 					return 3;
+				}
+				return 2;
+			}
+		},
+
+		{"RET NZ", 0xc0, 1,
+			[](auto& regs,  auto& memory, [[maybe_unused]] const auto& PC) {
+				if (!regs.read_flag("C")) {
+					const auto SP = regs.read("SP");
+					const auto PC_new = static_cast<uint16_t>((memory.read(SP + 1) << 8) + memory.read(SP));
+					regs.write("PC", PC_new - 1);
+					regs.write("SP", SP + 2);
+					return 5;
 				}
 				return 2;
 			}

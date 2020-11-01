@@ -141,7 +141,7 @@ void instruction_addc(const char(&dest_name)[kDestSize], const ValueType& value,
 	auto carry = carry_add_8bit(value, C);
 
 	const auto dest_old = regs.read(dest_name);
-	const auto dest_new = dest_old + value_with_carry;
+	const auto dest_new = static_cast<uint8_t>(dest_old + value_with_carry);
 	half_carry |= half_carry_add_8bit(dest_old, value_with_carry);
 	carry |= carry_add_8bit(dest_old, value_with_carry);
 

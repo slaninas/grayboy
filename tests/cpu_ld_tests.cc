@@ -1179,3 +1179,15 @@ TEST_CASE("LD A, A - 0x7f", "[ld]") {
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
+
+TEST_CASE("POP BC - 0xc1", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0xc1}, {0x0bd1, 0x43}, {0x0bd2, 0xbd}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.PC=0x00, .SP=0x0bd1}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 3);
+	const auto correct_regs = RegistersChanger{.BC=0xbd43, .PC=0x01, .SP=0x0bd3}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}

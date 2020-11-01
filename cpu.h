@@ -1051,6 +1051,19 @@ private:
 				return 1;
 			}
 		},
+		
+		// POP
+		{"POP BC", 0xc1, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto SP = regs.read("SP");
+				const auto BC_new = static_cast<uint16_t>((memory.read(SP + 1) << 8) + memory.read(SP));
+
+				regs.write("BC", BC_new);
+				regs.write("SP", SP + 2);
+				return 3;
+			}
+		},
+
 
 		// Decrement 16bit
 		{"DEC BC", 0x0b, 1,

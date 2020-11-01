@@ -1045,10 +1045,27 @@ private:
 				return 2;
 			}
 		},
-
 		{"LD A, A", 0x7f, 1,
 			[]([[maybe_unused]] auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				return 1;
+			}
+		},
+
+		// Load with implicit 0xff prefix
+		{"LD (a8), A", 0xe0, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto address = static_cast<uint16_t>(0xff00 + memory.read(PC + 1));
+				const auto value = regs.read("A");
+				memory.write(address, value);
+				return 3;
+			}
+		},
+		{"LD A, (a8)", 0xe1, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto address = static_cast<uint16_t>(0xff00 + memory.read(PC + 1));
+				const auto value = memory.read(address);
+				regs.write("A", value);
+				return 3;
 			}
 		},
 		

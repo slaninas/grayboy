@@ -896,3 +896,123 @@ TEST_CASE("SUB A - 0x97", "[arithmetic]") {
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
+
+TEST_CASE("SBC A, B - 0x98", "[arithmetic]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x98}}}.get(getRandomMemory());
+	const auto orig_flags = FlagsChanger{.C=1}.get(getRandomFlags());
+	const auto orig_regs = RegistersChanger{.A=0x56, .F=orig_flags, .B=0x34, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+
+	const auto correct_flags = FlagsChanger{.Z=0, .N=1, .H=0, .C=0}.get(orig_regs.read("F"));
+	const auto correct_regs = RegistersChanger{.A=0x21, .F=correct_flags, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("SBC A, C - 0x99", "[arithmetic]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x99}}}.get(getRandomMemory());
+	const auto orig_flags = FlagsChanger{.C=1}.get(getRandomFlags());
+	const auto orig_regs = RegistersChanger{.A=0x56, .F=orig_flags, .C=0x34, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+
+	const auto correct_flags = FlagsChanger{.Z=0, .N=1, .H=0, .C=0}.get(orig_regs.read("F"));
+	const auto correct_regs = RegistersChanger{.A=0x21, .F=correct_flags, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("SBC A, D - 0x9a", "[arithmetic]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x9a}}}.get(getRandomMemory());
+	const auto orig_flags = FlagsChanger{.C=1}.get(getRandomFlags());
+	const auto orig_regs = RegistersChanger{.A=0x56, .F=orig_flags, .D=0x34, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+
+	const auto correct_flags = FlagsChanger{.Z=0, .N=1, .H=0, .C=0}.get(orig_regs.read("F"));
+	const auto correct_regs = RegistersChanger{.A=0x21, .F=correct_flags, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("SBC A, E - 0x9b", "[arithmetic]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x9b}}}.get(getRandomMemory());
+	const auto orig_flags = FlagsChanger{.C=1}.get(getRandomFlags());
+	const auto orig_regs = RegistersChanger{.A=0x56, .F=orig_flags, .E=0x34, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+
+	const auto correct_flags = FlagsChanger{.Z=0, .N=1, .H=0, .C=0}.get(orig_regs.read("F"));
+	const auto correct_regs = RegistersChanger{.A=0x21, .F=correct_flags, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("SBC A, H - 0x9c", "[arithmetic]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x9c}}}.get(getRandomMemory());
+	const auto orig_flags = FlagsChanger{.C=1}.get(getRandomFlags());
+	const auto orig_regs = RegistersChanger{.A=0x56, .F=orig_flags, .H=0x34, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+
+	const auto correct_flags = FlagsChanger{.Z=0, .N=1, .H=0, .C=0}.get(orig_regs.read("F"));
+	const auto correct_regs = RegistersChanger{.A=0x21, .F=correct_flags, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("SBC A, L - 0x9d", "[arithmetic]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x9d}}}.get(getRandomMemory());
+	const auto orig_flags = FlagsChanger{.C=1}.get(getRandomFlags());
+	const auto orig_regs = RegistersChanger{.A=0x56, .F=orig_flags, .L=0x34, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+
+	const auto correct_flags = FlagsChanger{.Z=0, .N=1, .H=0, .C=0}.get(orig_regs.read("F"));
+	const auto correct_regs = RegistersChanger{.A=0x21, .F=correct_flags, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("SBC A, (HL) - 0x9e", "[arithmetic]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x9e}, {0xbcda, 0x34}}}.get(getRandomMemory());
+	const auto orig_flags = FlagsChanger{.C=1}.get(getRandomFlags());
+	const auto orig_regs = RegistersChanger{.A=0x56, .F=orig_flags, .HL=0xbcda, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 2);
+
+	const auto correct_flags = FlagsChanger{.Z=0, .N=1, .H=0, .C=0}.get(orig_regs.read("F"));
+	const auto correct_regs = RegistersChanger{.A=0x21, .F=correct_flags, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("SBC A, A - 0x9f", "[arithmetic]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0x9f}}}.get(getRandomMemory());
+	const auto orig_flags = FlagsChanger{.C=1}.get(getRandomFlags());
+	const auto orig_regs = RegistersChanger{.A=0x00, .F=orig_flags, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+
+	const auto correct_flags = FlagsChanger{.Z=0, .N=1, .H=1, .C=1}.get(orig_regs.read("F"));
+	const auto correct_regs = RegistersChanger{.A=0xff, .F=correct_flags, .PC=0x01}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}

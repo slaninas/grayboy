@@ -180,6 +180,36 @@ void instruction_sub(const char(&dest_name)[kDestSize], const char(&second_reg_n
 	instruction_sub(dest_name, regs.read(second_reg_name), regs);
 }
 
+// TODO: Unit unit test for this
+template<size_t kDestSize, typename ValueType>
+void instruction_subc(const char(&dest_name)[kDestSize], const ValueType& value, Registers& regs) {
+	constexpr auto real_size = kDestSize - 1;
+	static_assert(real_size == 1, "Only 8bit add with carry supported.");
+	static_assert(std::is_same_v<ValueType, uint8_t>, "Only 8bit add with carry supported.");
+
+	const auto C = regs.read_flag("C");
+	const auto dest_old = regs.read(dest_name);
+
+	const auto dest_old_minus_carry = static_cast<uint8_t>(dest_old - C);
+	auto half_carry = half_carry_sub_8bit(dest_old, C);
+	auto carry = carry_sub_8bit(dest_old, C);
+
+	const auto dest_new = static_cast<uint8_t>(dest_old_minus_carry  - value);
+	half_carry |= half_carry_sub_8bit(dest_old_minus_carry, value);
+	carry |= carry_sub_8bit(dest_old_minus_carry, value);
+
+	regs.write(dest_name, dest_new);
+	regs.set_flag("Z", dest_new == 0);
+	regs.set_flag("N", true);
+	regs.set_flag("H", half_carry);
+	regs.set_flag("C", carry);
+}
+//
+// TODO: Unit unit test for this
+template<size_t kDestSize, size_t kSecondRegNameSize>
+void instruction_subc(const char(&dest_name)[kDestSize], const char(&second_reg_name)[kSecondRegNameSize], Registers& regs) {
+	instruction_subc(dest_name, regs.read(second_reg_name), regs);
+}
 
 // Make exceptions asserts and run in debug
 // TODO: Add unit tests
@@ -1241,6 +1271,56 @@ private:
 		{"SUB A", 0x97, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				instruction_sub("A", "A", regs);
+				return 1;
+			}
+		},
+		{"SBC A, B", 0x98, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_subc("A", "B", regs);
+				return 1;
+			}
+		},
+		{"SBC A, C", 0x99, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_subc("A", "C", regs);
+				return 1;
+			}
+		},
+		{"SBC A, D", 0x9a, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_subc("A", "D", regs);
+				return 1;
+			}
+		},
+		{"SBC A, E", 0x9b, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_subc("A", "E", regs);
+				return 1;
+			}
+		},
+		{"SBC A, H", 0x9c, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_subc("A", "H", regs);
+				return 1;
+			}
+		},
+		{"SBC A, L", 0x9d, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_subc("A", "L", regs);
+				return 1;
+			}
+		},
+		{"SBC A, (HL)", 0x9e, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto address = regs.read("HL");
+				const auto value = memory.read(address);
+				instruction_subc("A", value, regs);
+				return 2;
+			}
+		},
+		{"SBC A, A", 0x9f, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_subc("A", "A", regs);
 				return 1;
 			}
 		},

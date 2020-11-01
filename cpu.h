@@ -56,6 +56,8 @@ struct Instruction {
 	return ((a & 0xffff) - (b & 0xffff)) < 0;
 }
 
+// TOOD: Cleanup these instruction_* functions
+
 template<size_t kSize>
 // TODO: remove _fn from name
 void instruction_inc_fn(const char(&reg_name)[kSize], Registers& regs) {
@@ -204,11 +206,56 @@ void instruction_subc(const char(&dest_name)[kDestSize], const ValueType& value,
 	regs.set_flag("H", half_carry);
 	regs.set_flag("C", carry);
 }
-//
+
 // TODO: Unit unit test for this
 template<size_t kDestSize, size_t kSecondRegNameSize>
 void instruction_subc(const char(&dest_name)[kDestSize], const char(&second_reg_name)[kSecondRegNameSize], Registers& regs) {
 	instruction_subc(dest_name, regs.read(second_reg_name), regs);
+}
+
+
+template<size_t kDestSize, typename ValueType>
+void instruction_and(const char(&dest_name)[kDestSize], const ValueType& value, Registers& regs) {
+	constexpr auto real_size = kDestSize - 1;
+	static_assert(real_size == 1, "Only 8bit AND supported.");
+	static_assert(std::is_same_v<ValueType, uint8_t>, "Only 8bit values supported.");
+
+	const auto dest_old = regs.read(dest_name);
+	const auto dest_new = static_cast<uint8_t>(dest_old & value);
+
+	regs.write(dest_name, dest_new);
+	regs.set_flag("Z", dest_new == 0);
+	regs.set_flag("N", false);
+	regs.set_flag("H", true);
+	regs.set_flag("C", false);
+
+}
+template<size_t kDestSize, size_t kSecondRegNameSize>
+void instruction_and(const char(&dest_name)[kDestSize], const char(&second_reg_name)[kSecondRegNameSize], Registers& regs) {
+	static_assert(kDestSize == kSecondRegNameSize, "Registers must be of a same size. And only 8bit are supported.");
+	instruction_and(dest_name, regs.read(second_reg_name), regs);
+}
+
+template<size_t kDestSize, typename ValueType>
+void instruction_xor(const char(&dest_name)[kDestSize], const ValueType& value, Registers& regs) {
+	constexpr auto real_size = kDestSize - 1;
+	static_assert(real_size == 1, "Only 8bit XOR supported.");
+	static_assert(std::is_same_v<ValueType, uint8_t>, "Only 8bit values supported.");
+
+	const auto dest_old = regs.read(dest_name);
+	const auto dest_new = static_cast<uint8_t>(dest_old ^ value);
+
+	regs.write(dest_name, dest_new);
+	regs.set_flag("Z", dest_new == 0);
+	regs.set_flag("N", false);
+	regs.set_flag("H", false);
+	regs.set_flag("C", false);
+
+}
+template<size_t kDestSize, size_t kSecondRegNameSize>
+void instruction_xor(const char(&dest_name)[kDestSize], const char(&second_reg_name)[kSecondRegNameSize], Registers& regs) {
+	static_assert(kDestSize == kSecondRegNameSize, "Registers must be of a same size. And only 8bit are supported.");
+	instruction_xor(dest_name, regs.read(second_reg_name), regs);
 }
 
 // Make exceptions asserts and run in debug
@@ -1321,6 +1368,116 @@ private:
 		{"SBC A, A", 0x9f, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				instruction_subc("A", "A", regs);
+				return 1;
+			}
+		},
+
+		// AND
+		{"AND B", 0xa0, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_and("A", "B", regs);
+				return 1;
+			}
+		},
+		{"AND C", 0xa1, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_and("A", "C", regs);
+				return 1;
+			}
+		},
+		{"AND D", 0xa2, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_and("A", "D", regs);
+				return 1;
+			}
+		},
+		{"AND E", 0xa3, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_and("A", "E", regs);
+				return 1;
+			}
+		},
+		{"AND H", 0xa4, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_and("A", "H", regs);
+				return 1;
+			}
+		},
+		{"AND L", 0xa5, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_and("A", "L", regs);
+				return 1;
+			}
+		},
+		{"AND (HL)", 0xa6, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto address = regs.read("HL");
+				const auto value = memory.read(address);
+				instruction_and("A", value, regs);
+				return 1;
+			}
+		},
+		{"AND A", 0xa7, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_and("A", "A", regs);
+				return 1;
+			}
+		},
+
+		// XOR
+		{"XOR B", 0xa8, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_xor("A", "B", regs);
+				return 1;
+			}
+		},
+		{"XOR C", 0xa9, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_xor("A", "C", regs);
+				return 1;
+			}
+		},
+		{"XOR D", 0xaa, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_xor("A", "D", regs);
+				return 1;
+			}
+		},
+		{"XOR E", 0xab, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_xor("A", "E", regs);
+				return 1;
+			}
+		},
+		{"XOR H", 0xac, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_xor("A", "H", regs);
+				return 1;
+			}
+		},
+		{"XOR L", 0xad, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_xor("A", "L", regs);
+				return 1;
+			}
+		},
+		{"XOR (HL)", 0xae, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto address = regs.read("HL");
+				const auto value = memory.read(address);
+				instruction_xor("A", value, regs);
+				return 1;
+			}
+		},
+		{"XOR A", 0xaf, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_xor("A", "A", regs);
+				return 1;
+			}
+		},
+		{"AND B", 0xa0, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_xor("A", "B", regs);
 				return 1;
 			}
 		},

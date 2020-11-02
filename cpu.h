@@ -1731,7 +1731,6 @@ private:
 				return 2;
 			}
 		},
-
 		{"RET NZ", 0xc0, 1,
 			[](auto& regs,  auto& memory, [[maybe_unused]] const auto& PC) {
 				if (!regs.read_flag("C")) {
@@ -1766,9 +1765,52 @@ private:
 		},
 		{"JP a16", 0xc3, 3,
 			[](auto& regs, auto& memory, const auto& PC) {
+				// TODO: Put into method
 				const auto PC_new = static_cast<uint16_t>((memory.read(PC + 2) << 8) + memory.read(PC + 1));
 				regs.write("PC", PC_new - 3);
 				return 4;
+			}
+		},
+		{"CALL NZ, a16", 0xc4, 3,
+			[](auto& regs, auto& memory, const auto& PC) {
+				if (regs.read_flag("Z") == false) {
+					// TODO: Put into method
+					const auto return_address = PC + 3;
+					const auto return_address_high = static_cast<uint8_t>((return_address & 0xff00) >> 8);
+					const auto return_address_low = static_cast<uint8_t>(return_address & 0x00ff);
+
+					const auto SP = regs.read("SP");
+					memory.write(SP - 1, return_address_high);
+					memory.write(SP - 2, return_address_low);
+					regs.write("SP", SP - 2);
+
+					const auto call_address = static_cast<uint16_t>((memory.read(PC + 2) << 8) + memory.read(PC + 1));
+
+					regs.write("PC", call_address - 3);
+					return 6;
+				}
+				return 3;
+			}
+		},
+		{"CALL NC, a16", 0xd4, 3,
+			[](auto& regs, auto& memory, const auto& PC) {
+				if (regs.read_flag("C") == false) {
+					// TODO: Put into method
+					const auto return_address = PC + 3;
+					const auto return_address_high = static_cast<uint8_t>((return_address & 0xff00) >> 8);
+					const auto return_address_low = static_cast<uint8_t>(return_address & 0x00ff);
+
+					const auto SP = regs.read("SP");
+					memory.write(SP - 1, return_address_high);
+					memory.write(SP - 2, return_address_low);
+					regs.write("SP", SP - 2);
+
+					const auto call_address = static_cast<uint16_t>((memory.read(PC + 2) << 8) + memory.read(PC + 1));
+
+					regs.write("PC", call_address - 3);
+					return 6;
+				}
+				return 3;
 			}
 		},
 

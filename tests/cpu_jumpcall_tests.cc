@@ -164,3 +164,61 @@ TEST_CASE("JP a16 - 0xc3", "[jump/call]") {
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
+
+TEST_CASE("CALL NZ, a16 - 0xc4", "[jump/call]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0xc4}, {0x01, 0x27}, {0x02, 0x90}}}.get(getRandomMemory());
+
+	SECTION("Do call") {
+		const auto orig_flags = FlagsChanger{.Z=0}.get(getRandomFlags());
+		const auto orig_regs = RegistersChanger{.F=orig_flags, .PC=0x00, .SP=0x4358}.get(getRandomRegisters());
+		auto cpu = Cpu{orig_memory, orig_regs};
+
+		auto cycles = cpu.execute_next();
+		CHECK(cycles == 6);
+		auto correct_regs = RegistersChanger{.PC=0x9027, .SP=0x4356}.get(orig_regs);
+		CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+		const auto correct_memory = MemoryChanger{{{0x4357, 0x00}, {0x4356, 0x03}}}.get(orig_memory);
+		CHECK(cpu.memory_dump() == correct_memory.dump());
+	}
+
+	SECTION("Do not call") {
+		const auto orig_flags = FlagsChanger{.Z=1}.get(getRandomFlags());
+		const auto orig_regs = RegistersChanger{.F=orig_flags, .PC=0x00}.get(getRandomRegisters());
+		auto cpu = Cpu{orig_memory, orig_regs};
+
+		auto cycles = cpu.execute_next();
+		CHECK(cycles == 3);
+		auto correct_regs = RegistersChanger{.PC=0x03}.get(orig_regs);
+		CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+		CHECK(cpu.memory_dump() == orig_memory.dump());
+	}
+}
+
+TEST_CASE("CALL NC, a16 - 0xd4", "[jump/call]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0xd4}, {0x01, 0x27}, {0x02, 0x90}}}.get(getRandomMemory());
+
+	SECTION("Do call") {
+		const auto orig_flags = FlagsChanger{.C=0}.get(getRandomFlags());
+		const auto orig_regs = RegistersChanger{.F=orig_flags, .PC=0x00, .SP=0x4358}.get(getRandomRegisters());
+		auto cpu = Cpu{orig_memory, orig_regs};
+
+		auto cycles = cpu.execute_next();
+		CHECK(cycles == 6);
+		auto correct_regs = RegistersChanger{.PC=0x9027, .SP=0x4356}.get(orig_regs);
+		CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+		const auto correct_memory = MemoryChanger{{{0x4357, 0x00}, {0x4356, 0x03}}}.get(orig_memory);
+		CHECK(cpu.memory_dump() == correct_memory.dump());
+	}
+
+	SECTION("Do not call") {
+		const auto orig_flags = FlagsChanger{.C=1}.get(getRandomFlags());
+		const auto orig_regs = RegistersChanger{.F=orig_flags, .PC=0x00}.get(getRandomRegisters());
+		auto cpu = Cpu{orig_memory, orig_regs};
+
+		auto cycles = cpu.execute_next();
+		CHECK(cycles == 3);
+		auto correct_regs = RegistersChanger{.PC=0x03}.get(orig_regs);
+		CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+		CHECK(cpu.memory_dump() == orig_memory.dump());
+	}
+}

@@ -1068,6 +1068,22 @@ private:
 				return 3;
 			}
 		},
+		{"LD (C), A", 0xe2, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto address = static_cast<uint16_t>(0xff00 + regs.read("C"));
+				const auto value = regs.read("A");
+				memory.write(address, value);
+				return 2;
+			}
+		},
+		{"LD A, (C)", 0xf2, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto address = static_cast<uint16_t>(0xff00 + regs.read("C"));
+				const auto value = memory.read(address);
+				regs.write("A", value);
+				return 2;
+			}
+		},
 		
 		// POP
 		{"POP BC", 0xc1, 1,

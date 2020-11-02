@@ -1124,6 +1124,44 @@ private:
 			}
 		},
 
+		// PUSH
+		{"PUSH BC", 0xc5, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto SP = regs.read("SP");
+				memory.write(SP - 1, regs.read("B"));
+				memory.write(SP - 2, regs.read("C"));
+				regs.write("SP", SP - 2);
+				return 4;
+			}
+		},
+		{"PUSH DE", 0xd5, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto SP = regs.read("SP");
+				memory.write(SP - 1, regs.read("D"));
+				memory.write(SP - 2, regs.read("E"));
+				regs.write("SP", SP - 2);
+				return 4;
+			}
+		},
+		{"PUSH HL", 0xe5, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto SP = regs.read("SP");
+				memory.write(SP - 1, regs.read("H"));
+				memory.write(SP - 2, regs.read("L"));
+				regs.write("SP", SP - 2);
+				return 4;
+			}
+		},
+		{"PUSH AF", 0xf5, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto SP = regs.read("SP");
+				memory.write(SP - 1, regs.read("A"));
+				memory.write(SP - 2, regs.read("F"));
+				regs.write("SP", SP - 2);
+				return 4;
+			}
+		},
+
 
 		// Decrement 16bit
 		{"DEC BC", 0x0b, 1,

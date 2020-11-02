@@ -1727,6 +1727,26 @@ private:
 				return 2;
 			}
 		},
+		{"JP NZ, a16", 0xc2, 3,
+			[](auto& regs, auto& memory, const auto& PC) {
+				if (regs.read_flag("Z") == false) {
+					const auto PC_new = static_cast<uint16_t>((memory.read(PC + 2) << 8) + memory.read(PC + 1));
+					regs.write("PC", PC_new - 3);
+					return 4;
+				}
+				return 3;
+			}
+		},
+		{"JP NC, a16", 0xd2, 3,
+			[](auto& regs, auto& memory, const auto& PC) {
+				if (regs.read_flag("C") == false) {
+					const auto PC_new = static_cast<uint16_t>((memory.read(PC + 2) << 8) + memory.read(PC + 1));
+					regs.write("PC", PC_new - 3);
+					return 4;
+				}
+				return 3;
+			}
+		},
 
 
 	};

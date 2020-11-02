@@ -1060,7 +1060,7 @@ private:
 				return 3;
 			}
 		},
-		{"LD A, (a8)", 0xe1, 2,
+		{"LD A, (a8)", 0xf0, 2,
 			[](auto& regs, auto& memory, const auto& PC) {
 				const auto address = static_cast<uint16_t>(0xff00 + memory.read(PC + 1));
 				const auto value = memory.read(address);
@@ -1079,7 +1079,7 @@ private:
 				return 3;
 			}
 		},
-		{"POP DE", 0xc2, 1,
+		{"POP DE", 0xd1, 1,
 			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
 				const auto SP = regs.read("SP");
 				const auto DE_new = static_cast<uint16_t>((memory.read(SP + 1) << 8) + memory.read(SP));
@@ -1088,7 +1088,7 @@ private:
 				return 3;
 			}
 		},
-		{"POP HL", 0xc3, 1,
+		{"POP HL", 0xe1, 1,
 			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
 				const auto SP = regs.read("SP");
 				const auto HL_new = static_cast<uint16_t>((memory.read(SP + 1) << 8) + memory.read(SP));
@@ -1097,7 +1097,7 @@ private:
 				return 3;
 			}
 		},
-		{"POP AF", 0xc4, 1,
+		{"POP AF", 0xf1, 1,
 			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
 				const auto SP = regs.read("SP");
 				const auto AF_new = static_cast<uint16_t>((memory.read(SP + 1) << 8) + memory.read(SP));

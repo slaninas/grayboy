@@ -1193,8 +1193,8 @@ TEST_CASE("LD (a8), A - 0xe0", "[ld]") {
 	CHECK(cpu.memory_dump() == correct_memory.dump());
 }
 
-TEST_CASE("LD A, (a8) - 0xe1", "[ld]") {
-	const auto orig_memory = MemoryChanger{{{0x00, 0xe1}, {0x01, 0xde}, {0xffde, 0x89}}}.get(getRandomMemory());
+TEST_CASE("LD A, (a8) - 0xf0", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0xf0}, {0x01, 0xde}, {0xffde, 0x89}}}.get(getRandomMemory());
 	const auto orig_regs = RegistersChanger{.PC=0x00}.get(getRandomRegisters());
 	auto cpu = Cpu{orig_memory, orig_regs};
 
@@ -1216,8 +1216,8 @@ TEST_CASE("POP BC - 0xc1", "[ld]") {
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
 
-TEST_CASE("POP DE - 0xc2", "[ld]") {
-	const auto orig_memory = MemoryChanger{{{0x00, 0xc2}, {0xf001, 0xde}, {0xf002, 0x89}}}.get(getRandomMemory());
+TEST_CASE("POP DE - 0xd1", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0xd1}, {0xf001, 0xde}, {0xf002, 0x89}}}.get(getRandomMemory());
 	const auto orig_regs = RegistersChanger{.PC=0x00, .SP=0xf001}.get(getRandomRegisters());
 	auto cpu = Cpu{orig_memory, orig_regs};
 
@@ -1228,8 +1228,8 @@ TEST_CASE("POP DE - 0xc2", "[ld]") {
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
 
-TEST_CASE("POP HL - 0xc3", "[ld]") {
-	const auto orig_memory = MemoryChanger{{{0x00, 0xc3}, {0xde12, 0xab}, {0xde13, 0x12}}}.get(getRandomMemory());
+TEST_CASE("POP HL - 0xe1", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0xe1}, {0xde12, 0xab}, {0xde13, 0x12}}}.get(getRandomMemory());
 	const auto orig_regs = RegistersChanger{.PC=0x00, .SP=0xde12}.get(getRandomRegisters());
 	auto cpu = Cpu{orig_memory, orig_regs};
 
@@ -1240,8 +1240,8 @@ TEST_CASE("POP HL - 0xc3", "[ld]") {
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
 
-TEST_CASE("POP AF - 0xc4", "[ld]") {
-	const auto orig_memory = MemoryChanger{{{0x00, 0xc4}, {0x8912, 0xff}, {0x8913, 0xee}}}.get(getRandomMemory());
+TEST_CASE("POP AF - 0xf1", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0xf1}, {0x8912, 0xff}, {0x8913, 0xee}}}.get(getRandomMemory());
 	const auto orig_regs = RegistersChanger{.PC=0x00, .SP=0x8912}.get(getRandomRegisters());
 	auto cpu = Cpu{orig_memory, orig_regs};
 

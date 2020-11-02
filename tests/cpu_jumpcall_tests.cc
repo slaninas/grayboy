@@ -152,3 +152,15 @@ TEST_CASE("JP NC, a16 - 0xd2", "[jump/call]") {
 		CHECK(cpu.memory_dump() == orig_memory.dump());
 	}
 }
+
+TEST_CASE("JP a16 - 0xc3", "[jump/call]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0xc3}, {0x01, 0x22}, {0x02, 0x43}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	auto cycles = cpu.execute_next();
+	CHECK(cycles == 4);
+	auto correct_regs = RegistersChanger{.PC=0x4322}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}

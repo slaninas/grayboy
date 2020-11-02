@@ -363,6 +363,7 @@ private:
 		// TODO: JR NC, s8 - 0x30
 		// TODO: DAA - 0x27
 		// TODO: HALT - 0x76
+		// TODO: DI - 0xf3
 		{"NOP", 0x00, 1,
 			[]([[maybe_unused]] auto& regs, [[maybe_unused]] auto& mem, [[maybe_unused]] const auto& PC) {
 				return 1;
@@ -1761,6 +1762,13 @@ private:
 					return 4;
 				}
 				return 3;
+			}
+		},
+		{"JP a16", 0xc3, 3,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto PC_new = static_cast<uint16_t>((memory.read(PC + 2) << 8) + memory.read(PC + 1));
+				regs.write("PC", PC_new - 3);
+				return 4;
 			}
 		},
 

@@ -1735,6 +1735,49 @@ private:
 			}
 		},
 
+		// Operations on A register
+		{"ADD A, d8", 0xc6, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto value = memory.read(PC + 1);
+				const auto A_old = regs.read("A");
+				const auto A_new = static_cast<uint8_t>(A_old + value);
+
+				regs.write("A", A_new);
+				regs.set_flag("Z", A_new == 0);
+				regs.set_flag("N", false);
+				regs.set_flag("H", half_carry_add_8bit(A_old, value));
+				regs.set_flag("C", carry_add_8bit(A_old, value));
+				return 2;
+			}
+		},
+		{"SUB A, d8", 0xd6, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto value = memory.read(PC + 1);
+				const auto A_old = regs.read("A");
+				const auto A_new = static_cast<uint8_t>(A_old - value);
+
+				regs.write("A", A_new);
+				regs.set_flag("Z", A_new == 0);
+				regs.set_flag("N", true);
+				regs.set_flag("H", half_carry_sub_8bit(A_old, value));
+				regs.set_flag("C", carry_sub_8bit(A_old, value));
+				return 2;
+			}
+		},
+		{"AND d8", 0xe6, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto value = memory.read(PC + 1);
+				instruction_and("A", value, regs);
+				return 2;
+			}
+		},
+		{"OR d8", 0xf6, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto value = memory.read(PC + 1);
+				instruction_or("A", value, regs);
+				return 2;
+			}
+		},
 
 		// Jumps/calls
 		// NOTE: Because the PC is incremented by instruction size in Instruction::operator() and these jumps/calls manipulate PC,

@@ -1826,7 +1826,7 @@ private:
 		},
 		{"RET NZ", 0xc0, 1,
 			[](auto& regs,  auto& memory, [[maybe_unused]] const auto& PC) {
-				if (!regs.read_flag("C")) {
+				if (!regs.read_flag("Z")) {
 					const auto SP = regs.read("SP");
 					const auto PC_new = static_cast<uint16_t>((memory.read(SP + 1) << 8) + memory.read(SP));
 					regs.write("PC", PC_new - 1);

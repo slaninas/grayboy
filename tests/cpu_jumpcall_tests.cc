@@ -73,7 +73,7 @@ TEST_CASE("RET NZ - 0xc0", "[jump/call]") {
 	const auto orig_memory = MemoryChanger{{{0x00, 0xc0}, {0x1234, 0xcb}, {0x1235, 0xae}}}.get(getRandomMemory());
 
 	SECTION("Do return") {
-		const auto orig_flags = FlagsChanger{.C=0}.get(getRandomFlags());
+		const auto orig_flags = FlagsChanger{.Z=0}.get(getRandomFlags());
 		const auto orig_regs = RegistersChanger{.F=orig_flags, .PC=0x00, .SP=0x1234}.get(getRandomRegisters());
 		auto cpu = Cpu{orig_memory, orig_regs};
 
@@ -85,7 +85,7 @@ TEST_CASE("RET NZ - 0xc0", "[jump/call]") {
 	}
 
 	SECTION("Do not return") {
-		const auto orig_flags = FlagsChanger{.C=1}.get(getRandomFlags());
+		const auto orig_flags = FlagsChanger{.Z=1}.get(getRandomFlags());
 		const auto orig_regs = RegistersChanger{.F=orig_flags, .PC=0x00, .SP=0x1234}.get(getRandomRegisters());
 		auto cpu = Cpu{orig_memory, orig_regs};
 

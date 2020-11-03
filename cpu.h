@@ -1791,6 +1791,23 @@ private:
 			}
 		},
 
+		// Signed add for SP
+		// TODO: Check if subtraction works correctly
+		{"ADD SP, s8", 0xe8, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto value = static_cast<int8_t>(memory.read(PC + 1));
+				const auto SP_old = regs.read("SP");
+				const auto SP_new = static_cast<uint16_t>(SP_old + value);
+
+				regs.write("SP", SP_new);
+				regs.set_flag("Z", false);
+				regs.set_flag("N", false);
+				regs.set_flag("H", half_carry_add_16bit(SP_old, value));
+				regs.set_flag("C", carry_add_16bit(SP_old, value));
+				return 4;
+			}
+		},
+
 		// Jumps/calls
 		// NOTE: Because the PC is incremented by instruction size in Instruction::operator() and these jumps/calls manipulate PC,
 		//       These instructions have to subtract their instruction size from PC to compensate for that.

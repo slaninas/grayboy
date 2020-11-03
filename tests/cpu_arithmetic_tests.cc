@@ -1526,3 +1526,17 @@ TEST_CASE("OR d8 - 0xf6", "[arithmetic]") {
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
+
+TEST_CASE("ADD SP, s8 - 0xe8", "[arithmetic]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0xe8}, {0x01, 0x04}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.PC=0x00, .SP=0x1234}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 4);
+
+	const auto correct_flags = FlagsChanger{.Z=0, .N=0, .H=0, .C=0}.get(orig_regs.read("F"));
+	const auto correct_regs = RegistersChanger{.F=correct_flags, .PC=0x02, .SP=0x1238}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}

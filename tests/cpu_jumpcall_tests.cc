@@ -410,3 +410,59 @@ TEST_CASE("RST 7 - 0xff", "[jump/call]") {
 	const auto correct_memory = MemoryChanger{{{0xabcc, 0x78}, {0xabcb, 0x45}}}.get(orig_memory);
 	CHECK(cpu.memory_dump() == correct_memory.dump());
 }
+
+TEST_CASE("JR NZ, s8 - 0x20", "[jump/call]") {
+	const auto orig_memory = MemoryChanger{{{0x0100, 0x20}, {0x0101, 0xfd}}}.get(getRandomMemory());
+
+	SECTION("Do jump") {
+		const auto orig_flags = FlagsChanger{.Z=0}.get(getRandomFlags());
+		const auto orig_regs = RegistersChanger{.F=orig_flags, .PC=0x0100}.get(getRandomRegisters());
+		auto cpu = Cpu{orig_memory, orig_regs};
+
+		auto cycles = cpu.execute_next();
+		CHECK(cycles == 3);
+		auto correct_regs = RegistersChanger{.PC=0x00fd}.get(orig_regs);
+		CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+		CHECK(cpu.memory_dump() == orig_memory.dump());
+	}
+
+	SECTION("Do not jump") {
+		const auto orig_flags = FlagsChanger{.Z=1}.get(getRandomFlags());
+		const auto orig_regs = RegistersChanger{.F=orig_flags, .PC=0x0100}.get(getRandomRegisters());
+		auto cpu = Cpu{orig_memory, orig_regs};
+
+		auto cycles = cpu.execute_next();
+		CHECK(cycles == 2);
+		auto correct_regs = RegistersChanger{.PC=0x0102}.get(orig_regs);
+		CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+		CHECK(cpu.memory_dump() == orig_memory.dump());
+	}
+}
+
+TEST_CASE("JR NC, s8 - 0x30", "[jump/call]") {
+	const auto orig_memory = MemoryChanger{{{0x0100, 0x30}, {0x0101, 0xfd}}}.get(getRandomMemory());
+
+	SECTION("Do jump") {
+		const auto orig_flags = FlagsChanger{.C=0}.get(getRandomFlags());
+		const auto orig_regs = RegistersChanger{.F=orig_flags, .PC=0x0100}.get(getRandomRegisters());
+		auto cpu = Cpu{orig_memory, orig_regs};
+
+		auto cycles = cpu.execute_next();
+		CHECK(cycles == 3);
+		auto correct_regs = RegistersChanger{.PC=0x00fd}.get(orig_regs);
+		CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+		CHECK(cpu.memory_dump() == orig_memory.dump());
+	}
+
+	SECTION("Do not jump") {
+		const auto orig_flags = FlagsChanger{.C=1}.get(getRandomFlags());
+		const auto orig_regs = RegistersChanger{.F=orig_flags, .PC=0x0100}.get(getRandomRegisters());
+		auto cpu = Cpu{orig_memory, orig_regs};
+
+		auto cycles = cpu.execute_next();
+		CHECK(cycles == 2);
+		auto correct_regs = RegistersChanger{.PC=0x0102}.get(orig_regs);
+		CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+		CHECK(cpu.memory_dump() == orig_memory.dump());
+	}
+}

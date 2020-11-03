@@ -2031,6 +2031,28 @@ private:
 				return 4;
 			}
 		},
+		{"JR NZ, s8", 0x20, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				if (!regs.read_flag("Z")) {
+					const auto value = static_cast<int8_t>(memory.read(PC + 1));
+					const auto PC_new = static_cast<uint16_t>(PC + value);
+					regs.write("PC", PC_new - 2);
+					return 3;
+				}
+				return 2;
+			}
+		},
+		{"JR NC, s8", 0x30, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				if (!regs.read_flag("C")) {
+					const auto value = static_cast<int8_t>(memory.read(PC + 1));
+					const auto PC_new = static_cast<uint16_t>(PC + value);
+					regs.write("PC", PC_new - 2);
+					return 3;
+				}
+				return 2;
+			}
+		},
 
 
 	};

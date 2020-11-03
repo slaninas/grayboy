@@ -58,6 +58,18 @@ struct Instruction {
 
 // TOOD: Cleanup these instruction_* functions
 
+void instruction_rst(const uint8_t& value, Registers& regs, Memory& memory, const uint16_t& PC) {
+	const auto PC_high = static_cast<uint8_t>((PC & 0xff00) >> 8);
+	const auto PC_low = static_cast<uint8_t>(PC & 0x00ff);
+	const auto SP = regs.read("SP");
+
+	memory.write(SP - 1, PC_high);
+	memory.write(SP - 2, PC_low);
+
+	regs.write("SP", SP - 2);
+	regs.write("PC", value - 1);
+}
+
 template<size_t kSize>
 // TODO: remove _fn from name
 void instruction_inc_fn(const char(&reg_name)[kSize], Registers& regs) {
@@ -1892,6 +1904,54 @@ private:
 					return 6;
 				}
 				return 3;
+			}
+		},
+		{"RST 0", 0xc7, 1,
+			[](auto& regs, auto& memory, const auto& PC) {
+				instruction_rst(0x00, regs, memory, PC);
+				return 4;
+			}
+		},
+		{"RST 2", 0xd7, 1,
+			[](auto& regs, auto& memory, const auto& PC) {
+				instruction_rst(0x10, regs, memory, PC);
+				return 4;
+			}
+		},
+		{"RST 4", 0xe7, 1,
+			[](auto& regs, auto& memory, const auto& PC) {
+				instruction_rst(0x20, regs, memory, PC);
+				return 4;
+			}
+		},
+		{"RST 6", 0xf7, 1,
+			[](auto& regs, auto& memory, const auto& PC) {
+				instruction_rst(0x30, regs, memory, PC);
+				return 4;
+			}
+		},
+		{"RST 1", 0xcf, 1,
+			[](auto& regs, auto& memory, const auto& PC) {
+				instruction_rst(0x08, regs, memory, PC);
+				return 4;
+			}
+		},
+		{"RST 3", 0xdf, 1,
+			[](auto& regs, auto& memory, const auto& PC) {
+				instruction_rst(0x18, regs, memory, PC);
+				return 4;
+			}
+		},
+		{"RST 5", 0xef, 1,
+			[](auto& regs, auto& memory, const auto& PC) {
+				instruction_rst(0x28, regs, memory, PC);
+				return 4;
+			}
+		},
+		{"RST 7", 0xff, 1,
+			[](auto& regs, auto& memory, const auto& PC) {
+				instruction_rst(0x38, regs, memory, PC);
+				return 4;
 			}
 		},
 

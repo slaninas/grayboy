@@ -222,3 +222,107 @@ TEST_CASE("CALL NC, a16 - 0xd4", "[jump/call]") {
 		CHECK(cpu.memory_dump() == orig_memory.dump());
 	}
 }
+
+TEST_CASE("RST 0 - 0xc7", "[jump/call]") {
+	const auto orig_memory = MemoryChanger{{{0x7845, 0xc7}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.PC=0x7845, .SP=0xabcd}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	auto cycles = cpu.execute_next();
+	CHECK(cycles == 4);
+	auto correct_regs = RegistersChanger{.PC=0x00, .SP=0xabcb}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	const auto correct_memory = MemoryChanger{{{0xabcc, 0x78}, {0xabcb, 0x45}}}.get(orig_memory);
+	CHECK(cpu.memory_dump() == correct_memory.dump());
+}
+
+TEST_CASE("RST 2 - 0xd7", "[jump/call]") {
+	const auto orig_memory = MemoryChanger{{{0x7845, 0xd7}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.PC=0x7845, .SP=0xabcd}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	auto cycles = cpu.execute_next();
+	CHECK(cycles == 4);
+	auto correct_regs = RegistersChanger{.PC=0x10, .SP=0xabcb}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	const auto correct_memory = MemoryChanger{{{0xabcc, 0x78}, {0xabcb, 0x45}}}.get(orig_memory);
+	CHECK(cpu.memory_dump() == correct_memory.dump());
+}
+
+TEST_CASE("RST 4 - 0xe7", "[jump/call]") {
+	const auto orig_memory = MemoryChanger{{{0x7845, 0xe7}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.PC=0x7845, .SP=0xabcd}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	auto cycles = cpu.execute_next();
+	CHECK(cycles == 4);
+	auto correct_regs = RegistersChanger{.PC=0x20, .SP=0xabcb}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	const auto correct_memory = MemoryChanger{{{0xabcc, 0x78}, {0xabcb, 0x45}}}.get(orig_memory);
+	CHECK(cpu.memory_dump() == correct_memory.dump());
+}
+
+TEST_CASE("RST 6 - 0xf7", "[jump/call]") {
+	const auto orig_memory = MemoryChanger{{{0x7845, 0xf7}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.PC=0x7845, .SP=0xabcd}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	auto cycles = cpu.execute_next();
+	CHECK(cycles == 4);
+	auto correct_regs = RegistersChanger{.PC=0x30, .SP=0xabcb}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	const auto correct_memory = MemoryChanger{{{0xabcc, 0x78}, {0xabcb, 0x45}}}.get(orig_memory);
+	CHECK(cpu.memory_dump() == correct_memory.dump());
+}
+
+TEST_CASE("RST 1 - 0xcf", "[jump/call]") {
+	const auto orig_memory = MemoryChanger{{{0x7845, 0xcf}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.PC=0x7845, .SP=0xabcd}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	auto cycles = cpu.execute_next();
+	CHECK(cycles == 4);
+	auto correct_regs = RegistersChanger{.PC=0x08, .SP=0xabcb}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	const auto correct_memory = MemoryChanger{{{0xabcc, 0x78}, {0xabcb, 0x45}}}.get(orig_memory);
+	CHECK(cpu.memory_dump() == correct_memory.dump());
+}
+
+TEST_CASE("RST 3 - 0xdf", "[jump/call]") {
+	const auto orig_memory = MemoryChanger{{{0x7845, 0xdf}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.PC=0x7845, .SP=0xabcd}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	auto cycles = cpu.execute_next();
+	CHECK(cycles == 4);
+	auto correct_regs = RegistersChanger{.PC=0x18, .SP=0xabcb}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	const auto correct_memory = MemoryChanger{{{0xabcc, 0x78}, {0xabcb, 0x45}}}.get(orig_memory);
+	CHECK(cpu.memory_dump() == correct_memory.dump());
+}
+
+TEST_CASE("RST 5 - 0xef", "[jump/call]") {
+	const auto orig_memory = MemoryChanger{{{0x7845, 0xef}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.PC=0x7845, .SP=0xabcd}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	auto cycles = cpu.execute_next();
+	CHECK(cycles == 4);
+	auto correct_regs = RegistersChanger{.PC=0x28, .SP=0xabcb}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	const auto correct_memory = MemoryChanger{{{0xabcc, 0x78}, {0xabcb, 0x45}}}.get(orig_memory);
+	CHECK(cpu.memory_dump() == correct_memory.dump());
+}
+
+TEST_CASE("RST 7 - 0xff", "[jump/call]") {
+	const auto orig_memory = MemoryChanger{{{0x7845, 0xff}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.PC=0x7845, .SP=0xabcd}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	auto cycles = cpu.execute_next();
+	CHECK(cycles == 4);
+	auto correct_regs = RegistersChanger{.PC=0x38, .SP=0xabcb}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	const auto correct_memory = MemoryChanger{{{0xabcc, 0x78}, {0xabcb, 0x45}}}.get(orig_memory);
+	CHECK(cpu.memory_dump() == correct_memory.dump());
+}

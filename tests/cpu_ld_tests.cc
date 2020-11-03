@@ -1329,3 +1329,17 @@ TEST_CASE("PUSH AF - 0xf5", "[ld]") {
 	const auto correct_memory = MemoryChanger{{{0x3277, 0xbc}, {0x3276, 0xde}}}.get(orig_memory);
 	CHECK(cpu.memory_dump() == correct_memory.dump());
 }
+
+TEST_CASE("LD HL, SP+s8 - 0xf8", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0xf8}, {0x01, 0x23}}}.get(getRandomMemory());
+	const auto orig_flags = getRandomFlags();
+	const auto orig_regs = RegistersChanger{.F=orig_flags, .HL=0x1000, .PC=0x00, .SP=0x2000}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 3);
+	const auto correct_flags = FlagsChanger{.Z=0, .N=0, .H=0, .C=0}.get(orig_flags);
+	const auto correct_regs = RegistersChanger{.F=correct_flags, .HL=0x3023, .PC=0x02}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}

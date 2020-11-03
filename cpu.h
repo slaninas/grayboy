@@ -1174,6 +1174,30 @@ private:
 			}
 		},
 
+		// LD with signed add
+		// TODO: Check if subtraction works correctly
+		{"LD HL, SP+s8", 0xf8, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto value = static_cast<int8_t>(memory.read(PC + 1));
+				const auto SP = regs.read("SP");
+				const auto HL_old = regs.read("HL");
+
+				const auto intermediate_result = static_cast<uint16_t>(SP + value);
+				auto half_carry = half_carry_add_16bit(SP, value);
+				auto carry = carry_add_16bit(SP, value);
+
+				const auto HL_new = static_cast<uint16_t>(HL_old + intermediate_result);
+				half_carry |= half_carry_add_16bit(HL_old, intermediate_result);
+				carry |= carry_add_16bit(HL_old, intermediate_result);
+
+				regs.write("HL", HL_new);
+				regs.set_flag("Z", false);
+				regs.set_flag("N", false);
+				regs.set_flag("H", half_carry);
+				regs.set_flag("C", carry);
+				return 3;
+			}
+		},
 
 		// Decrement 16bit
 		{"DEC BC", 0x0b, 1,

@@ -23,6 +23,16 @@ struct Instruction {
 	}
 };
 
+[[nodiscard]] const Instruction& find_by_opcode(const uint16_t opcode, const std::vector<Instruction>& instructions) {
+	auto res = std::find_if(begin(instructions), end(instructions), [opcode](const auto& instruction) { return instruction.opcode ==  opcode; });
+	if (res == end(instructions)) {
+		auto stream = std::stringstream{};
+		stream << std::hex << opcode;
+		throw std::runtime_error("Opcode 0x" + stream.str() + " not found.");
+	}
+	return *res;
+}
+
 // TODO: Merge (half) carries somehow?
 // TODO: Are (half) carries correct?
 // Detect half-carry for addition, see https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/
@@ -2058,13 +2068,7 @@ private:
 	};
 
 	[[nodiscard]] const Instruction& find_by_opcode(const uint16_t opcode) {
-		auto res = std::find_if(begin(instructions_), end(instructions_), [opcode](const auto& instruction) { return instruction.opcode ==  opcode; });
-		if (res == end(instructions_)) {
-			auto stream = std::stringstream{};
-			stream << std::hex << opcode;
-			throw std::runtime_error("Opcode 0x" + stream.str() + " not found.");
-		}
-		return *res;
+		return ::find_by_opcode(opcode, instructions_);
 	}
 
 };

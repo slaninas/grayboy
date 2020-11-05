@@ -23,6 +23,13 @@ struct Instruction {
 	}
 };
 
+struct DissasemblyInfo {
+	uint16_t address;
+	uint16_t next_address;
+	Instruction instruction;
+	std::vector<uint8_t> memory_representation;
+};
+
 [[nodiscard]] const Instruction& find_by_opcode(const uint16_t opcode, const std::vector<Instruction>& instructions) {
 	auto res = std::find_if(begin(instructions), end(instructions), [opcode](const auto& instruction) { return instruction.opcode ==  opcode; });
 	if (res == end(instructions)) {
@@ -360,6 +367,23 @@ public:
 		const auto cycles = instruction(regs_, memory_, PC);
 		return cycles;
 	}
+
+	[[nodiscard]] auto disassemble_next(const uint16_t& addr) {
+		const auto PC = addr;
+		regs_.write("PC", PC);
+		const auto opcode = memory_.read(PC);
+
+		const auto instruction = find_by_opcode(opcode);
+
+		const auto cycles = instruction(regs_, memory_, PC);
+		auto memory_representation = std::vector<uint8_t>{};
+		for (auto i = addr; i < addr + instruction.size; ++i) {
+			memory_representation.push_back(memory_.read(i));
+		}
+
+		return DissasemblyInfo{addr, regs_.read("PC"), instruction, memory_representation};
+	}
+
 
 	[[nodiscard]] auto registers_dump() const {
 		return regs_;

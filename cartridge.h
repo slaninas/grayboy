@@ -71,6 +71,10 @@ public:
 		std::cout << std::dec;
 	}
 
+	auto dump() {
+		return buffer_;
+	}
+
 
 private:
 	void print_as_hex(const std::pair<uint16_t, uint16_t>& range) {

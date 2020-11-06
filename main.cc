@@ -9,17 +9,32 @@
 #include "registers.h"
 
 
+void dprint(const DissasemblyInfo& info) {
+	std::cout << std::hex;
+	std::cout << "0x" << info.address << ": " << info.instruction.mnemonic << " | ";
+	for (const auto& val : info.memory_representation) {
+		std::cout << (int)val << ' ';
+	}
+	std::cout << '\n';
+	std::cout << std::dec;
+}
+
 template<typename T>
 void p(const T& cont) {
-	std::cout << std::hex;
 	for (const auto el : cont) {
-		std::cout << "0x" << el.address << ": " << el.instruction.mnemonic << " | ";
-		for (const auto& val : el.memory_representation) {
-			std::cout << (int)val << ' ';
-		}
-		std::cout << '\n';
+		dprint(el);
 	}
-	std::cout << std::dec;
+}
+
+template<typename T>
+void print_memory(const T& mem) {
+
+	for (int i = 0; i < mem.size(); ++i) {
+		const auto& value = mem[i];
+		if (value != 0) {
+			std::cout << "Memory 0x" << i << "=" << (int)value <<'\n';
+		}
+	}
 }
 
 auto disasseble(Cpu& cpu) {
@@ -67,18 +82,31 @@ int main(int argc, const char** argv) {
 		[](const auto& el) { return static_cast<uint8_t>(el); }
 	);
 
+	for (int i = 0x200; i < array.size(); ++i) {
+		array[i] = 0;
+	}
+
 	const auto regs = RegistersChanger{.PC=0x0100}.get(Registers{});
 
 	auto cpu = Cpu{array, regs};
 	cpu.registers().print();
-	// auto next = static_cast<uint16_t>(0x0100);
-	// for (auto i = 0; i < 10; ++i) {
-		// cpu.execute_next();
-		// cpu.registers().print();
-		// std::cout << "---------------------------\n\n";
-	// }
 
-	disasseble(cpu);
-	cpu.registers().print();
+	// disasseble(cpu);
+	char c;
+	auto next_addr = static_cast<uint16_t>(0x0100);
+	uint16_t num;
+
+	while (1) {
+		const auto dissasembled = cpu.disassemble_next(next_addr);
+		cpu.registers().print();
+		std::cout << "Next: "; dprint(dissasembled);
+		next_addr = dissasembled.next_address;
+		cpu.execute_next();
+		std::cin >> c;
+		while (c == 'm') {
+			print_memory(cpu.memory_dump());
+			std::cin >> c;
+		}
+	}
 
 }

@@ -145,7 +145,7 @@ int main(int argc, const char** argv) {
 		return false;
 	};
 
-	std::vector<uint16_t> break_points = {0x0209, 0x020f};
+	std::vector<uint16_t> break_points = {0x020b, 0x020f};
 
 	auto running = false;
 
@@ -158,11 +158,13 @@ int main(int argc, const char** argv) {
 
 		cpu.registers().print(registers_ss);
 
-		reg_window.update(registers_ss.str());
 
 		const auto PC = cpu.registers().read("PC");
 		get_from_to(disassembled_instructions, 10, PC, ss);
-		instruction_window.update(ss.str());
+		if (!running) {
+			instruction_window.update(ss.str());
+			reg_window.update(registers_ss.str());
+		}
 
 		if (!running) {
 			auto c = cursed.get_char();

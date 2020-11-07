@@ -138,6 +138,15 @@ int main(int argc, const char** argv) {
 	auto cpu_copy = cpu;
 	auto disassembled_instructions = disassemble(cpu_copy);
 
+	auto should_break = [] (const auto& break_points, const auto& next_addr) {
+		auto iter = std::find(begin(break_points), end(break_points), next_addr);
+		if (iter != end(break_points)) return true;
+		return false;
+	};
+
+	std::vector<uint16_t> break_points = {0x0209, 0x020f};
+
+	auto running = false;
 
 	while (1) {
 		auto registers_ss = std::ostringstream{};
@@ -154,12 +163,22 @@ int main(int argc, const char** argv) {
 		get_from_to(disassembled_instructions, 10, PC, ss);
 		instruction_window.update(ss.str());
 
-		cursed.wait_for_any();
+		if (!running) {
+			auto c = cursed.get_char();
+			if (c == 'r') running = true;
+		}
+		else {
+			if (should_break(break_points, next_addr)) {
+				running = false;
+			}
+		}
 
 		[[maybe_unused]] const auto cycles = cpu.execute_next();
 		cpu_copy = cpu;
 		auto disassembled_new = disassemble(cpu_copy);
 		update_instructions(disassembled_new, disassembled_instructions);
+
+
 	}
 
 }

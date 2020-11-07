@@ -92,6 +92,10 @@ public:
 	void wait_for_any() {
 		getch();
 	}
+	
+	auto get_char() {
+		return getch();
+	}
 
 private:
 	// std::vector<CursedWindow> windows_;

@@ -11,6 +11,8 @@ option(BUILD_TESTS "Build tests and add them to ctest" ON)
 add_compile_options(-Wall -Wextra -Wpedantic)
 
 add_executable(gameboy  main.cc)
+find_package(curses)
+target_link_libraries(gameboy curses)
 
 if (${BUILD_TESTS})
 	enable_testing()

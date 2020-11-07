@@ -7,6 +7,7 @@
 #include "cpu.h"
 #include "registers.h"
 #include "registers.h"
+#include "curse.h"
 
 
 void dprint(const DissasemblyInfo& info) {
@@ -96,7 +97,7 @@ int main(int argc, const char** argv) {
 	auto next_addr = static_cast<uint16_t>(0x0100);
 	uint16_t num;
 
-	while (1) {
+	while (0) {
 		const auto dissasembled = cpu.disassemble_next(next_addr);
 		cpu.registers().print();
 		std::cout << "Next: "; dprint(dissasembled);
@@ -108,5 +109,8 @@ int main(int argc, const char** argv) {
 			std::cin >> c;
 		}
 	}
+
+	auto cursed = MainCurse{};
+
 
 }

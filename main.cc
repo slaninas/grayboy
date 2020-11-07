@@ -123,7 +123,8 @@ int main(int argc, const char** argv) {
 		[](const auto& el) { return static_cast<uint8_t>(el); }
 	);
 
-	const auto regs = RegistersChanger{.PC=0x0100}.get(Registers{});
+	// Initializing values same way bgb emualtor does it
+	const auto regs = RegistersChanger{.AF=0x1180, .DE=0xff56, .HL=0x000d, .PC=0x0100, .SP=0xfffe}.get(Registers{});
 
 	auto cpu = Cpu{array, regs};
 	cpu.registers().print();

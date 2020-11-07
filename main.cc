@@ -89,7 +89,8 @@ auto get_from_to(const std::vector<DisassemblyInfo>& infos, const uint16_t& neig
 	assert((next_addr_element != end(infos)) && "Well, well, it's broken. next_addr should already be in infos.");
 
 	const auto start = begin(infos) < next_addr_element - neighbors ? next_addr_element - neighbors : begin(infos);
-	const auto last = end(infos) > next_addr_element + neighbors ? next_addr_element + neighbors : end(infos);
+	// const auto last = end(infos) > next_addr_element + neighbors ? next_addr_element + neighbors : end(infos);
+	const auto last = end(infos);
 
 
 	// std::cout << "start: " << start << ", end: " << end << '\n';

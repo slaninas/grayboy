@@ -17,7 +17,6 @@ public:
 	CursedWindow(const WindowPosition& position, const WindowSize& size) {
 		// std::cout << "INFO: window_=" << window_ << '\n';
 		window_ = newwin(size.height, size.width, position.y, position.x);
-		box(window_, 0, 0);
 		wrefresh(window_);
 	}
 	CursedWindow(const CursedWindow&) = delete;
@@ -28,6 +27,13 @@ public:
 
 	~CursedWindow() {
 		destroy();
+	}
+
+	void update(const std::string& content) {
+		werase(window_);
+		// box(window_, 0, 0);
+		wprintw(window_, content.c_str());
+		wrefresh(window_);
 	}
 
 	void destroy() {
@@ -64,14 +70,14 @@ public:
 		refresh();
 	}
 
-	void add_window(CursedWindow&& window) {
-		windows_.emplace_back(std::move(window));
-	}
+	// void add_window(CursedWindow&& window) {
+		// windows_.emplace_back(std::move(window));
+	// }
 	void wait_for_any() {
 		getch();
 	}
 
 private:
-	std::vector<CursedWindow> windows_;
+	// std::vector<CursedWindow> windows_;
 
 };

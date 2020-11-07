@@ -112,9 +112,16 @@ int main(int argc, const char** argv) {
 
 	auto cursed = MainCurse{};
 	auto win = CursedWindow{{20, 10}, {30, 30}};
-	cursed.add_window(std::move(win));
-	cursed.update();
-	cursed.wait_for_any();
+	// cursed.add_window(std::move(win));
 
+	while (1) {
+		auto ss = std::ostringstream{};
+		cpu.registers().print(ss);
+
+		win.update(ss.str());
+		cursed.wait_for_any();
+
+		cpu.execute_next();
+	}
 
 }

@@ -135,7 +135,6 @@ int main(int argc, const char** argv) {
 	auto cursed = MainCurse{};
 	auto reg_window = CursedWindow{{40, 10}, {18, 12}};
 	auto instruction_window = CursedWindow{{0, 0}, {40, 50}};
-	auto instruction_window2 = CursedWindow{{60, 0}, {40, 50}};
 
 	auto cpu_copy = cpu;
 	auto disassembled_instructions = disassemble(cpu_copy);
@@ -144,23 +143,18 @@ int main(int argc, const char** argv) {
 	while (1) {
 		auto registers_ss = std::ostringstream{};
 		auto ss = std::ostringstream{};
-		auto ss2 = std::ostringstream{};
 
 		const auto disassembled = cpu.disassemble_next(next_addr);
 		next_addr = disassembled.next_address;
-		ss << "Next: ";
-		dprint(disassembled, ss);
-		// cursed.add(ss.str());
 
 		cpu.registers().print(registers_ss);
 
 		reg_window.update(registers_ss.str());
-		// instruction_window.add(ss.str());
 
 		const auto PC = cpu.registers().read("PC");
-		get_from_to(disassembled_instructions, 10, PC, ss2);
+		get_from_to(disassembled_instructions, 10, PC, ss);
+		instruction_window.update(ss.str());
 
-		instruction_window2.update(ss2.str());
 		cursed.wait_for_any();
 
 		cpu.execute_next();

@@ -11,7 +11,7 @@
 
 void dprint(const DisassemblyInfo& info, std::ostream& os) {
 	os << std::hex;
-	os << "0x" << info.address << ": " << info.instruction.mnemonic << " | ";
+	os << "0x" << std::setw(4) << std::setfill('0') << info.address << ": " << info.instruction.mnemonic << " | ";
 	for (const auto& val : info.memory_representation) {
 		os << (int)val << ' ';
 	}
@@ -43,11 +43,13 @@ void print_memory(const T& mem) {
 }
 
 auto disassemble(Cpu& cpu) {
-	auto addr = static_cast<uint16_t>(0x100);
+	auto addr = static_cast<uint16_t>(cpu.registers().read("PC"));
 
+	// TODO: Use something better than vector
 	auto disassembled = std::vector<DisassemblyInfo>{};
 
-	for (int i = 0; i < 1000; ++i) {
+	// TODO: Unify size of lookup with get_from_to
+	for (int i = 0; i < 10; ++i) {
 		const auto info =  cpu.disassemble_next(addr);
 		addr = info.next_address;
 		disassembled.push_back(info);
@@ -66,10 +68,36 @@ auto disassemble(Cpu& cpu) {
 	return disassembled;
 }
 
-auto get_from_to(const std::vector<DisassemblyInfo>& infos, const uint16_t& from, const uint16_t& to, const uint16_t& next_addr, std::ostream& os) {
-	for (const auto info : infos) {
+void update_instructions(const std::vector<DisassemblyInfo>& new_instructions, std::vector<DisassemblyInfo>& instructions) {
+	std::copy(begin(new_instructions), end(new_instructions), std::back_insert_iterator<std::vector<DisassemblyInfo>>(instructions));
+
+	std::sort(
+		begin(instructions),
+		end(instructions),
+		[](const auto& a, const auto& b) {
+			return a.address < b.address;
+		}
+	);
+	auto new_end = std::unique(begin(instructions), end(instructions), [] (const auto& a, const auto&b) { return a.address == b.address; } );
+
+	instructions.erase(new_end, end(instructions));
+}
+
+auto get_from_to(const std::vector<DisassemblyInfo>& infos, const uint16_t& neighbors, const uint16_t& next_addr, std::ostream& os) {
+
+	auto next_addr_element = std::find_if(begin(infos), end(infos), [next_addr](const auto& info) { return info.address == next_addr; });
+	assert((next_addr_element != end(infos)) && "Well, well, it's broken. next_addr should already be in infos.");
+
+	const auto start = begin(infos) < next_addr_element - neighbors ? next_addr_element - neighbors : begin(infos);
+	const auto last = end(infos) > next_addr_element + neighbors ? next_addr_element + neighbors : end(infos);
+
+
+	// std::cout << "start: " << start << ", end: " << end << '\n';
+
+	for (auto iter = start; iter != last; ++iter) {
+		const auto& info = *iter;
 		auto character = info.address == next_addr ? '>' : ' ';
-		os << character;
+		os << character << ' ';
 		dprint(info, os);
 	}
 }
@@ -102,21 +130,7 @@ int main(int argc, const char** argv) {
 
 	// disasseble(cpu);
 	char c;
-	auto next_addr = static_cast<uint16_t>(0x0100);
-	uint16_t num;
-
-	while (0) {
-		const auto disassembled = cpu.disassemble_next(next_addr);
-		cpu.registers().print();
-		std::cout << "Next: "; dprint(disassembled);
-		next_addr = disassembled.next_address;
-		cpu.execute_next();
-		std::cin >> c;
-		while (c == 'm') {
-			print_memory(cpu.memory_dump());
-			std::cin >> c;
-		}
-	}
+	auto next_addr = cpu.registers().read("PC");
 
 	auto cursed = MainCurse{};
 	auto reg_window = CursedWindow{{40, 10}, {18, 12}};
@@ -124,7 +138,7 @@ int main(int argc, const char** argv) {
 	auto instruction_window2 = CursedWindow{{60, 0}, {40, 50}};
 
 	auto cpu_copy = cpu;
-	auto disassembled_more = disassemble(cpu_copy);
+	auto disassembled_instructions = disassemble(cpu_copy);
 
 
 	while (1) {
@@ -141,14 +155,18 @@ int main(int argc, const char** argv) {
 		cpu.registers().print(registers_ss);
 
 		reg_window.update(registers_ss.str());
-		instruction_window.add(ss.str());
+		// instruction_window.add(ss.str());
 
-		get_from_to(disassembled_more, 0, 0, cpu.registers().read("PC"), ss2);
+		const auto PC = cpu.registers().read("PC");
+		get_from_to(disassembled_instructions, 10, PC, ss2);
 
 		instruction_window2.update(ss2.str());
 		cursed.wait_for_any();
 
 		cpu.execute_next();
+		cpu_copy = cpu;
+		auto disassembled_new = disassemble(cpu_copy);
+		update_instructions(disassembled_new, disassembled_instructions);
 	}
 
 }

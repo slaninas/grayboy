@@ -5,26 +5,26 @@
 #include "cpu.h"
 
 TEST_CASE("JR s8 - 0x18", "[jump/call]") {
-	const auto orig_memory = MemoryChanger{{{0x00, 0x18}, {0x01, 0x43}, {0x43, 0x18}, {0x44, 0xde}}}.get(getRandomMemory());
+	const auto orig_memory = MemoryChanger{{{0x00, 0x18}, {0x01, 0x43}, {0x45, 0x18}, {0x46, 0xde}}}.get(getRandomMemory());
 	const auto orig_regs = RegistersChanger{.PC=0x00}.get(getRandomRegisters());
 	auto cpu = Cpu{orig_memory, orig_regs};
 
 	auto cycles = cpu.execute_next();
 	CHECK(cycles == 3);
-	auto correct_regs = RegistersChanger{.PC=0x43}.get(orig_regs);
+	auto correct_regs = RegistersChanger{.PC=0x45}.get(orig_regs);
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 
 
 	cycles = cpu.execute_next();
 	CHECK(cycles == 3);
-	correct_regs = RegistersChanger{.PC=0x0121}.get(orig_regs);
+	correct_regs = RegistersChanger{.PC=0x0025}.get(orig_regs);
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
 
 TEST_CASE("JR Z, s8 - 0x28", "[jump/call]") {
-	const auto orig_memory = MemoryChanger{{{0x00, 0x28}, {0x01, 0x43}, {0x02, 0x28}, {0x03, 0xde}}}.get(getRandomMemory());
+	const auto orig_memory = MemoryChanger{{{0x00, 0x28}, {0x01, 0x43}, {0x02, 0x28}, {0x03, 0xff}}}.get(getRandomMemory());
 	const auto orig_flags = FlagsChanger{.Z=0}.get(getRandomFlags());
 	const auto orig_regs = RegistersChanger{.F=orig_flags, .PC=0x00}.get(getRandomRegisters());
 	auto cpu = Cpu{orig_memory, orig_regs};
@@ -41,13 +41,13 @@ TEST_CASE("JR Z, s8 - 0x28", "[jump/call]") {
 	cycles = cpu.execute_next();
 	CHECK(cycles == 3);
 	const auto correct_flags = FlagsChanger{.Z=1}.get(orig_flags); // Z was manually setg to true
-	correct_regs = RegistersChanger{.F=correct_flags, .PC=0xe0}.get(orig_regs);
+	correct_regs = RegistersChanger{.F=correct_flags, .PC=0x03}.get(orig_regs);
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
 
 TEST_CASE("JR C, s8 - 0x38", "[jump/call]") {
-	const auto orig_memory = MemoryChanger{{{0x00, 0x38}, {0x01, 0x43}, {0x02, 0x38}, {0x03, 0xde}}}.get(getRandomMemory());
+	const auto orig_memory = MemoryChanger{{{0x00, 0x38}, {0x01, 0x43}, {0x02, 0x38}, {0x03, 0xff}}}.get(getRandomMemory());
 	const auto orig_flags = FlagsChanger{.C=0}.get(getRandomFlags());
 	const auto orig_regs = RegistersChanger{.F=orig_flags, .PC=0x00}.get(getRandomRegisters());
 	auto cpu = Cpu{orig_memory, orig_regs};
@@ -64,7 +64,7 @@ TEST_CASE("JR C, s8 - 0x38", "[jump/call]") {
 	cycles = cpu.execute_next();
 	CHECK(cycles == 3);
 	const auto correct_flags = FlagsChanger{.C=1}.get(orig_flags); // C was manually setg to true
-	correct_regs = RegistersChanger{.F=correct_flags, .PC=0xe0}.get(orig_regs);
+	correct_regs = RegistersChanger{.F=correct_flags, .PC=0x03}.get(orig_regs);
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
@@ -421,7 +421,7 @@ TEST_CASE("JR NZ, s8 - 0x20", "[jump/call]") {
 
 		auto cycles = cpu.execute_next();
 		CHECK(cycles == 3);
-		auto correct_regs = RegistersChanger{.PC=0x00fd}.get(orig_regs);
+		auto correct_regs = RegistersChanger{.PC=0x00ff}.get(orig_regs);
 		CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
 		CHECK(cpu.memory_dump() == orig_memory.dump());
 	}
@@ -449,7 +449,7 @@ TEST_CASE("JR NC, s8 - 0x30", "[jump/call]") {
 
 		auto cycles = cpu.execute_next();
 		CHECK(cycles == 3);
-		auto correct_regs = RegistersChanger{.PC=0x00fd}.get(orig_regs);
+		auto correct_regs = RegistersChanger{.PC=0x00ff}.get(orig_regs);
 		CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
 		CHECK(cpu.memory_dump() == orig_memory.dump());
 	}

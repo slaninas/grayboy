@@ -128,8 +128,6 @@ int main(int argc, const char** argv) {
 	auto cpu = Cpu{array, regs};
 	cpu.registers().print();
 
-	// disasseble(cpu);
-	char c;
 	auto next_addr = cpu.registers().read("PC");
 
 	auto cursed = MainCurse{};
@@ -157,7 +155,7 @@ int main(int argc, const char** argv) {
 
 		cursed.wait_for_any();
 
-		cpu.execute_next();
+		[[maybe_unused]] const auto cycles = cpu.execute_next();
 		cpu_copy = cpu;
 		auto disassembled_new = disassemble(cpu_copy);
 		update_instructions(disassembled_new, disassembled_instructions);

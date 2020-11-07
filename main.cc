@@ -45,25 +45,27 @@ void print_memory(const T& mem) {
 auto disasseble(Cpu& cpu) {
 	auto addr = static_cast<uint16_t>(0x100);
 
-	auto dissasembled = std::vector<DissasemblyInfo>{};
+	auto disassembled = std::vector<DissasemblyInfo>{};
 
 	for (int i = 0; i < 1000; ++i) {
 		const auto info =  cpu.disassemble_next(addr);
 		addr = info.next_address;
-		dissasembled.push_back(info);
+		disassembled.push_back(info);
 	}
 
 	std::sort(
-		begin(dissasembled),
-		end(dissasembled),
+		begin(disassembled),
+		end(disassembled),
 		[](const auto& a, const auto& b) {
 			return a.address < b.address;
 		}
 	);
-	auto new_end = std::unique(begin(dissasembled), end(dissasembled), [] (const auto& a, const auto&b) { return a.address == b.address; } );
+	auto new_end = std::unique(begin(disassembled), end(disassembled), [] (const auto& a, const auto&b) { return a.address == b.address; } );
 
-	dissasembled.erase(new_end, end(dissasembled));
-	p(dissasembled);
+	disassembled.erase(new_end, end(disassembled));
+	p(disassembled);
+}
+
 }
 
 int main(int argc, const char** argv) {
@@ -98,10 +100,10 @@ int main(int argc, const char** argv) {
 	uint16_t num;
 
 	while (0) {
-		const auto dissasembled = cpu.disassemble_next(next_addr);
+		const auto disassembled = cpu.disassemble_next(next_addr);
 		cpu.registers().print();
-		std::cout << "Next: "; dprint(dissasembled);
-		next_addr = dissasembled.next_address;
+		std::cout << "Next: "; dprint(disassembled);
+		next_addr = disassembled.next_address;
 		cpu.execute_next();
 		std::cin >> c;
 		while (c == 'm') {
@@ -118,10 +120,10 @@ int main(int argc, const char** argv) {
 		auto registers_ss = std::ostringstream{};
 		auto ss = std::ostringstream{};
 
-		const auto dissasembled = cpu.disassemble_next(next_addr);
-		next_addr = dissasembled.next_address;
+		const auto disassembled = cpu.disassemble_next(next_addr);
+		next_addr = disassembled.next_address;
 		ss << "Next: ";
-		dprint(dissasembled, ss);
+		dprint(disassembled, ss);
 		// cursed.add(ss.str());
 
 		cpu.registers().print(registers_ss);

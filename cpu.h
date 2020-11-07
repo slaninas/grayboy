@@ -23,7 +23,7 @@ struct Instruction {
 	}
 };
 
-struct DissasemblyInfo {
+struct DisassemblyInfo {
 	uint16_t address;
 	uint16_t next_address;
 	Instruction instruction;
@@ -383,7 +383,7 @@ public:
 			memory_representation.push_back(memory.read(i));
 		}
 
-		const auto result = DissasemblyInfo{addr, regs.read("PC"), instruction, memory_representation};
+		const auto result = DisassemblyInfo{addr, regs.read("PC"), instruction, memory_representation};
 		return result;
 	}
 

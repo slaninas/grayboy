@@ -9,7 +9,7 @@
 #include "registers.h"
 #include "curse.h"
 
-void dprint(const DissasemblyInfo& info, std::ostream& os) {
+void dprint(const DisassemblyInfo& info, std::ostream& os) {
 	os << std::hex;
 	os << "0x" << info.address << ": " << info.instruction.mnemonic << " | ";
 	for (const auto& val : info.memory_representation) {
@@ -19,7 +19,7 @@ void dprint(const DissasemblyInfo& info, std::ostream& os) {
 	os << std::dec;
 }
 
-void dprint(const DissasemblyInfo& info) {
+void dprint(const DisassemblyInfo& info) {
 	dprint(info, std::cout);
 }
 
@@ -42,10 +42,10 @@ void print_memory(const T& mem) {
 	}
 }
 
-auto disasseble(Cpu& cpu) {
+auto disassemble(Cpu& cpu) {
 	auto addr = static_cast<uint16_t>(0x100);
 
-	auto disassembled = std::vector<DissasemblyInfo>{};
+	auto disassembled = std::vector<DisassemblyInfo>{};
 
 	for (int i = 0; i < 1000; ++i) {
 		const auto info =  cpu.disassemble_next(addr);

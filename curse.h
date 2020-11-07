@@ -7,6 +7,7 @@ public:
 
 	MainCurse() {
 		initscr();
+		// TODO: raw(); ?
 		printw("Blabla, hi!");
 		refresh();
 		getch();

@@ -100,23 +100,26 @@ public:
 	void print(std::ostream& os) const {
 		auto result = std::ostringstream{};
 		result << std::hex;
-		auto print_pair = [&](const auto& name, const auto& both, const auto& hi, const auto& lo) {
-			result << name << ": " << static_cast<int>(both);
-			result << "\t[" << name[0] << "=" << static_cast<int>(hi) << ' ' << name[1] << "="<< static_cast<int>(lo) << ']';
+		auto print_pair = [&](const auto& name, const auto& hi, const auto& lo) {
+			result << name << ": ";
+			result << std::setw(2) << std::setfill('0') << static_cast<int>(hi);
+			result << ' ';
+			result << std::setw(2) << std::setfill('0') << static_cast<int>(lo);
 			result << '\n';
 		};
 
-		result << "Registers: \n" << std::string(20, '-') << '\n';
-		// print_pair("AF", read("AF"), read("A"), read("F"));
-		print_pair("AF", read("AF"), read("A"), read("F"));
-		print_pair("BC", read("BC"), read("B"), read("C"));
-		print_pair("DE", read("DE"), read("D"), read("E"));
-		print_pair("HL", read("HL"), read("H"), read("L"));
+		result << "Registers: \n" << std::string(15, '-') << '\n';
 
-		result << "PC: " << static_cast<int>(read("PC")) << '\n';
-		result << "SP: " << static_cast<int>(read("SP")) << '\n';
-		result << "Flags: ";
-		result << "Z=" << read_flag("Z") << " N=" << read_flag("N") << " H=" << read_flag("H") << " C=" << read_flag("C") << "]\n";
+		print_pair("AF", read("A"), read("F"));
+		print_pair("BC", read("B"), read("C"));
+		print_pair("DE", read("D"), read("E"));
+		print_pair("HL", read("H"), read("L"));
+
+		result << "PC: " << std::setw(4) << std::setfill('0') << static_cast<int>(read("PC")) << '\n';
+		result << "SP: " << std::setw(4) << std::setfill('0') << static_cast<int>(read("SP")) << '\n';
+
+		result << std::string(15, '-') << '\n';
+		result << "Z=" << read_flag("Z") << " N=" << read_flag("N") << " H=" << read_flag("H") << " C=" << read_flag("C") << '\n';
 
 		os << result.str();
 	}

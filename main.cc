@@ -111,8 +111,8 @@ int main(int argc, const char** argv) {
 	}
 
 	auto cursed = MainCurse{};
-	auto win = CursedWindow{{40, 10}, {30, 30}};
-	// cursed.add_window(std::move(win));
+	auto reg_window = CursedWindow{{40, 10}, {18, 12}};
+	auto instruction_window = CursedWindow{{0, 0}, {40, 50}};
 
 	while (1) {
 		auto registers_ss = std::ostringstream{};
@@ -122,11 +122,12 @@ int main(int argc, const char** argv) {
 		next_addr = dissasembled.next_address;
 		ss << "Next: ";
 		dprint(dissasembled, ss);
-		cursed.add(ss.str());
+		// cursed.add(ss.str());
 
 		cpu.registers().print(registers_ss);
 
-		win.update(registers_ss.str());
+		reg_window.update(registers_ss.str());
+		instruction_window.add(ss.str());
 		cursed.wait_for_any();
 
 		cpu.execute_next();

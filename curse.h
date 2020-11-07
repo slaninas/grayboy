@@ -16,8 +16,12 @@ class CursedWindow {
 public:
 	CursedWindow(const WindowPosition& position, const WindowSize& size) {
 		// std::cout << "INFO: window_=" << window_ << '\n';
-		window_ = newwin(size.height, size.width, position.y, position.x);
+		window_ = newwin(size.height - 2, size.width - 2, position.y + 1, position.x + 1);
 		wrefresh(window_);
+
+		border_window_ = newwin(size.height, size.width, position.y, position.x);
+		box(border_window_, 0, 0);
+		wrefresh(border_window_);
 	}
 	CursedWindow(const CursedWindow&) = delete;
 	CursedWindow(CursedWindow&& window) {
@@ -30,9 +34,16 @@ public:
 	}
 
 	void update(const std::string& content) {
+		box(border_window_, 0, 0);
+		wrefresh(border_window_);
+
 		werase(window_);
-		// box(window_, 0, 0);
 		wprintw(window_, content.c_str());
+		wrefresh(window_);
+	}
+
+	void add(const std::string& str) {
+		wprintw(window_, str.c_str());
 		wrefresh(window_);
 	}
 
@@ -45,6 +56,7 @@ public:
 
 private:
 	WINDOW * window_ = nullptr;
+	WINDOW * border_window_ = nullptr;
 };
 
 class MainCurse {

@@ -63,9 +63,15 @@ auto disassemble(Cpu& cpu) {
 	auto new_end = std::unique(begin(disassembled), end(disassembled), [] (const auto& a, const auto&b) { return a.address == b.address; } );
 
 	disassembled.erase(new_end, end(disassembled));
-	p(disassembled);
+	return disassembled;
 }
 
+auto get_from_to(const std::vector<DisassemblyInfo>& infos, const uint16_t& from, const uint16_t& to, const uint16_t& next_addr, std::ostream& os) {
+	for (const auto info : infos) {
+		auto character = info.address == next_addr ? '>' : ' ';
+		os << character;
+		dprint(info, os);
+	}
 }
 
 int main(int argc, const char** argv) {
@@ -115,10 +121,16 @@ int main(int argc, const char** argv) {
 	auto cursed = MainCurse{};
 	auto reg_window = CursedWindow{{40, 10}, {18, 12}};
 	auto instruction_window = CursedWindow{{0, 0}, {40, 50}};
+	auto instruction_window2 = CursedWindow{{60, 0}, {40, 50}};
+
+	auto cpu_copy = cpu;
+	auto disassembled_more = disassemble(cpu_copy);
+
 
 	while (1) {
 		auto registers_ss = std::ostringstream{};
 		auto ss = std::ostringstream{};
+		auto ss2 = std::ostringstream{};
 
 		const auto disassembled = cpu.disassemble_next(next_addr);
 		next_addr = disassembled.next_address;
@@ -130,6 +142,10 @@ int main(int argc, const char** argv) {
 
 		reg_window.update(registers_ss.str());
 		instruction_window.add(ss.str());
+
+		get_from_to(disassembled_more, 0, 0, cpu.registers().read("PC"), ss2);
+
+		instruction_window2.update(ss2.str());
 		cursed.wait_for_any();
 
 		cpu.execute_next();

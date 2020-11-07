@@ -12,7 +12,7 @@ add_compile_options(-Wall -Wextra -Wpedantic)
 
 add_executable(gameboy  main.cc)
 find_package(curses)
-target_link_libraries(gameboy curses)
+target_link_libraries(gameboy ncurses)
 
 if (${BUILD_TESTS})
 	enable_testing()

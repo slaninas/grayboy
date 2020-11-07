@@ -111,6 +111,10 @@ int main(int argc, const char** argv) {
 	}
 
 	auto cursed = MainCurse{};
+	auto win = CursedWindow{{20, 10}, {30, 30}};
+	cursed.add_window(std::move(win));
+	cursed.update();
+	cursed.wait_for_any();
 
 
 }

@@ -70,6 +70,10 @@ public:
 		refresh();
 	}
 
+	void add(const std::string& str) {
+		printw(str.c_str());
+	}
+
 	// void add_window(CursedWindow&& window) {
 		// windows_.emplace_back(std::move(window));
 	// }

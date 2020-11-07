@@ -9,16 +9,20 @@
 #include "registers.h"
 #include "curse.h"
 
+void dprint(const DissasemblyInfo& info, std::ostream& os) {
+	os << std::hex;
+	os << "0x" << info.address << ": " << info.instruction.mnemonic << " | ";
+	for (const auto& val : info.memory_representation) {
+		os << (int)val << ' ';
+	}
+	os << '\n';
+	os << std::dec;
+}
 
 void dprint(const DissasemblyInfo& info) {
-	std::cout << std::hex;
-	std::cout << "0x" << info.address << ": " << info.instruction.mnemonic << " | ";
-	for (const auto& val : info.memory_representation) {
-		std::cout << (int)val << ' ';
-	}
-	std::cout << '\n';
-	std::cout << std::dec;
+	dprint(info, std::cout);
 }
+
 
 template<typename T>
 void p(const T& cont) {
@@ -83,10 +87,6 @@ int main(int argc, const char** argv) {
 		[](const auto& el) { return static_cast<uint8_t>(el); }
 	);
 
-	for (int i = 0x200; i < array.size(); ++i) {
-		array[i] = 0;
-	}
-
 	const auto regs = RegistersChanger{.PC=0x0100}.get(Registers{});
 
 	auto cpu = Cpu{array, regs};
@@ -111,14 +111,22 @@ int main(int argc, const char** argv) {
 	}
 
 	auto cursed = MainCurse{};
-	auto win = CursedWindow{{20, 10}, {30, 30}};
+	auto win = CursedWindow{{40, 10}, {30, 30}};
 	// cursed.add_window(std::move(win));
 
 	while (1) {
+		auto registers_ss = std::ostringstream{};
 		auto ss = std::ostringstream{};
-		cpu.registers().print(ss);
 
-		win.update(ss.str());
+		const auto dissasembled = cpu.disassemble_next(next_addr);
+		next_addr = dissasembled.next_address;
+		ss << "Next: ";
+		dprint(dissasembled, ss);
+		cursed.add(ss.str());
+
+		cpu.registers().print(registers_ss);
+
+		win.update(registers_ss.str());
 		cursed.wait_for_any();
 
 		cpu.execute_next();

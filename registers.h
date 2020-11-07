@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
 #include <cassert>
 
@@ -96,28 +97,28 @@ public:
 		}
 	}
 
-	auto& print(std::ostream& os) const {
-		os << std::hex;
+	void print(std::ostream& os) const {
+		auto result = std::ostringstream{};
+		result << std::hex;
 		auto print_pair = [&](const auto& name, const auto& both, const auto& hi, const auto& lo) {
-			os << name << ": " << static_cast<int>(both);
-			os << "\t[" << name[0] << "=" << static_cast<int>(hi) << ' ' << name[1] << "="<< static_cast<int>(lo) << ']';
-			os << '\n';
+			result << name << ": " << static_cast<int>(both);
+			result << "\t[" << name[0] << "=" << static_cast<int>(hi) << ' ' << name[1] << "="<< static_cast<int>(lo) << ']';
+			result << '\n';
 		};
 
-		os << "Registers: \n" << std::string(20, '-') << '\n';
+		result << "Registers: \n" << std::string(20, '-') << '\n';
 		// print_pair("AF", read("AF"), read("A"), read("F"));
 		print_pair("AF", read("AF"), read("A"), read("F"));
 		print_pair("BC", read("BC"), read("B"), read("C"));
 		print_pair("DE", read("DE"), read("D"), read("E"));
 		print_pair("HL", read("HL"), read("H"), read("L"));
 
-		os << "PC: " << static_cast<int>(read("PC")) << '\n';
-		os << "SP: " << static_cast<int>(read("SP")) << '\n';
-		os << "Flags: ";
-		os << "Z=" << read_flag("Z") << " N=" << read_flag("N") << " H=" << read_flag("H") << " C=" << read_flag("C") << "]\n";
+		result << "PC: " << static_cast<int>(read("PC")) << '\n';
+		result << "SP: " << static_cast<int>(read("SP")) << '\n';
+		result << "Flags: ";
+		result << "Z=" << read_flag("Z") << " N=" << read_flag("N") << " H=" << read_flag("H") << " C=" << read_flag("C") << "]\n";
 
-		os << std::dec;
-		return os;
+		os << result.str();
 	}
 
 	void print() const {
@@ -158,7 +159,8 @@ private:
 };
 
 std::ostream& operator<<(std::ostream& os, const Registers& registers) {
-	return registers.print(os);
+	registers.print(os);
+	return os;
 }
 
 struct MakeRegisters{

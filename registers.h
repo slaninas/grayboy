@@ -67,6 +67,7 @@ public:
 		assert(false && "You should not be here, it means you called read_flag with incorrect flag name.");
 	}
 
+	// TODO: Use set + reset flag methods instead?
 	template<size_t kSize>
 	void set_flag(const char(&flag_name)[kSize], const bool value) {
 		// TODO: Use static_assert
@@ -133,6 +134,14 @@ public:
 		return register_array_;
 	}
 
+	void set_IME(const bool value) {
+		ime_flag_ = value;
+	}
+
+	auto read_IME() {
+		return ime_flag_;
+	}
+
 private:
 	std::array<uint8_t, 12> register_array_ = {};
 
@@ -159,6 +168,7 @@ private:
 		else if (reg == "SP") return 10;
 		else throw std::logic_error(std::string("Register ") + reg_name + " doesn't exist");
 	}
+	bool ime_flag_ = false;
 
 };
 
@@ -183,6 +193,8 @@ struct MakeRegisters{
 	std::optional<uint16_t> PC;
 	std::optional<uint16_t> SP;
 
+	std::optional<uint16_t> IME;
+
 
 	auto get() {
 		check_consistency();
@@ -202,10 +214,13 @@ struct MakeRegisters{
 		const auto PC_val = static_cast<uint16_t>(PC.value_or(0x0000));
 		const auto SP_val = static_cast<uint16_t>(SP.value_or(0x0000));
 
+		const auto IME_val = static_cast<uint16_t>(IME.value_or(false));
+
 		auto array = std::array<uint8_t, 12>{F_val, A_val, C_val, B_val, E_val, D_val, L_val, H_val};
 		auto registers = Registers{array};
 		registers.write("PC", PC_val);
 		registers.write("SP", SP_val);
+		registers.set_IME(IME_val);
 		return registers;
 	}
 
@@ -235,6 +250,8 @@ struct RegistersChanger{
 	std::optional<uint16_t> PC;
 	std::optional<uint16_t> SP;
 
+	std::optional<uint16_t> IME;
+
 
 	auto get(const Registers& registers) {
 		check_consistency();
@@ -253,6 +270,7 @@ struct RegistersChanger{
 		if (L.has_value()) changed_regs.write("L", L.value());
 		if (PC.has_value()) changed_regs.write("PC", PC.value());
 		if (SP.has_value()) changed_regs.write("SP", SP.value());
+		if (IME.has_value()) changed_regs.set_IME(IME.value());
 		return changed_regs;
 	}
 

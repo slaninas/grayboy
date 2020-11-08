@@ -98,3 +98,39 @@ TEST_CASE("CCF - 0x3f", "[misc]") {
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
+
+TEST_CASE("DI - 0xf3", "[misc]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0xf3}, {0x01, 0xf3}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.PC=0x00, .IME=1}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+	auto correct_registers = RegistersChanger{.PC=0x01, .IME=0}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+
+	cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+	correct_registers = RegistersChanger{.PC=0x02, .IME=0}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
+TEST_CASE("EI - 0xfb", "[misc]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0xfb}, {0x01, 0xfb}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.PC=0x00, .IME=0}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+	auto correct_registers = RegistersChanger{.PC=0x01, .IME=1}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+
+	cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+	correct_registers = RegistersChanger{.PC=0x02, .IME=1}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}

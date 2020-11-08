@@ -408,11 +408,8 @@ private:
 	// See https://meganesulli.com/generate-gb-opcodes/
 	std::vector<Instruction> instructions_ = {
 		// TODO: {"STOP", 0x10, 2, 1},
-		// TODO: JR NZ, s8 - 0x20
-		// TODO: JR NC, s8 - 0x30
 		// TODO: DAA - 0x27
 		// TODO: HALT - 0x76
-		// TODO: DI - 0xf3
 		{"NOP", 0x00, 1,
 			[]([[maybe_unused]] auto& regs, [[maybe_unused]] auto& mem, [[maybe_unused]] const auto& PC) {
 				return 1;
@@ -1354,6 +1351,19 @@ private:
 				regs.set_flag("N", false);
 				regs.set_flag("H", false);
 				regs.set_flag("C", !regs.read_flag("C"));
+				return 1;
+			}
+		},
+		// TODO: Make sure DI and EI do exactly what they should do, for now they just enable/disable IME register in any context
+		{"DI", 0xf3, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				regs.set_IME(false);
+				return 1;
+			}
+		},
+		{"EI", 0xfb, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				regs.set_IME(true);
 				return 1;
 			}
 		},

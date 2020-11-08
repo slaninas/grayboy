@@ -133,7 +133,7 @@ int main(int argc, const char** argv) {
 	auto next_addr = cpu.registers().read("PC");
 
 	auto cursed = MainCurse{};
-	auto reg_window = CursedWindow{{40, 10}, {18, 12}};
+	auto reg_window = CursedWindow{{40, 10}, {18, 13}};
 	auto instruction_window = CursedWindow{{0, 0}, {40, 50}};
 
 	auto cpu_copy = cpu;
@@ -163,6 +163,7 @@ int main(int argc, const char** argv) {
 		get_from_to(disassembled_instructions, 10, PC, ss);
 		if (!running) {
 			instruction_window.update(ss.str());
+			registers_ss << "IME: " << cpu.registers().read_IME() << '\n';
 			reg_window.update(registers_ss.str());
 		}
 

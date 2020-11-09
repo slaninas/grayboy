@@ -410,6 +410,7 @@ private:
 		// TODO: {"STOP", 0x10, 2, 1},
 		// TODO: DAA - 0x27
 		// TODO: HALT - 0x76
+		// TODO: RETI - 0xd9
 		{"NOP", 0x00, 1,
 			[]([[maybe_unused]] auto& regs, [[maybe_unused]] auto& mem, [[maybe_unused]] const auto& PC) {
 				return 1;
@@ -1131,7 +1132,7 @@ private:
 				return 2;
 			}
 		},
-		
+
 		// POP
 		{"POP BC", 0xc1, 1,
 			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {

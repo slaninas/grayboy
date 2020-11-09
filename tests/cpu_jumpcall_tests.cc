@@ -181,6 +181,18 @@ TEST_CASE("RET C - 0xd8", "[jump/call]") {
 	}
 }
 
+TEST_CASE("RET - 0xc9", "[jump/call]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0xc9}, {0x1234, 0xcb}, {0x1235, 0xae}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.PC=0x00, .SP=0x1234}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	auto cycles = cpu.execute_next();
+	CHECK(cycles == 5);
+	auto correct_regs = RegistersChanger{.PC=0xaecb, .SP=0x1236}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
 TEST_CASE("JP NZ, a16 - 0xc2", "[jump/call]") {
 	const auto orig_memory = MemoryChanger{{{0x00, 0xc2}, {0x01, 0x12}, {0x02, 0x34}}}.get(getRandomMemory());
 

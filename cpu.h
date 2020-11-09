@@ -1965,6 +1965,18 @@ private:
 				return 2;
 			}
 		},
+		{"RET", 0xc9, 1,
+			[](auto& regs,  auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto SP = regs.read("SP");
+				const auto PC_new = static_cast<uint16_t>((memory.read(SP + 1) << 8) + memory.read(SP));
+				regs.write("PC", PC_new - 1);
+				regs.write("SP", SP + 2);
+				return 5;
+			}
+		},
+
+
+
 		{"JP NZ, a16", 0xc2, 3,
 			[](auto& regs, auto& memory, const auto& PC) {
 				if (regs.read_flag("Z") == false) {

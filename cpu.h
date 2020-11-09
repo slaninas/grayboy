@@ -1233,6 +1233,12 @@ private:
 				return 3;
 			}
 		},
+		{"LD SP, HL", 0xf9, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				regs.write("SP", regs.read("HL"));
+				return 2;
+			}
+		},
 
 		// Decrement 16bit
 		{"DEC BC", 0x0b, 1,

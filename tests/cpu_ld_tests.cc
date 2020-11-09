@@ -1343,3 +1343,15 @@ TEST_CASE("LD HL, SP+s8 - 0xf8", "[ld]") {
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
+
+TEST_CASE("LD SP, HL - 0xf9", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0xf9}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.HL=0xa981, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 2);
+	const auto correct_regs = RegistersChanger{.PC=0x01, .SP=0xa981}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}

@@ -478,3 +478,15 @@ TEST_CASE("JR NC, s8 - 0x30", "[jump/call]") {
 		CHECK(cpu.memory_dump() == orig_memory.dump());
 	}
 }
+
+TEST_CASE("JP (HL) - 0xe9", "[jump/call]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0xe9}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.HL=0x8329, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	auto cycles = cpu.execute_next();
+	CHECK(cycles == 1);
+	auto correct_regs = RegistersChanger{.PC=0x8329}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}

@@ -1975,9 +1975,6 @@ private:
 				return 5;
 			}
 		},
-
-
-
 		{"JP NZ, a16", 0xc2, 3,
 			[](auto& regs, auto& memory, const auto& PC) {
 				if (regs.read_flag("Z") == false) {
@@ -2004,6 +2001,14 @@ private:
 				const auto PC_new = static_cast<uint16_t>((memory.read(PC + 2) << 8) + memory.read(PC + 1));
 				regs.write("PC", PC_new - 3);
 				return 4;
+			}
+		},
+		{"JP (HL)", 0xe9, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				// TODO: Put into method
+				const auto PC_new = regs.read("HL");
+				regs.write("PC", PC_new - 1);
+				return 1;
 			}
 		},
 		{"CALL NZ, a16", 0xc4, 3,

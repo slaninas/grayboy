@@ -1991,9 +1991,29 @@ private:
 				return 3;
 			}
 		},
+		{"JP Z, a16", 0xca, 3,
+			[](auto& regs, auto& memory, const auto& PC) {
+				if (regs.read_flag("Z")) {
+					const auto PC_new = static_cast<uint16_t>((memory.read(PC + 2) << 8) + memory.read(PC + 1));
+					regs.write("PC", PC_new - 3);
+					return 4;
+				}
+				return 3;
+			}
+		},
 		{"JP NC, a16", 0xd2, 3,
 			[](auto& regs, auto& memory, const auto& PC) {
 				if (regs.read_flag("C") == false) {
+					const auto PC_new = static_cast<uint16_t>((memory.read(PC + 2) << 8) + memory.read(PC + 1));
+					regs.write("PC", PC_new - 3);
+					return 4;
+				}
+				return 3;
+			}
+		},
+		{"JP C, a16", 0xda, 3,
+			[](auto& regs, auto& memory, const auto& PC) {
+				if (regs.read_flag("C")) {
 					const auto PC_new = static_cast<uint16_t>((memory.read(PC + 2) << 8) + memory.read(PC + 1));
 					regs.write("PC", PC_new - 3);
 					return 4;

@@ -221,6 +221,34 @@ TEST_CASE("JP NZ, a16 - 0xc2", "[jump/call]") {
 	}
 }
 
+TEST_CASE("JP Z, a16 - 0xca", "[jump/call]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0xca}, {0x01, 0x12}, {0x02, 0x34}}}.get(getRandomMemory());
+
+	SECTION("Do jump") {
+		const auto orig_flags = FlagsChanger{.Z=1}.get(getRandomFlags());
+		const auto orig_regs = RegistersChanger{.F=orig_flags, .PC=0x00}.get(getRandomRegisters());
+		auto cpu = Cpu{orig_memory, orig_regs};
+
+		auto cycles = cpu.execute_next();
+		CHECK(cycles == 4);
+		auto correct_regs = RegistersChanger{.PC=0x3412}.get(orig_regs);
+		CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+		CHECK(cpu.memory_dump() == orig_memory.dump());
+	}
+
+	SECTION("Do not jump") {
+		const auto orig_flags = FlagsChanger{.Z=0}.get(getRandomFlags());
+		const auto orig_regs = RegistersChanger{.F=orig_flags, .PC=0x00}.get(getRandomRegisters());
+		auto cpu = Cpu{orig_memory, orig_regs};
+
+		auto cycles = cpu.execute_next();
+		CHECK(cycles == 3);
+		auto correct_regs = RegistersChanger{.PC=0x03}.get(orig_regs);
+		CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+		CHECK(cpu.memory_dump() == orig_memory.dump());
+	}
+}
+
 TEST_CASE("JP NC, a16 - 0xd2", "[jump/call]") {
 	const auto orig_memory = MemoryChanger{{{0x00, 0xd2}, {0x01, 0xab}, {0x02, 0xcd}}}.get(getRandomMemory());
 
@@ -238,6 +266,34 @@ TEST_CASE("JP NC, a16 - 0xd2", "[jump/call]") {
 
 	SECTION("Do not jump") {
 		const auto orig_flags = FlagsChanger{.C=1}.get(getRandomFlags());
+		const auto orig_regs = RegistersChanger{.F=orig_flags, .PC=0x00}.get(getRandomRegisters());
+		auto cpu = Cpu{orig_memory, orig_regs};
+
+		auto cycles = cpu.execute_next();
+		CHECK(cycles == 3);
+		auto correct_regs = RegistersChanger{.PC=0x03}.get(orig_regs);
+		CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+		CHECK(cpu.memory_dump() == orig_memory.dump());
+	}
+}
+
+TEST_CASE("JP C, a16 - 0xda", "[jump/call]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0xda}, {0x01, 0x12}, {0x02, 0x34}}}.get(getRandomMemory());
+
+	SECTION("Do jump") {
+		const auto orig_flags = FlagsChanger{.C=1}.get(getRandomFlags());
+		const auto orig_regs = RegistersChanger{.F=orig_flags, .PC=0x00}.get(getRandomRegisters());
+		auto cpu = Cpu{orig_memory, orig_regs};
+
+		auto cycles = cpu.execute_next();
+		CHECK(cycles == 4);
+		auto correct_regs = RegistersChanger{.PC=0x3412}.get(orig_regs);
+		CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+		CHECK(cpu.memory_dump() == orig_memory.dump());
+	}
+
+	SECTION("Do not jump") {
+		const auto orig_flags = FlagsChanger{.C=0}.get(getRandomFlags());
 		const auto orig_regs = RegistersChanger{.F=orig_flags, .PC=0x00}.get(getRandomRegisters());
 		auto cpu = Cpu{orig_memory, orig_regs};
 

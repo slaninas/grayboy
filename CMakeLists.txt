@@ -10,9 +10,12 @@ option(BUILD_TESTS "Build tests and add them to ctest" ON)
 # TODO: Add/remove options - check which options are useful
 add_compile_options(-Wall -Wextra -Wpedantic)
 
-add_executable(gameboy  main.cc)
+add_executable(gameboy main.cc)
+
+add_executable(debugger debugger.cc)
 find_package(curses)
-target_link_libraries(gameboy ncurses)
+target_link_libraries(debugger ncurses)
+
 
 if (${BUILD_TESTS})
 	enable_testing()

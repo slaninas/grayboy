@@ -1749,6 +1749,13 @@ private:
 				return 1;
 			}
 		},
+		{"XOR d8", 0xee, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto value = memory.read(PC + 1);
+				instruction_xor("A", value, regs);
+				return 1;
+			}
+		},
 
 		// OR
 		{"OR B", 0xb0, 1,

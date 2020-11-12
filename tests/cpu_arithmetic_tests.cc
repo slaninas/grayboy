@@ -1273,6 +1273,20 @@ TEST_CASE("XOR A, A - 0xaf", "[arithmetic]") {
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
 
+TEST_CASE("XOR d8 - 0xee", "[arithmetic]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0xee}, {0x01, 0xf3}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.A=0xcb, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 2);
+
+	const auto correct_flags = FlagsChanger{.Z=0, .N=0, .H=0, .C=0}.get(orig_regs.read("F"));
+	const auto correct_regs = RegistersChanger{.A=0x38, .F=correct_flags, .PC=0x02}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
 // ----------------------- OR -----------------------
 
 TEST_CASE("OR B - 0xb0", "[arithmetic]") {

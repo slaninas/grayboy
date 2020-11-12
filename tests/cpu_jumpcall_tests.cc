@@ -433,6 +433,20 @@ TEST_CASE("CALL C, a16 - 0xdc", "[jump/call]") {
 	}
 }
 
+TEST_CASE("CALL a16 - 0xcd", "[jump/call]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0xcd}, {0x01, 0x27}, {0x02, 0x90}}}.get(getRandomMemory());
+	const auto orig_flags = FlagsChanger{.C=1}.get(getRandomFlags());
+	const auto orig_regs = RegistersChanger{.F=orig_flags, .PC=0x00, .SP=0x4358}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	auto cycles = cpu.execute_next();
+	CHECK(cycles == 6);
+	auto correct_regs = RegistersChanger{.PC=0x9027, .SP=0x4356}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	const auto correct_memory = MemoryChanger{{{0x4357, 0x00}, {0x4356, 0x03}}}.get(orig_memory);
+	CHECK(cpu.memory_dump() == correct_memory.dump());
+}
+
 TEST_CASE("RST 0 - 0xc7", "[jump/call]") {
 	const auto orig_memory = MemoryChanger{{{0x7845, 0xc7}}}.get(getRandomMemory());
 	const auto orig_regs = RegistersChanger{.PC=0x7845, .SP=0xabcd}.get(getRandomRegisters());

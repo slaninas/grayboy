@@ -1860,6 +1860,19 @@ private:
 				return 1;
 			}
 		},
+		{"CP d8", 0xfe, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto value = memory.read(PC + 1);
+				const auto A = regs.read("A");
+				const auto result = A - value;
+
+				regs.set_flag("Z", result == 0);
+				regs.set_flag("N", true);
+				regs.set_flag("H", half_carry_sub_8bit(A, value));
+				regs.set_flag("C", carry_sub_8bit(A, value));
+				return 2;
+			}
+		},
 
 		// Operations on A register
 		{"ADD A, d8", 0xc6, 2,

@@ -1515,6 +1515,20 @@ TEST_CASE("CP A - 0xbf", "[arithmetic]") {
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
 
+TEST_CASE("CP d8 - 0xfe", "[arithmetic]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0xfe}, {0x01, 0xf3}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.A=0xcb, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 2);
+
+	const auto correct_flags = FlagsChanger{.Z=0, .N=1, .H=0, .C=1}.get(orig_regs.read("F"));
+	const auto correct_regs = RegistersChanger{.F=correct_flags, .PC=0x02}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
 TEST_CASE("ADD A, d8 - 0xc6", "[arithmetic]") {
 	const auto orig_memory = MemoryChanger{{{0x00, 0xc6}, {0x01, 0xba}}}.get(getRandomMemory());
 	const auto orig_regs = RegistersChanger{.A=0x38, .PC=0x00}.get(getRandomRegisters());

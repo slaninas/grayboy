@@ -1528,6 +1528,13 @@ private:
 				return 2;
 			}
 		},
+		{"ADC A, d8", 0xce, 1,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto value = memory.read(PC + 1);
+				instruction_addc("A", value, regs);
+				return 2;
+			}
+		},
 
 		// 8bit sub
 		{"SUB B", 0x90, 1,

@@ -2115,7 +2115,7 @@ private:
 				return 3;
 			}
 		},
-		{"CALL C, a16", 0xcd, 3,
+		{"CALL C, a16", 0xdc, 3,
 			[](auto& regs, auto& memory, const auto& PC) {
 				if (regs.read_flag("C")) {
 					// TODO: Put into method

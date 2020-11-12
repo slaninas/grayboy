@@ -404,8 +404,8 @@ TEST_CASE("CALL NC, a16 - 0xd4", "[jump/call]") {
 	}
 }
 
-TEST_CASE("CALL C, a16 - 0xcd", "[jump/call]") {
-	const auto orig_memory = MemoryChanger{{{0x00, 0xcd}, {0x01, 0x27}, {0x02, 0x90}}}.get(getRandomMemory());
+TEST_CASE("CALL C, a16 - 0xdc", "[jump/call]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0xdc}, {0x01, 0x27}, {0x02, 0x90}}}.get(getRandomMemory());
 
 	SECTION("Do call") {
 		const auto orig_flags = FlagsChanger{.C=1}.get(getRandomFlags());

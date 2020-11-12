@@ -1032,6 +1032,21 @@ TEST_CASE("SBC A, A - 0x9f", "[arithmetic]") {
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
 
+TEST_CASE("SBC A, d8 - 0xde", "[arithmetic]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0xde}, {0x01, 0x34}}}.get(getRandomMemory());
+	const auto orig_flags = FlagsChanger{.C=1}.get(getRandomFlags());
+	const auto orig_regs = RegistersChanger{.A=0x56, .F=orig_flags, .L=0x34, .PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 2);
+
+	const auto correct_flags = FlagsChanger{.Z=0, .N=1, .H=0, .C=0}.get(orig_regs.read("F"));
+	const auto correct_regs = RegistersChanger{.A=0x21, .F=correct_flags, .PC=0x02}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}
+
 TEST_CASE("AND A, B - 0xa0", "[arithmetic]") {
 	const auto orig_memory = MemoryChanger{{{0x00, 0xa0}}}.get(getRandomMemory());
 	const auto orig_regs = RegistersChanger{.A=0xcb, .B=0xf3, .PC=0x00}.get(getRandomRegisters());

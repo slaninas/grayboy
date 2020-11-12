@@ -1638,6 +1638,13 @@ private:
 				return 1;
 			}
 		},
+		{"SBC A, d8", 0xde, 2,
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto value = memory.read(PC + 1);
+				instruction_subc("A", value, regs);
+				return 2;
+			}
+		},
 
 		// AND
 		{"AND B", 0xa0, 1,

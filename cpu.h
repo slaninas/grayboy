@@ -1530,7 +1530,7 @@ private:
 			}
 		},
 		{"ADC A, d8", 0xce, 2,
-			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+			[](auto& regs, auto& memory, const auto& PC) {
 				const auto value = memory.read(PC + 1);
 				instruction_addc("A", value, regs);
 				return 2;
@@ -1639,7 +1639,7 @@ private:
 			}
 		},
 		{"SBC A, d8", 0xde, 2,
-			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+			[](auto& regs, auto& memory, const auto& PC) {
 				const auto value = memory.read(PC + 1);
 				instruction_subc("A", value, regs);
 				return 2;
@@ -1749,11 +1749,11 @@ private:
 				return 1;
 			}
 		},
-		{"XOR d8", 0xee, 1,
+		{"XOR d8", 0xee, 2,
 			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
 				const auto value = memory.read(PC + 1);
 				instruction_xor("A", value, regs);
-				return 1;
+				return 2;
 			}
 		},
 

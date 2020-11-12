@@ -795,7 +795,7 @@ TEST_CASE("ADC A, d8 - 0xce", "[arithmetic]") {
 	CHECK(cycles == 2);
 
 	const auto correct_flags = FlagsChanger{.Z=0, .N=0, .H=1, .C=0}.get(orig_regs.read("F"));
-	const auto correct_regs = RegistersChanger{.A=0x22, .F=correct_flags, .PC=0x01}.get(orig_regs);
+	const auto correct_regs = RegistersChanger{.A=0x22, .F=correct_flags, .PC=0x02}.get(orig_regs);
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }

@@ -365,7 +365,7 @@ public:
 
 		const auto instruction = find_by_opcode(opcode);
 		const auto cycles = instruction(regs_, memory_, PC);
-		// NOTE: Unit test are not prepared for this, if getRandomMemory() set 0xff02 to 0x81, it may fail
+		// TODO: Unit test are not prepared for this, if getRandomMemory() set 0xff02 to 0x81, it may fail. Make getRandomMemory() to set 0xff02 not to 0x81?
 		// if (memory_.read(0xff02) == 0x81) {
 			// auto c = static_cast<char>(memory_.read(0xff01));
 			// std::cout << c;

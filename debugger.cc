@@ -145,8 +145,9 @@ int main(int argc, const char** argv) {
 		return false;
 	};
 
-	// std::vector<uint16_t> break_points = {0x020b, 0x020f};
-	std::vector<uint16_t> break_points = {0xc221}; // TODO: Compare with bgb, looks ok to 0xc221
+	// TODO: Fix: with blargg 06-ld r,r.gb test ROM, 0xc221 is correctly disasembled as LD SP, d16 but 0xc222 and 0xc223 are shown as nop,
+	//       they should be part of the 0xc221 instruction
+	std::vector<uint16_t> break_points = {0xc220}; // TODO: Compare with bgb, looks ok to 0xc220
 
 	auto running = false;
 

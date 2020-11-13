@@ -1,5 +1,20 @@
 #pragma once
 
+
+struct Instruction {
+	std::string mnemonic;
+	uint16_t opcode;
+	uint8_t size;
+	std::function<uint8_t(Registers&, Memory&, const uint16_t&)> run;
+
+	[[nodiscard]] auto operator()(Registers& regs, Memory& mem, const uint16_t& PC) const {
+		const auto cycles = run(regs, mem, PC);
+		const auto PC_new = regs.read("PC");
+		regs.write("PC", PC_new + size);
+		return cycles;
+	}
+};
+
 // TODO: Merge (half) carries somehow?
 // TODO: Are (half) carries correct?
 // Detect half-carry for addition, see https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/

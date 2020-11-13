@@ -57,10 +57,6 @@ public:
 		const auto PC = regs_.read("PC");
 		const auto opcode = memory_.read(PC);
 
-		if (opcode == 0xCB) {
-			throw std::runtime_error("16-bit opcodes not implemented yet.");
-		}
-
 		const auto instruction = find_by_opcode(opcode);
 		const auto cycles = instruction(regs_, memory_, PC);
 		// TODO: Unit test are not prepared for this, if getRandomMemory() set 0xff02 to 0x81, it may fail. Make getRandomMemory() to set 0xff02 not to 0x81?

@@ -322,3 +322,20 @@ void instruction_rlc(const char (&reg_name)[2], Registers& regs) {
 	regs.set_flag("H", 0);
 	regs.set_flag("C", carry);
 }
+
+auto rl(uint8_t old_value, const bool carry) {
+	const auto new_value = static_cast<uint8_t>((old_value << 1) + carry);
+	const auto new_carry = static_cast<bool>(old_value & (1 << 7));
+	return std::pair{new_value, new_carry};
+}
+
+void instruction_rl(const char (&reg_name)[2], Registers& regs) {
+	const auto old_value = regs.read(reg_name);
+	const auto [new_value, carry] = rl(old_value, regs.read_flag("C"));
+
+	regs.write(reg_name, new_value);
+	regs.set_flag("Z", new_value == 0);
+	regs.set_flag("N", 0);
+	regs.set_flag("H", 0);
+	regs.set_flag("C", carry);
+}

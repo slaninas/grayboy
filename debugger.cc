@@ -147,7 +147,7 @@ int main(int argc, const char** argv) {
 
 	// TODO: Fix: with blargg 06-ld r,r.gb test ROM, 0xc221 is correctly disasembled as LD SP, d16 but 0xc222 and 0xc223 are shown as nop,
 	//       they should be part of the 0xc221 instruction
-	std::vector<uint16_t> break_points = {0xc246}; // TODO: Compare with bgb, looks ok to 0xc243 (including)
+	std::vector<uint16_t> break_points = {0xc24c, 0xc24f, 0xc252}; // TODO: Compare with bgb, registers look ok to 0xc24c (including), memory not checked
 
 	auto running = false;
 

@@ -306,11 +306,14 @@ void instruction_cp(const char(&dest_name)[kDestSize], const char(&second_reg_na
 	instruction_cp(dest_name, regs.read(second_reg_name), regs);
 }
 
+auto rlc(uint8_t old_value, const Registers& regs) {
+	const auto carry = regs.read_flag("C");
+	return static_cast<uint8_t>((old_value << 1) + carry);
+}
+
 void instruction_rlc(const char (&reg_name)[2], Registers& regs) {
 	const auto old_value = regs.read(reg_name);
-	const auto carry = regs.read_flag("C");
-
-	const auto new_value = static_cast<uint8_t>((old_value << 1) + carry);
+	const auto new_value = rlc(old_value, regs);
 
 	regs.write(reg_name, new_value);
 	regs.set_flag("Z", new_value == 0);

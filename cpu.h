@@ -8,7 +8,7 @@
 
 #include "registers.h"
 #include "memory.h"
-#include "instructions_8bit.h"
+#include "instructions.h"
 
 
 struct DisassemblyInfo {
@@ -110,7 +110,7 @@ private:
 	Registers regs_ = {};
 
 	// See https://meganesulli.com/generate-gb-opcodes/
-	std::vector<Instruction> instructions_ = get_8bit_instructions();
+	std::vector<Instruction> instructions_ = get_all_instructions();
 
 	[[nodiscard]] const Instruction& find_by_opcode(const uint16_t opcode) const {
 		return ::find_by_opcode(opcode, instructions_);

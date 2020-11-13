@@ -1345,9 +1345,18 @@ private:
 		},
 		{"LD (a16), A", 0xea, 3,
 			[](auto& regs, auto& memory, const auto& PC) {
+				// TODO: Check byte order
 				const auto address = static_cast<uint16_t>((memory.read(PC + 1) << 8) + memory.read(PC + 2));
 				const auto value = regs.read("A");
 				memory.write(address, value);
+				return 4;
+			}
+		},
+		{"LD A, (a16)", 0xfa, 3,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto address = static_cast<uint16_t>((memory.read(PC + 2) << 8) + memory.read(PC + 1));
+				const auto value = memory.read(address);
+				regs.write("A", value);
 				return 4;
 			}
 		},

@@ -1368,3 +1368,15 @@ TEST_CASE("LD (a16), A - 0xea", "[ld]") {
 	const auto correct_memory = MemoryChanger{{{0xfec1, 0xba}}}.get(orig_memory);
 	CHECK(cpu.memory_dump() == correct_memory.dump());
 }
+
+TEST_CASE("LD A, (a16) - 0xfa", "[ld]") {
+	const auto orig_memory = MemoryChanger{{{0x00, 0xfa}, {0x01, 0xfe}, {0x02, 0xc1}, {0xc1fe, 0xbc}}}.get(getRandomMemory());
+	const auto orig_regs = RegistersChanger{.PC=0x00}.get(getRandomRegisters());
+	auto cpu = Cpu{orig_memory, orig_regs};
+
+	const auto cycles = cpu.execute_next();
+	CHECK(cycles == 4);
+	const auto correct_regs = RegistersChanger{.A=0xbc, .PC=0x03}.get(orig_regs);
+	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
+	CHECK(cpu.memory_dump() == orig_memory.dump());
+}

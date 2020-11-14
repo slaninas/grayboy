@@ -46,10 +46,7 @@ auto get_16bit_instructions() {
 				const auto value = memory.read(address);
 				const auto [new_value, carry] = rlc(value);
 
-				regs.set_flag("Z", new_value == 0);
-				regs.set_flag("N", 0);
-				regs.set_flag("H", 0);
-				regs.set_flag("C", carry);
+				set_flags_for_rotate(regs, new_value, carry);
 				return 2;
 			}
 		},

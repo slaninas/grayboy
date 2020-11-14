@@ -312,15 +312,18 @@ auto rlc(uint8_t old_value) {
 	return std::pair{new_value, carry};
 }
 
-void instruction_rlc(const char (&reg_name)[2], Registers& regs) {
-	const auto old_value = regs.read(reg_name);
-	const auto [new_value, carry] = rlc(old_value);
-
-	regs.write(reg_name, new_value);
+void set_flags_for_rotate(Registers& regs, const uint8_t new_value, const bool carry) {
 	regs.set_flag("Z", new_value == 0);
 	regs.set_flag("N", 0);
 	regs.set_flag("H", 0);
 	regs.set_flag("C", carry);
+}
+
+void instruction_rlc(const char (&reg_name)[2], Registers& regs) {
+	const auto old_value = regs.read(reg_name);
+	const auto [new_value, carry] = rlc(old_value);
+	regs.write(reg_name, new_value);
+	set_flags_for_rotate(regs, new_value, carry);
 }
 
 auto rl(uint8_t old_value, const bool carry) {
@@ -332,12 +335,8 @@ auto rl(uint8_t old_value, const bool carry) {
 void instruction_rl(const char (&reg_name)[2], Registers& regs) {
 	const auto old_value = regs.read(reg_name);
 	const auto [new_value, carry] = rl(old_value, regs.read_flag("C"));
-
 	regs.write(reg_name, new_value);
-	regs.set_flag("Z", new_value == 0);
-	regs.set_flag("N", 0);
-	regs.set_flag("H", 0);
-	regs.set_flag("C", carry);
+	set_flags_for_rotate(regs, new_value, carry);
 }
 
 auto rrc(uint8_t old_value) {
@@ -349,12 +348,8 @@ auto rrc(uint8_t old_value) {
 void instruction_rrc(const char (&reg_name)[2], Registers& regs) {
 	const auto old_value = regs.read(reg_name);
 	const auto [new_value, carry] = rrc(old_value);
-
 	regs.write(reg_name, new_value);
-	regs.set_flag("Z", new_value == 0);
-	regs.set_flag("N", 0);
-	regs.set_flag("H", 0);
-	regs.set_flag("C", carry);
+	set_flags_for_rotate(regs, new_value, carry);
 }
 
 auto rr(uint8_t old_value, const bool carry) {
@@ -366,10 +361,6 @@ auto rr(uint8_t old_value, const bool carry) {
 void instruction_rr(const char (&reg_name)[2], Registers& regs) {
 	const auto old_value = regs.read(reg_name);
 	const auto [new_value, carry] = rr(old_value, regs.read_flag("C"));
-
 	regs.write(reg_name, new_value);
-	regs.set_flag("Z", new_value == 0);
-	regs.set_flag("N", 0);
-	regs.set_flag("H", 0);
-	regs.set_flag("C", carry);
+	set_flags_for_rotate(regs, new_value, carry);
 }

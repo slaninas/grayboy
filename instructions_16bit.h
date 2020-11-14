@@ -48,7 +48,7 @@ auto get_16bit_instructions() {
 
 				memory.write(address, new_value);
 				set_flags_for_rotate(regs, new_value, carry);
-				return 2;
+				return 4;
 			}
 		},
 		{"RLC A", 0xcb07, 2,

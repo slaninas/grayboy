@@ -4,6 +4,7 @@
 
 auto get_16bit_instructions() {
 	return std::vector<Instruction>{
+		// RLC
 		{"RLC B", 0xcb00, 2,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				instruction_rlc("B", regs);
@@ -58,6 +59,7 @@ auto get_16bit_instructions() {
 			}
 		},
 
+		// RRC
 		{"RRC B", 0xcb08, 2,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				instruction_rrc("A", regs);

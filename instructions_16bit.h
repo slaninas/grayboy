@@ -62,7 +62,7 @@ auto get_16bit_instructions() {
 		// RRC
 		{"RRC B", 0xcb08, 2,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
-				instruction_rrc("A", regs);
+				instruction_rrc("B", regs);
 				return 2;
 			}
 		},

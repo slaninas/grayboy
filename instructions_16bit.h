@@ -170,5 +170,61 @@ auto get_16bit_instructions() {
 			}
 		},
 
+		// RR
+		{"RR B", 0xcb18, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_rr("B", regs);
+				return 2;
+			}
+		},
+		{"RR C", 0xcb19, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_rr("C", regs);
+				return 2;
+			}
+		},
+		{"RR D", 0xcb1a, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_rr("D", regs);
+				return 2;
+			}
+		},
+		{"RR E", 0xcb1b, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_rr("E", regs);
+				return 2;
+			}
+		},
+		{"RR H", 0xcb1c, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_rr("H", regs);
+				return 2;
+			}
+		},
+		{"RR L", 0xcb1d, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_rr("L", regs);
+				return 2;
+			}
+		},
+		{"RR (HL)", 0xcb1e, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto address = memory.read(PC + 1);
+				const auto value = memory.read(address);
+				const auto old_carry = regs.read_flag("C");
+				const auto [new_value, carry] = rr(value, old_carry);
+
+				memory.write(address, new_value);
+				set_flags_for_rotate(regs, new_value, carry);
+				return 4;
+			}
+		},
+		{"RR A", 0xcb1f, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_rr("A", regs);
+				return 2;
+			}
+		},
+
 	};
 }

@@ -3,6 +3,8 @@
 #include "instructions_8bit.h"
 #include "instructions_16bit.h"
 
+// TODO: Add function to check which instructions are not implemented yet
+
 auto get_all_instructions() {
 	auto instructions_8bit = get_8bit_instructions();
 	const auto instructions_16bit = get_16bit_instructions();

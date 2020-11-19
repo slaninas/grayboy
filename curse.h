@@ -12,6 +12,7 @@ struct WindowSize {
 	int height;
 };
 
+// TODO: Hide CursedWindow inside MainCurse, add method to MainCurse for making CursedWindow 
 class CursedWindow {
 public:
 	CursedWindow(const WindowPosition& position, const WindowSize& size) {

@@ -107,5 +107,6 @@ private:
 		std::cout << std::dec;
 	}
 
+	// TODO: Use uint8_t
 	std::vector<std::byte> buffer_;
 };

@@ -68,22 +68,21 @@ public:
 		return cycles;
 	}
 
-	[[nodiscard]] auto disassemble_next(const uint16_t& addr) const {
+	[[nodiscard]] auto disassemble_next(const uint16_t& starting_address) const {
 		auto regs = regs_;
 		auto memory = memory_;
-		const auto PC = addr;
-		regs.write("PC", PC);
-		const auto opcode = memory.read(PC);
+		regs.write("PC", starting_address);
+		const auto opcode = memory.read(starting_address);
 
 		const auto instruction = find_by_opcode(opcode);
 
 		[[maybe_unused]] const auto cycles = instruction(regs, memory, PC);
 		auto memory_representation = std::vector<uint8_t>{};
-		for (auto i = addr; i < addr + instruction.size; ++i) {
-			memory_representation.push_back(memory.read(i));
+		for (auto address = starting_address; address < starting_address + instruction.size; ++address) {
+			memory_representation.push_back(memory.read(address));
 		}
 
-		const auto result = DisassemblyInfo{addr, regs.read("PC"), instruction, memory_representation};
+		const auto result = DisassemblyInfo{starting_address, regs.read("PC"), instruction, memory_representation};
 		return result;
 	}
 

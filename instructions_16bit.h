@@ -391,5 +391,60 @@ auto get_16bit_instructions() {
 			}
 		},
 
+		// SRL
+		{"SRL B", 0xcb38, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_srl("B", regs);
+				return 2;
+			}
+		},
+		{"SRL C", 0xcb39, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_srl("C", regs);
+				return 2;
+			}
+		},
+		{"SRL D", 0xcb3a, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_srl("D", regs);
+				return 2;
+			}
+		},
+		{"SRL E", 0xcb3b, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_srl("E", regs);
+				return 2;
+			}
+		},
+		{"SRL H", 0xcb3c, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_srl("H", regs);
+				return 2;
+			}
+		},
+		{"SRL L", 0xcb3d, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_srl("L", regs);
+				return 2;
+			}
+		},
+		{"SRL (HL)", 0xcb3e, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto address = memory.read(PC + 1);
+				const auto value = memory.read(address);
+				const auto [new_value, carry] = srl(value);
+
+				memory.write(address, new_value);
+				set_flags_for_shift(regs, new_value, carry);
+				return 4;
+			}
+		},
+		{"SRL A", 0xcb3f, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_srl("A", regs);
+				return 2;
+			}
+		},
+
 	};
 }

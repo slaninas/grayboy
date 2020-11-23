@@ -76,7 +76,7 @@ public:
 
 		const auto instruction = find_by_opcode(opcode);
 
-		[[maybe_unused]] const auto cycles = instruction(regs, memory, PC);
+		[[maybe_unused]] const auto cycles = instruction(regs, memory, starting_address);
 		auto memory_representation = std::vector<uint8_t>{};
 		for (auto address = starting_address; address < starting_address + instruction.size; ++address) {
 			memory_representation.push_back(memory.read(address));

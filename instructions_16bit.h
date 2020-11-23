@@ -337,4 +337,60 @@ auto get_16bit_instructions() {
 		},
 
 	};
+		// SWAP
+		{"SWAP B", 0xcb30, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_swap("B", regs);
+				return 2;
+			}
+		},
+		{"SWAP C", 0xcb31, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_swap("C", regs);
+				return 2;
+			}
+		},
+		{"SWAP D", 0xcb32, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_swap("D", regs);
+				return 2;
+			}
+		},
+		{"SWAP E", 0xcb33, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_swap("E", regs);
+				return 2;
+			}
+		},
+		{"SWAP H", 0xcb34, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_swap("H", regs);
+				return 2;
+			}
+		},
+		{"SWAP L", 0xcb35, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_swap("L", regs);
+				return 2;
+			}
+		},
+		{"SWAP (HL)", 0xcb36, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto address = memory.read(PC + 1);
+				const auto value = memory.read(address);
+				const auto [new_value, carry] = swap(value);
+
+				memory.write(address, new_value);
+				set_flags_for_swap(regs, new_value);
+				return 4;
+			}
+		},
+		{"SWAP A", 0xcb37, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_swap("A", regs);
+				return 2;
+			}
+		},
+
+	};
 }

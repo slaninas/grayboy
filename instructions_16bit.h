@@ -336,7 +336,6 @@ auto get_16bit_instructions() {
 			}
 		},
 
-	};
 		// SWAP
 		{"SWAP B", 0xcb30, 2,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
@@ -378,7 +377,7 @@ auto get_16bit_instructions() {
 			[](auto& regs, auto& memory, const auto& PC) {
 				const auto address = memory.read(PC + 1);
 				const auto value = memory.read(address);
-				const auto [new_value, carry] = swap(value);
+				const auto new_value = swap(value);
 
 				memory.write(address, new_value);
 				set_flags_for_swap(regs, new_value);

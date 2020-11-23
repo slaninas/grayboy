@@ -319,6 +319,10 @@ void set_flags_for_rotate(Registers& regs, const uint8_t new_value, const bool c
 	regs.set_flag("C", carry);
 }
 
+void set_flags_for_shift(Registers& regs, const uint8_t new_value, const bool carry) {
+	set_flags_for_rotate(regs, new_value, carry);
+}
+
 void instruction_rlc(const char (&reg_name)[2], Registers& regs) {
 	const auto old_value = regs.read(reg_name);
 	const auto [new_value, carry] = rlc(old_value);
@@ -363,4 +367,17 @@ void instruction_rr(const char (&reg_name)[2], Registers& regs) {
 	const auto [new_value, carry] = rr(old_value, regs.read_flag("C"));
 	regs.write(reg_name, new_value);
 	set_flags_for_rotate(regs, new_value, carry);
+}
+
+auto sla(const uint8_t old_value) {
+	const auto new_value = static_cast<uint8_t>(old_value << 1);
+	const auto new_carry = static_cast<bool>(old_value & (1 << 7));
+	return std::pair{new_value, new_carry};
+}
+
+void instruction_sla(const char (&reg_name)[2], Registers& regs) {
+	const auto old_value = regs.read(reg_name);
+	const auto [new_value, new_carry] = sla(old_value);
+	regs.write(reg_name, new_value);
+	set_flags_for_shift(regs, new_value, new_carry);
 }

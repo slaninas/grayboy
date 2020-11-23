@@ -414,3 +414,16 @@ void instruction_swap(const char (&reg_name)[2], Registers& regs) {
 	regs.write(reg_name, new_value);
 	set_flags_for_swap(regs, new_value);
 }
+
+auto srl(const uint8_t old_value) {
+	const auto new_value = static_cast<uint8_t>(old_value >> 1);
+	const auto new_carry = static_cast<bool>(old_value & 1);
+	return std::pair{new_value, new_carry};
+}
+
+void instruction_srl(const char (&reg_name)[2], Registers& regs) {
+	const auto old_value = regs.read(reg_name);
+	const auto [new_value, new_carry] = srl(old_value);
+	regs.write(reg_name, new_value);
+	set_flags_for_shift(regs, new_value, new_carry);
+}

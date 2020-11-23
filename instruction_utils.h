@@ -394,3 +394,24 @@ void instruction_sra(const char (&reg_name)[2], Registers& regs) {
 	regs.write(reg_name, new_value);
 	set_flags_for_shift(regs, new_value, new_carry);
 }
+
+void set_flags_for_swap(Registers& regs, const uint8_t new_value) {
+	regs.set_flag("Z", new_value == 0);
+	regs.set_flag("N", false);
+	regs.set_flag("H", false);
+	regs.set_flag("C", false);
+}
+
+auto swap(const uint8_t old_value) {
+	std::cout << std::hex;
+	const auto lower_byte = static_cast<uint8_t>(old_value & 0x0f);
+	const auto higher_byte = static_cast<uint8_t>((old_value & 0xf0) >> 4);
+	return static_cast<uint8_t>((lower_byte << 4) + higher_byte);
+}
+
+void instruction_swap(const char (&reg_name)[2], Registers& regs) {
+	const auto old_value = regs.read(reg_name);
+	const auto new_value = swap(old_value);
+	regs.write(reg_name, new_value);
+	set_flags_for_swap(regs, new_value);
+}

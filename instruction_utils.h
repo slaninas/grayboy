@@ -403,7 +403,6 @@ void set_flags_for_swap(Registers& regs, const uint8_t new_value) {
 }
 
 auto swap(const uint8_t old_value) {
-	std::cout << std::hex;
 	const auto lower_byte = static_cast<uint8_t>(old_value & 0x0f);
 	const auto higher_byte = static_cast<uint8_t>((old_value & 0xf0) >> 4);
 	return static_cast<uint8_t>((lower_byte << 4) + higher_byte);

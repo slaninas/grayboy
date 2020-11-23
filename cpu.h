@@ -51,11 +51,20 @@ public:
 		regs_.clear();
 	}
 
+	[[nodiscard]] auto get_opcode(const uint16_t& starting_address) const {
+		const auto first_byte = static_cast<uint16_t>(memory_.read(starting_address));
+		if (first_byte == 0xcb) {
+			const auto second_byte = memory_.read(starting_address + 1);
+			const auto shifted = first_byte << 8;
+			return static_cast<uint16_t>((first_byte << 8) + second_byte);
+		}
+		return first_byte;
+	}
 
 
 	[[nodiscard]] auto execute_next() {
 		const auto PC = regs_.read("PC");
-		const auto opcode = memory_.read(PC);
+		const auto opcode = get_opcode(PC);
 
 		const auto instruction = find_by_opcode(opcode);
 		const auto cycles = instruction(regs_, memory_, PC);
@@ -72,7 +81,7 @@ public:
 		auto regs = regs_;
 		auto memory = memory_;
 		regs.write("PC", starting_address);
-		const auto opcode = memory.read(starting_address);
+		const auto opcode = get_opcode(starting_address);
 
 		const auto instruction = find_by_opcode(opcode);
 

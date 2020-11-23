@@ -281,5 +281,60 @@ auto get_16bit_instructions() {
 			}
 		},
 
+		// SRA
+		{"SRA B", 0xcb20, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_sra("B", regs);
+				return 2;
+			}
+		},
+		{"SRA C", 0xcb21, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_sra("C", regs);
+				return 2;
+			}
+		},
+		{"SRA D", 0xcb22, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_sra("D", regs);
+				return 2;
+			}
+		},
+		{"SRA E", 0xcb23, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_sra("E", regs);
+				return 2;
+			}
+		},
+		{"SRA H", 0xcb24, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_sra("H", regs);
+				return 2;
+			}
+		},
+		{"SRA L", 0xcb25, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_sra("L", regs);
+				return 2;
+			}
+		},
+		{"SRA (HL)", 0xcb26, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto address = memory.read(PC + 1);
+				const auto value = memory.read(address);
+				const auto [new_value, carry] = sra(value);
+
+				memory.write(address, new_value);
+				set_flags_for_shift(regs, new_value, carry);
+				return 4;
+			}
+		},
+		{"SRA A", 0xcb27, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_sra("A", regs);
+				return 2;
+			}
+		},
+
 	};
 }

@@ -55,7 +55,6 @@ public:
 		const auto first_byte = static_cast<uint16_t>(memory_.read(starting_address));
 		if (first_byte == 0xcb) {
 			const auto second_byte = memory_.read(starting_address + 1);
-			const auto shifted = first_byte << 8;
 			return static_cast<uint16_t>((first_byte << 8) + second_byte);
 		}
 		return first_byte;

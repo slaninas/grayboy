@@ -104,12 +104,88 @@ TEST_CASE("SRL", "[bit_operations]") {
 
 TEST_CASE("BIT", "[bit_operations]") {
 	const auto orig_flags = getRandomFlags();
-	const auto orig_regs = RegistersChanger{.F=orig_flags, .B=0xfe}.get(getRandomRegisters());
 
-	auto regs = orig_regs;
-	instruction_bit("B", 0, regs);
+	SECTION("Bit #0") {
+		const auto orig_regs = RegistersChanger{.F=orig_flags, .B=0xd6}.get(getRandomRegisters());
 
-	const auto correct_flags = FlagsChanger{.Z=1, .N=0, .H=1}.get(orig_flags);
-	const auto correct_regs = RegistersChanger{.F=correct_flags}.get(orig_regs);
-	CHECK_THAT(regs, RegistersCompare{correct_regs});
+		auto regs = orig_regs;
+		instruction_bit("B", 0, regs);
+
+		const auto correct_flags = FlagsChanger{.Z=1, .N=0, .H=1}.get(orig_flags);
+		const auto correct_regs = RegistersChanger{.F=correct_flags}.get(orig_regs);
+		CHECK_THAT(regs, RegistersCompare{correct_regs});
+	}
+
+	SECTION("Bit #1") {
+		const auto orig_regs = RegistersChanger{.F=orig_flags, .B=0xd6}.get(getRandomRegisters());
+
+		auto regs = orig_regs;
+		instruction_bit("B", 1, regs);
+
+		const auto correct_flags = FlagsChanger{.Z=0, .N=0, .H=1}.get(orig_flags);
+		const auto correct_regs = RegistersChanger{.F=correct_flags}.get(orig_regs);
+		CHECK_THAT(regs, RegistersCompare{correct_regs});
+	}
+	SECTION("Bit #2") {
+		const auto orig_regs = RegistersChanger{.F=orig_flags, .B=0xd6}.get(getRandomRegisters());
+
+		auto regs = orig_regs;
+		instruction_bit("B", 2, regs);
+
+		const auto correct_flags = FlagsChanger{.Z=0, .N=0, .H=1}.get(orig_flags);
+		const auto correct_regs = RegistersChanger{.F=correct_flags}.get(orig_regs);
+		CHECK_THAT(regs, RegistersCompare{correct_regs});
+	}
+	SECTION("Bit #3") {
+		const auto orig_regs = RegistersChanger{.F=orig_flags, .B=0xd6}.get(getRandomRegisters());
+
+		auto regs = orig_regs;
+		instruction_bit("B", 3, regs);
+
+		const auto correct_flags = FlagsChanger{.Z=1, .N=0, .H=1}.get(orig_flags);
+		const auto correct_regs = RegistersChanger{.F=correct_flags}.get(orig_regs);
+		CHECK_THAT(regs, RegistersCompare{correct_regs});
+	}
+
+	SECTION("Bit #4") {
+		const auto orig_regs = RegistersChanger{.F=orig_flags, .B=0xd6}.get(getRandomRegisters());
+
+		auto regs = orig_regs;
+		instruction_bit("B", 4, regs);
+
+		const auto correct_flags = FlagsChanger{.Z=0, .N=0, .H=1}.get(orig_flags);
+		const auto correct_regs = RegistersChanger{.F=correct_flags}.get(orig_regs);
+		CHECK_THAT(regs, RegistersCompare{correct_regs});
+	}
+	SECTION("Bit #5") {
+		const auto orig_regs = RegistersChanger{.F=orig_flags, .B=0xd6}.get(getRandomRegisters());
+
+		auto regs = orig_regs;
+		instruction_bit("B", 5, regs);
+
+		const auto correct_flags = FlagsChanger{.Z=1, .N=0, .H=1}.get(orig_flags);
+		const auto correct_regs = RegistersChanger{.F=correct_flags}.get(orig_regs);
+		CHECK_THAT(regs, RegistersCompare{correct_regs});
+	}
+	SECTION("Bit #6") {
+		const auto orig_regs = RegistersChanger{.F=orig_flags, .B=0xd6}.get(getRandomRegisters());
+
+		auto regs = orig_regs;
+		instruction_bit("B", 6, regs);
+
+		const auto correct_flags = FlagsChanger{.Z=0, .N=0, .H=1}.get(orig_flags);
+		const auto correct_regs = RegistersChanger{.F=correct_flags}.get(orig_regs);
+		CHECK_THAT(regs, RegistersCompare{correct_regs});
+	}
+	SECTION("Bit #7") {
+		const auto orig_regs = RegistersChanger{.F=orig_flags, .B=0xd6}.get(getRandomRegisters());
+
+		auto regs = orig_regs;
+		instruction_bit("B", 7, regs);
+
+		const auto correct_flags = FlagsChanger{.Z=0, .N=0, .H=1}.get(orig_flags);
+		const auto correct_regs = RegistersChanger{.F=correct_flags}.get(orig_regs);
+		CHECK_THAT(regs, RegistersCompare{correct_regs});
+	}
 }
+

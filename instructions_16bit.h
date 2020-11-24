@@ -649,5 +649,105 @@ auto get_16bit_instructions() {
 			}
 		},
 
+		{"BIT 4, B", 0xcb60, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_bit("B", 4, regs);
+				return 2;
+			}
+		},
+		{"BIT 4, C", 0xcb61, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_bit("C", 4, regs);
+				return 2;
+			}
+		},
+		{"BIT 4, D", 0xcb62, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_bit("D", 4, regs);
+				return 2;
+			}
+		},
+		{"BIT 4, E", 0xcb63, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_bit("E", 4, regs);
+				return 2;
+			}
+		},
+		{"BIT 4, H", 0xcb64, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_bit("H", 4, regs);
+				return 2;
+			}
+		},
+		{"BIT 4, L", 0xcb65, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_bit("L", 4, regs);
+				return 2;
+			}
+		},
+		{"BIT 4, (HL)", 0xcb66, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto address = memory.read(PC + 1);
+				const auto value = memory.read(address);
+				bit(value, 4, regs);
+				return 4;
+			}
+		},
+		{"BIT 4, A", 0xcb67, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_bit("A", 4, regs);
+				return 2;
+			}
+		},
+		{"BIT 5, B", 0xcb68, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_bit("B", 5, regs);
+				return 2;
+			}
+		},
+		{"BIT 5, C", 0xcb69, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_bit("C", 5, regs);
+				return 2;
+			}
+		},
+		{"BIT 5, D", 0xcb6a, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_bit("D", 5, regs);
+				return 2;
+			}
+		},
+		{"BIT 5, E", 0xcb6b, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_bit("E", 5, regs);
+				return 2;
+			}
+		},
+		{"BIT 5, H", 0xcb6c, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_bit("H", 5, regs);
+				return 2;
+			}
+		},
+		{"BIT 5, L", 0xcb6d, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_bit("L", 5, regs);
+				return 2;
+			}
+		},
+		{"BIT 5, (HL)", 0xcb6e, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto address = memory.read(PC + 1);
+				const auto value = memory.read(address);
+				bit(value, 5, regs);
+				return 4;
+			}
+		},
+		{"BIT 5, A", 0xcb6f, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_bit("A", 5, regs);
+				return 2;
+			}
+		},
 	};
 }

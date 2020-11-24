@@ -427,3 +427,15 @@ void instruction_srl(const char (&reg_name)[2], Registers& regs) {
 	regs.write(reg_name, new_value);
 	set_flags_for_shift(regs, new_value, new_carry);
 }
+
+auto bit(const uint8_t value, const uint8_t position, Registers& regs) {
+	const auto bit_value = static_cast<bool>(value & (1 << position));
+	regs.set_flag("Z", !bit_value);
+	regs.set_flag("N", 0);
+	regs.set_flag("H", 1);
+}
+
+void instruction_bit(const char (&reg_name)[2], const uint8_t position, Registers& regs) {
+	const auto value = regs.read(reg_name);
+	bit(value, position, regs);
+}

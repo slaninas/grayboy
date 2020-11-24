@@ -101,3 +101,15 @@ TEST_CASE("SRL", "[bit_operations]") {
 	const auto correct_regs = RegistersChanger{.F=correct_flags, .B=0x74}.get(orig_regs);
 	CHECK_THAT(regs, RegistersCompare{correct_regs});
 }
+
+TEST_CASE("BIT", "[bit_operations]") {
+	const auto orig_flags = getRandomFlags();
+	const auto orig_regs = RegistersChanger{.F=orig_flags, .B=0xfe}.get(getRandomRegisters());
+
+	auto regs = orig_regs;
+	instruction_bit("B", 0, regs);
+
+	const auto correct_flags = FlagsChanger{.Z=1, .N=0, .H=1}.get(orig_flags);
+	const auto correct_regs = RegistersChanger{.F=correct_flags}.get(orig_regs);
+	CHECK_THAT(regs, RegistersCompare{correct_regs});
+}

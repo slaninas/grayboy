@@ -16,7 +16,6 @@ struct WindowSize {
 class CursedWindow {
 public:
 	CursedWindow(const WindowPosition& position, const WindowSize& size) {
-		// std::cout << "INFO: window_=" << window_ << '\n';
 		window_ = newwin(size.height - 2, size.width - 2, position.y + 1, position.x + 1);
 		wrefresh(window_);
 
@@ -49,8 +48,6 @@ public:
 	}
 
 	void destroy() {
-		// wborder(window_, ' ', ' ', ' ',' ',' ',' ',' ',' ');
-		// wrefresh(window_);
 		delwin(window_);
 		window_ = nullptr;
 	}
@@ -68,8 +65,6 @@ public:
 		cbreak();
 		// TODO: raw(); ?
 		printw("Blabla, hi!");
-		refresh();
-		// getch();
 	}
 
 	MainCurse(const MainCurse&) = delete;
@@ -87,9 +82,6 @@ public:
 		printw(str.c_str());
 	}
 
-	// void add_window(CursedWindow&& window) {
-		// windows_.emplace_back(std::move(window));
-	// }
 	void wait_for_any() {
 		getch();
 	}

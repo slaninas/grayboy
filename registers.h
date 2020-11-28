@@ -116,9 +116,9 @@ public:
 		print_pair("BC", read("B"), read("C"));
 		print_pair("DE", read("D"), read("E"));
 		print_pair("HL", read("H"), read("L"));
-
-		result << "PC: " << std::setw(4) << std::setfill('0') << static_cast<int>(read("PC")) << '\n';
+		
 		result << "SP: " << std::setw(4) << std::setfill('0') << static_cast<int>(read("SP")) << '\n';
+		result << "PC: " << std::setw(4) << std::setfill('0') << static_cast<int>(read("PC")) << '\n';
 
 		result << std::string(15, '-') << '\n';
 		result << "Z=" << read_flag("Z") << " N=" << read_flag("N") << " H=" << read_flag("H") << " C=" << read_flag("C") << '\n';

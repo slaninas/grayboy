@@ -165,10 +165,8 @@ TEST_CASE("BIT", "[bit_operations]") {
 }
 
 TEST_CASE("RES", "[bit_operations]") {
-	const auto orig_flags = getRandomFlags();
-
 	SECTION("Reset one bit") {
-		const auto orig_regs = RegistersChanger{.F=orig_flags, .B=0xff}.get(getRandomRegisters());
+		const auto orig_regs = RegistersChanger{.B=0xff}.get(getRandomRegisters());
 		auto regs = orig_regs;
 
 		SECTION("Bit #0") {
@@ -214,7 +212,7 @@ TEST_CASE("RES", "[bit_operations]") {
 	}
 
 	SECTION("Do nothing") {
-		const auto orig_regs = RegistersChanger{.F=orig_flags, .B=0x00}.get(getRandomRegisters());
+		const auto orig_regs = RegistersChanger{.B=0x00}.get(getRandomRegisters());
 		auto regs = orig_regs;
 
 		for (auto position = 0; position <= 7; position++) {
@@ -225,10 +223,8 @@ TEST_CASE("RES", "[bit_operations]") {
 }
 
 TEST_CASE("SET", "[bit_operations]") {
-	const auto orig_flags = getRandomFlags();
-
 	SECTION("Set one bit") {
-		const auto orig_regs = RegistersChanger{.F=orig_flags, .B=0x00}.get(getRandomRegisters());
+		const auto orig_regs = RegistersChanger{.B=0x00}.get(getRandomRegisters());
 		auto regs = orig_regs;
 
 		SECTION("Bit #0") {
@@ -274,7 +270,7 @@ TEST_CASE("SET", "[bit_operations]") {
 	}
 
 	SECTION("Do nothing") {
-		const auto orig_regs = RegistersChanger{.F=orig_flags, .B=0xff}.get(getRandomRegisters());
+		const auto orig_regs = RegistersChanger{.B=0xff}.get(getRandomRegisters());
 		auto regs = orig_regs;
 
 		for (auto position = 0; position <= 7; position++) {

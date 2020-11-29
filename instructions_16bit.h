@@ -957,5 +957,110 @@ auto get_16bit_instructions() {
 			}
 		},
 
+		{"RES 2, B", 0xcb90, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_reset_bit("B", 2, regs);
+				return 2;
+			}
+		},
+		{"RES 2, C", 0xcb91, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_reset_bit("C", 2, regs);
+				return 2;
+			}
+		},
+		{"RES 2, D", 0xcb92, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_reset_bit("D", 2, regs);
+				return 2;
+			}
+		},
+		{"RES 2, E", 0xcb93, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_reset_bit("E", 2, regs);
+				return 2;
+			}
+		},
+		{"RES 2, H", 0xcb94, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_reset_bit("H", 2, regs);
+				return 2;
+			}
+		},
+		{"RES 2, L", 0xcb95, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_reset_bit("L", 2, regs);
+				return 2;
+			}
+		},
+		{"RES 2, (HL)", 0xcb96, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto address = memory.read(PC + 1);
+				const auto old_value = memory.read(address);
+
+				auto new_value = reset_bit(old_value, 2);
+				memory.write(address, new_value);
+				return 4;
+			}
+		},
+		{"RES 2, A", 0xcb97, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_reset_bit("A", 2, regs);
+				return 2;
+			}
+		},
+		{"RES 3, B", 0xcb98, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_reset_bit("B", 3, regs);
+				return 2;
+			}
+		},
+		{"RES 3, C", 0xcb99, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_reset_bit("C", 3, regs);
+				return 2;
+			}
+		},
+		{"RES 3, D", 0xcb9a, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_reset_bit("D", 3, regs);
+				return 2;
+			}
+		},
+		{"RES 3, E", 0xcb9b, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_reset_bit("E", 3, regs);
+				return 2;
+			}
+		},
+		{"RES 3, H", 0xcb9c, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_reset_bit("H", 3, regs);
+				return 2;
+			}
+		},
+		{"RES 3, L", 0xcb9d, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_reset_bit("L", 3, regs);
+				return 2;
+			}
+		},
+		{"RES 3, (HL)", 0xcb9e, 2,
+			[](auto& regs, auto& memory, const auto& PC) {
+				const auto address = memory.read(PC + 1);
+				const auto old_value = memory.read(address);
+
+				auto new_value = reset_bit(old_value, 3);
+				memory.write(address, new_value);
+				return 4;
+			}
+		},
+		{"RES 3, A", 0xcb9f, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_reset_bit("A", 3, regs);
+				return 2;
+			}
+		},
+
 	};
 }

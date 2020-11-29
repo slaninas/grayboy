@@ -222,5 +222,64 @@ TEST_CASE("RES", "[bit_operations]") {
 			CHECK_THAT(regs, RegistersCompare{orig_regs});
 		}
 	}
+}
 
+TEST_CASE("SET", "[bit_operations]") {
+	const auto orig_flags = getRandomFlags();
+
+	SECTION("Set one bit") {
+		const auto orig_regs = RegistersChanger{.F=orig_flags, .B=0x00}.get(getRandomRegisters());
+		auto regs = orig_regs;
+
+		SECTION("Bit #0") {
+			instruction_set_bit("B", 0, regs);
+			const auto correct_regs = RegistersChanger{.B=0x01}.get(orig_regs);
+			CHECK_THAT(regs, RegistersCompare{correct_regs});
+		}
+		SECTION("Bit #1") {
+			instruction_set_bit("B", 1, regs);
+			const auto correct_regs = RegistersChanger{.B=0x02}.get(orig_regs);
+			CHECK_THAT(regs, RegistersCompare{correct_regs});
+		}
+		SECTION("Bit #2") {
+			instruction_set_bit("B", 2, regs);
+			const auto correct_regs = RegistersChanger{.B=0x04}.get(orig_regs);
+			CHECK_THAT(regs, RegistersCompare{correct_regs});
+		}
+		SECTION("Bit #3") {
+			instruction_set_bit("B", 3, regs);
+			const auto correct_regs = RegistersChanger{.B=0x08}.get(orig_regs);
+			CHECK_THAT(regs, RegistersCompare{correct_regs});
+		}
+		SECTION("Bit #4") {
+			instruction_set_bit("B", 4, regs);
+			const auto correct_regs = RegistersChanger{.B=0x10}.get(orig_regs);
+			CHECK_THAT(regs, RegistersCompare{correct_regs});
+		}
+		SECTION("Bit #5") {
+			instruction_set_bit("B", 5, regs);
+			const auto correct_regs = RegistersChanger{.B=0x20}.get(orig_regs);
+			CHECK_THAT(regs, RegistersCompare{correct_regs});
+		}
+		SECTION("Bit #6") {
+			instruction_set_bit("B", 6, regs);
+			const auto correct_regs = RegistersChanger{.B=0x40}.get(orig_regs);
+			CHECK_THAT(regs, RegistersCompare{correct_regs});
+		}
+		SECTION("Bit #7") {
+			instruction_set_bit("B", 7, regs);
+			const auto correct_regs = RegistersChanger{.B=0x80}.get(orig_regs);
+			CHECK_THAT(regs, RegistersCompare{correct_regs});
+		}
+	}
+
+	SECTION("Do nothing") {
+		const auto orig_regs = RegistersChanger{.F=orig_flags, .B=0xff}.get(getRandomRegisters());
+		auto regs = orig_regs;
+
+		for (auto position = 0; position <= 7; position++) {
+			instruction_set_bit("B", position, regs);
+			CHECK_THAT(regs, RegistersCompare{orig_regs});
+		}
+	}
 }

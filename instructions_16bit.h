@@ -889,7 +889,7 @@ auto get_16bit_instructions() {
 			}
 		},
 		{"RES 0, (HL)", 0xcb86, 2,
-			[](auto& regs, auto& memory, const auto& PC) {
+			[]([[maybe_unused]] auto& regs, auto& memory, const auto& PC) {
 				const auto address = memory.read(PC + 1);
 				const auto old_value = memory.read(address);
 
@@ -941,7 +941,7 @@ auto get_16bit_instructions() {
 			}
 		},
 		{"RES 1, (HL)", 0xcb8e, 2,
-			[](auto& regs, auto& memory, const auto& PC) {
+			[]([[maybe_unused]] auto& regs, auto& memory, const auto& PC) {
 				const auto address = memory.read(PC + 1);
 				const auto old_value = memory.read(address);
 
@@ -994,7 +994,7 @@ auto get_16bit_instructions() {
 			}
 		},
 		{"RES 2, (HL)", 0xcb96, 2,
-			[](auto& regs, auto& memory, const auto& PC) {
+			[]([[maybe_unused]] auto& regs, auto& memory, const auto& PC) {
 				const auto address = memory.read(PC + 1);
 				const auto old_value = memory.read(address);
 
@@ -1046,7 +1046,7 @@ auto get_16bit_instructions() {
 			}
 		},
 		{"RES 3, (HL)", 0xcb9e, 2,
-			[](auto& regs, auto& memory, const auto& PC) {
+			[]([[maybe_unused]] auto& regs,  auto& memory, const auto& PC) {
 				const auto address = memory.read(PC + 1);
 				const auto old_value = memory.read(address);
 

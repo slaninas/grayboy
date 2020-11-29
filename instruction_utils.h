@@ -453,7 +453,7 @@ void instruction_set_bit(const char (&reg_name)[2], const uint8_t position, Regi
 auto reset_bit(const uint8_t orig_value, const uint8_t position) {
 	assert(position <= 7);
 	const auto mask = static_cast<uint8_t>(0xff ^ (1 << position));
-	return (orig_value & mask);
+	return static_cast<uint8_t>(orig_value & mask);
 }
 
 void instruction_reset_bit(const char (&reg_name)[2], const uint8_t position, Registers& regs) {

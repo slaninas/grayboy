@@ -439,3 +439,14 @@ void instruction_bit(const char (&reg_name)[2], const uint8_t position, Register
 	const auto value = regs.read(reg_name);
 	bit(value, position, regs);
 }
+
+auto reset_bit(const uint8_t orig_value, const uint8_t position) {
+	assert(position <= 7);
+	const auto mask = static_cast<uint8_t>(0xff ^ (1 << position));
+	return (orig_value & mask);
+}
+
+void instruction_reset_bit(const char (&reg_name)[2], const uint8_t position, Registers& regs) {
+	auto new_value = reset_bit(regs.read(reg_name), position);
+	regs.write(reg_name, new_value);
+}

@@ -3,6 +3,7 @@
 #include "instruction_utils.h"
 
 auto get_16bit_instructions() {
+	// TODO: Use macros? It's repeated over and over but C++ macros sucks.
 	return std::vector<Instruction>{
 		// RLC
 		{"RLC B", 0xcb00, 2,

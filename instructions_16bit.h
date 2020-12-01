@@ -1273,5 +1273,110 @@ auto get_16bit_instructions() {
 			}
 		},
 
+		{"SET 0, B", 0xcbc0, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_set_bit("B", 0, regs);
+				return 2;
+			}
+		},
+		{"SET 0, C", 0xcbc1, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_set_bit("C", 0, regs);
+				return 2;
+			}
+		},
+		{"SET 0, D", 0xcbc2, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_set_bit("D", 0, regs);
+				return 2;
+			}
+		},
+		{"SET 0, E", 0xcbc3, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_set_bit("E", 0, regs);
+				return 2;
+			}
+		},
+		{"SET 0, H", 0xcbc4, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_set_bit("H", 0, regs);
+				return 2;
+			}
+		},
+		{"SET 0, L", 0xcbc5, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_set_bit("L", 0, regs);
+				return 2;
+			}
+		},
+		{"SET 0, (HL)", 0xcbc6, 2,
+			[]([[maybe_unused]] auto& regs, auto& memory, const auto& PC) {
+				const auto address = memory.read(PC + 1);
+				const auto old_value = memory.read(address);
+
+				auto new_value = reset_bit(old_value, 0);
+				memory.write(address, new_value);
+				return 4;
+			}
+		},
+		{"SET 0, A", 0xcbc7, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_set_bit("A", 0, regs);
+				return 2;
+			}
+		},
+		{"SET 1, B", 0xcbc8, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_set_bit("B", 1, regs);
+				return 2;
+			}
+		},
+		{"SET 1, C", 0xcbc9, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_set_bit("C", 1, regs);
+				return 2;
+			}
+		},
+		{"SET 1, D", 0xcbca, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_set_bit("D", 1, regs);
+				return 2;
+			}
+		},
+		{"SET 1, E", 0xcbcb, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_set_bit("E", 1, regs);
+				return 2;
+			}
+		},
+		{"SET 1, H", 0xcbcc, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_set_bit("H", 1, regs);
+				return 2;
+			}
+		},
+		{"SET 1, L", 0xcbcd, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_set_bit("L", 1, regs);
+				return 2;
+			}
+		},
+		{"SET 1, (HL)", 0xcbce, 2,
+			[]([[maybe_unused]] auto& regs,  auto& memory, const auto& PC) {
+				const auto address = memory.read(PC + 1);
+				const auto old_value = memory.read(address);
+
+				auto new_value = reset_bit(old_value, 1);
+				memory.write(address, new_value);
+				return 4;
+			}
+		},
+		{"SET 1, A", 0xcbcf, 2,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				instruction_set_bit("A", 1, regs);
+				return 2;
+			}
+		},
+
 	};
 }

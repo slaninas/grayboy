@@ -1314,7 +1314,7 @@ auto get_16bit_instructions() {
 				const auto address = memory.read(PC + 1);
 				const auto old_value = memory.read(address);
 
-				auto new_value = reset_bit(old_value, 0);
+				auto new_value = set_bit(old_value, 0);
 				memory.write(address, new_value);
 				return 4;
 			}
@@ -1366,7 +1366,7 @@ auto get_16bit_instructions() {
 				const auto address = memory.read(PC + 1);
 				const auto old_value = memory.read(address);
 
-				auto new_value = reset_bit(old_value, 1);
+				auto new_value = set_bit(old_value, 1);
 				memory.write(address, new_value);
 				return 4;
 			}
@@ -1419,7 +1419,7 @@ auto get_16bit_instructions() {
 				const auto address = memory.read(PC + 1);
 				const auto old_value = memory.read(address);
 
-				auto new_value = reset_bit(old_value, 2);
+				auto new_value = set_bit(old_value, 2);
 				memory.write(address, new_value);
 				return 4;
 			}
@@ -1471,7 +1471,7 @@ auto get_16bit_instructions() {
 				const auto address = memory.read(PC + 1);
 				const auto old_value = memory.read(address);
 
-				auto new_value = reset_bit(old_value, 3);
+				auto new_value = set_bit(old_value, 3);
 				memory.write(address, new_value);
 				return 4;
 			}
@@ -1524,7 +1524,7 @@ auto get_16bit_instructions() {
 				const auto address = memory.read(PC + 1);
 				const auto old_value = memory.read(address);
 
-				auto new_value = reset_bit(old_value, 4);
+				auto new_value = set_bit(old_value, 4);
 				memory.write(address, new_value);
 				return 4;
 			}
@@ -1576,7 +1576,7 @@ auto get_16bit_instructions() {
 				const auto address = memory.read(PC + 1);
 				const auto old_value = memory.read(address);
 
-				auto new_value = reset_bit(old_value, 5);
+				auto new_value = set_bit(old_value, 5);
 				memory.write(address, new_value);
 				return 4;
 			}

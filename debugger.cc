@@ -25,7 +25,6 @@ void dprint(const DisassemblyInfo& info) {
 	dprint(info, std::cout);
 }
 
-
 template<typename T>
 void p(const T& cont) {
 	for (const auto el : cont) {
@@ -94,9 +93,6 @@ auto get_from_to(const std::vector<DisassemblyInfo>& infos, const uint16_t& neig
 	// const auto last = end(infos) > next_addr_element + neighbors ? next_addr_element + neighbors : end(infos);
 	const auto last = end(infos);
 
-
-	// std::cout << "start: " << start << ", end: " << end << '\n';
-
 	for (auto iter = start; iter != last; ++iter) {
 		const auto& info = *iter;
 		auto character = info.address == next_addr ? '>' : ' ';
@@ -114,7 +110,6 @@ int main(int argc, const char** argv) {
 	auto filename = std::string(argv[1]);
 
 	auto cart = Cartridge{filename};
-	// cart.print_info();
 
 	const auto rom = cart.dump();
 	auto array = Memory::ArrayType{};
@@ -152,9 +147,7 @@ int main(int argc, const char** argv) {
 	std::vector<uint16_t> break_points = {0xc7f1, 0xc7f9, 0xc24f, 0xc252}; // TODO: Compare with bgb, registers look ok to 0xc7f1 (including), memory not checked, diff at 0xc7f1
 
 	auto running = false;
-
 	auto instruction_count = static_cast<uint64_t>(0);
-	auto file = std::ofstream("debug");
 
 	while (1) {
 		auto registers_ss = std::ostringstream{};
@@ -188,8 +181,6 @@ int main(int argc, const char** argv) {
 		cpu_copy = cpu;
 		auto disassembled_new = disassemble(cpu_copy);
 		update_instructions(disassembled_new, disassembled_instructions);
-
-		file << instruction_count++ << '\n';
 	}
 
 }

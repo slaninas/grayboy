@@ -11,7 +11,6 @@ auto get_all_instructions() {
 	const auto instructions_16bit = get_16bit_instructions();
 
 	std::copy(begin(instructions_16bit), end(instructions_16bit), std::back_inserter(instructions_8bit));
-	std::cout << instructions_8bit.size() << '\n';
 
 	return instructions_8bit;
 }

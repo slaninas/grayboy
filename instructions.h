@@ -34,11 +34,11 @@ void check_implemented() {
 	};
 
 	// Check 8bit opcodes
-	auto all_8bit = get_8bit_instructions();
+	const auto all_8bit = get_8bit_instructions();
 	for(uint8_t opcode = 0x00; opcode <= 0xff; ++opcode) {
-		auto is_implemented = std::find_if(cbegin(all_8bit), cend(all_8bit), [opcode](const auto& instruction) {	return instruction.opcode == opcode; }) != cend(all_8bit);
+		const auto is_implemented = std::find_if(cbegin(all_8bit), cend(all_8bit), [opcode](const auto& instruction) {	return instruction.opcode == opcode; }) != cend(all_8bit);
 
-		auto should_be_implemented = std::find_if(
+		const auto should_be_implemented = std::find_if(
 			cbegin(omitted_8bit_opcodes),
 			cend(omitted_8bit_opcodes),
 			[opcode](const auto& instruction_opcode) {	return instruction_opcode == opcode; }

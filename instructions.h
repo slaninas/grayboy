@@ -3,6 +3,7 @@
 #include "instructions_8bit.h"
 #include "instructions_16bit.h"
 
+// TODO: Make functions in headers inline or put definitions into .cc files
 // TODO: Add function to check which instructions are not implemented yet
 
 auto get_all_instructions() {

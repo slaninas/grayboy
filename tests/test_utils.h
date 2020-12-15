@@ -62,7 +62,7 @@ auto getRandomMemory() {
 }
 
 auto getRandomRegisters() {
-	return Registers{getRandomArray<Registers::ArrayElements>()};
+	return Registers{getRandomArray<Registers::ArrayElementCount>()};
 }
 
 auto getRandomFlags() {

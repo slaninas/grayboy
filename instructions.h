@@ -35,7 +35,7 @@ void check_implemented() {
 
 	// Check 8bit opcodes
 	const auto all_8bit = get_8bit_instructions();
-	for(uint8_t opcode = 0x00; opcode <= 0xff; ++opcode) {
+	for(uint16_t opcode = 0x00; opcode <= 0xff; ++opcode) {
 		const auto is_implemented = std::find_if(cbegin(all_8bit), cend(all_8bit), [opcode](const auto& instruction) {	return instruction.opcode == opcode; }) != cend(all_8bit);
 
 		const auto should_be_implemented = std::find_if(

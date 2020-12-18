@@ -34,8 +34,10 @@ int main(int argc, const char** argv) {
 
 	auto cpu = Cpu{array, regs};
 
-	while (1) {
-		[[maybe_unused]] const auto cycles = cpu.execute_next();
-	}
+	// while (1) {
+		// [[maybe_unused]] const auto cycles = cpu.execute_next();
+	// }
+	//
+	check_implemented();
 
 }

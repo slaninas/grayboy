@@ -18,7 +18,7 @@ auto get_all_instructions() {
 
 void check_implemented() {
 	std::cout << std::hex;
-	auto omitted_8bit_opcodes = std::vector<uint8_t>{
+	const auto omitted_8bit_opcodes = std::vector<uint8_t>{
 		0xcb,
 		0xd3,
 		0xdb,
@@ -52,7 +52,18 @@ void check_implemented() {
 		}
 	}
 
-	// TODO: Check 0xcb* opcodes
+	const auto all_16bit = get_16bit_instructions();
+
+	for (uint16_t opcode = 0xcb00; opcode <= 0xcbff; ++opcode) {
+		const auto is_implemented = std::find_if(
+			cbegin(all_16bit),
+			cend(all_16bit), [opcode](const auto& instruction) {	return instruction.opcode == opcode; }
+		) != cend(all_16bit);
+
+		if (!is_implemented) {
+			std::cout << "Instruction 0x" << (int)opcode << " not found among implemented 16bit instructions.\n";
+		}
+	}
 
 	std::cout << std::dec;
 }

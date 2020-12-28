@@ -116,7 +116,7 @@ public:
 		print_pair("BC", read("B"), read("C"));
 		print_pair("DE", read("D"), read("E"));
 		print_pair("HL", read("H"), read("L"));
-		
+
 		result << "SP: " << std::setw(4) << std::setfill('0') << static_cast<int>(read("SP")) << '\n';
 		result << "PC: " << std::setw(4) << std::setfill('0') << static_cast<int>(read("PC")) << '\n';
 
@@ -227,7 +227,7 @@ struct MakeRegisters{
 	void check_consistency() {
 		assert(!(AF.has_value() && (A.has_value() || F.has_value())) && "You can't set AF and A (or F) at the same time");
 		assert(!(BC.has_value() && (B.has_value() || C.has_value())) && "You can't set BC and B (or C) at the same time");
-		assert(!(DE.has_value() && (D.has_value() || E.has_value())) && "You can't set AF and D (or E) at the same time");
+		assert(!(DE.has_value() && (D.has_value() || E.has_value())) && "You can't set DE and D (or E) at the same time");
 		assert(!(HL.has_value() && (H.has_value() || L.has_value())) && "You can't set HL and H (or L) at the same time");
 	}
 
@@ -277,7 +277,7 @@ struct RegistersChanger{
 	void check_consistency() {
 		assert(!(AF.has_value() && (A.has_value() || F.has_value())) && "You can't change AF and A (or F) at the same time");
 		assert(!(BC.has_value() && (B.has_value() || C.has_value())) && "You can't change BC and B (or C) at the same time");
-		assert(!(DE.has_value() && (D.has_value() || E.has_value())) && "You can't change AF and D (or E) at the same time");
+		assert(!(DE.has_value() && (D.has_value() || E.has_value())) && "You can't change DE and D (or E) at the same time");
 		assert(!(HL.has_value() && (H.has_value() || L.has_value())) && "You can't change HL and H (or L) at the same time");
 	}
 

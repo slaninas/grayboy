@@ -1,3 +1,4 @@
 # Build dir and vim tmp files
 build
+build-notests
 *.swp

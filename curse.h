@@ -64,7 +64,6 @@ public:
 		initscr();
 		cbreak();
 		// TODO: raw(); ?
-		printw("Blabla, hi!");
 	}
 
 	MainCurse(const MainCurse&) = delete;
@@ -85,7 +84,7 @@ public:
 	void wait_for_any() {
 		getch();
 	}
-	
+
 	auto get_char() {
 		return getch();
 	}

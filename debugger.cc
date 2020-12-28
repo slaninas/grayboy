@@ -147,7 +147,7 @@ int main(int argc, const char** argv) {
 	std::vector<uint16_t> break_points = {0xc7f1, 0xc7f9, 0xc24f, 0xc252}; // TODO: Compare with bgb, registers look ok to 0xc7f1 (including), memory not checked, diff at 0xc7f1
 
 	auto running = false;
-	auto instruction_count = static_cast<uint64_t>(0);
+	// auto instruction_count = static_cast<uint64_t>(0);
 
 	while (1) {
 		auto registers_ss = std::ostringstream{};

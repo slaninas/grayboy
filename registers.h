@@ -178,22 +178,22 @@ std::ostream& operator<<(std::ostream& os, const Registers& registers) {
 }
 
 struct MakeRegisters{
-	std::optional<uint16_t> AF;
-	std::optional<uint8_t> A;
-	std::optional<uint8_t> F;
-	std::optional<uint16_t> BC;
-	std::optional<uint8_t> B;
-	std::optional<uint8_t> C;
-	std::optional<uint16_t> DE;
-	std::optional<uint8_t> D;
-	std::optional<uint8_t> E;
-	std::optional<uint16_t> HL;
-	std::optional<uint8_t> H;
-	std::optional<uint8_t> L;
-	std::optional<uint16_t> PC;
-	std::optional<uint16_t> SP;
+	std::optional<uint16_t> AF = {};
+	std::optional<uint8_t> A = {};
+	std::optional<uint8_t> F = {};
+	std::optional<uint16_t> BC = {};
+	std::optional<uint8_t> B = {};
+	std::optional<uint8_t> C = {};
+	std::optional<uint16_t> DE = {};
+	std::optional<uint8_t> D = {};
+	std::optional<uint8_t> E = {};
+	std::optional<uint16_t> HL = {};
+	std::optional<uint8_t> H = {};
+	std::optional<uint8_t> L = {};
+	std::optional<uint16_t> PC = {};
+	std::optional<uint16_t> SP = {};
 
-	std::optional<uint16_t> IME;
+	std::optional<uint16_t> IME = {};
 
 
 	auto get() {
@@ -235,22 +235,22 @@ struct MakeRegisters{
 
 // TODO: Merge from MakeRegisters or inherit?
 struct RegistersChanger{
-	std::optional<uint16_t> AF;
-	std::optional<uint8_t> A;
-	std::optional<uint8_t> F;
-	std::optional<uint16_t> BC;
-	std::optional<uint8_t> B;
-	std::optional<uint8_t> C;
-	std::optional<uint16_t> DE;
-	std::optional<uint8_t> D;
-	std::optional<uint8_t> E;
-	std::optional<uint16_t> HL;
-	std::optional<uint8_t> H;
-	std::optional<uint8_t> L;
-	std::optional<uint16_t> PC;
-	std::optional<uint16_t> SP;
+	std::optional<uint16_t> AF = {};
+	std::optional<uint8_t> A = {};
+	std::optional<uint8_t> F = {};
+	std::optional<uint16_t> BC = {};
+	std::optional<uint8_t> B = {};
+	std::optional<uint8_t> C = {};
+	std::optional<uint16_t> DE = {};
+	std::optional<uint8_t> D = {};
+	std::optional<uint8_t> E = {};
+	std::optional<uint16_t> HL = {};
+	std::optional<uint8_t> H = {};
+	std::optional<uint8_t> L = {};
+	std::optional<uint16_t> PC = {};
+	std::optional<uint16_t> SP = {};
 
-	std::optional<uint16_t> IME;
+	std::optional<uint16_t> IME = {};
 
 
 	auto get(const Registers& registers) {
@@ -284,11 +284,11 @@ struct RegistersChanger{
 };
 
 struct MakeFlags {
-	std::optional<bool> Z;
-	std::optional<bool> N;
-	std::optional<bool> H;
-	std::optional<bool> C;
-	std::optional<uint8_t> unused;
+	std::optional<bool> Z = {};
+	std::optional<bool> N = {};
+	std::optional<bool> H = {};
+	std::optional<bool> C = {};
+	std::optional<uint8_t> unused = {};
 
 	[[nodiscard]] auto get() {
 		auto value = static_cast<uint8_t>(0x00);
@@ -302,11 +302,11 @@ struct MakeFlags {
 };
 
 struct FlagsChanger {
-	std::optional<bool> Z;
-	std::optional<bool> N;
-	std::optional<bool> H;
-	std::optional<bool> C;
-	std::optional<uint8_t> unused;
+	std::optional<bool> Z = {};
+	std::optional<bool> N = {};
+	std::optional<bool> H = {};
+	std::optional<bool> C = {};
+	std::optional<uint8_t> unused = {};
 
 	[[nodiscard]] auto get(const uint8_t orig_flags) {
 		auto Z_val = Z.value_or(static_cast<bool>(orig_flags & (1 << 7)));

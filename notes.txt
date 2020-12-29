@@ -1,0 +1,4 @@
+Build times - no tests, debug, make -j10 [s]
+-          clang        gcc
+before     3.4          5.4
+

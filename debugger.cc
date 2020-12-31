@@ -43,6 +43,41 @@ void print_memory(const T& mem) {
 	}
 	std::cout << std::dec;
 }
+
+struct MemoryDiff {
+	uint16_t address;
+	uint8_t orig_value;
+	uint8_t new_value;
+
+};
+
+std::ostream& operator<<(std::ostream& os, const MemoryDiff& diff) {
+	os << std::hex;
+	os << "[0x" << static_cast<int>(diff.address) << "] 0x" << static_cast<int>(diff.orig_value) << " vs 0x" << static_cast<int>(diff.new_value);
+	os << std::dec;
+	return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const std::vector<MemoryDiff>& diff) {
+	os << "Diff between two memories:\n";
+	for (const auto& element : diff) {
+		os << '\t' << element << '\n';
+	}
+	return os;
+}
+
+template<typename Memory>
+auto memory_diff(const Memory& orig_memory, const Memory& new_memory) {
+	auto result = std::vector<MemoryDiff>{};
+
+	for (auto address = 0; address < Memory::ArrayElements; ++address) {
+		const auto orig_value = orig_memory.read(address);
+		const auto new_value = new_memory.read(address);
+		if (orig_value != new_value) {
+			result.push_back({static_cast<typename Memory::AddressType>(address), orig_value, new_value});
+		}
+	}
+	return result;
 }
 
 auto disassemble(Cpu& cpu) {

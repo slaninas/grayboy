@@ -6,6 +6,7 @@ class Memory {
 public:
 	static const size_t ArrayElements = 1 << 16;
 	using ArrayType = std::array<uint8_t, ArrayElements>;
+	using AddressType = uint16_t;
 
 	Memory() = default;
 	Memory(const ArrayType& array) : array_{array} {}

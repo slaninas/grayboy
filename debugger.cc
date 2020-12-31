@@ -34,13 +34,15 @@ void p(const T& cont) {
 
 template<typename T>
 void print_memory(const T& mem) {
-
+	std::cout << std::hex;
 	for (int i = 0; i < mem.size(); ++i) {
 		const auto& value = mem[i];
 		if (value != 0) {
-			std::cout << "Memory 0x" << i << "=" << (int)value <<'\n';
+			std::cout << "Memory 0x" << i << " = 0x" << (int)value <<'\n';
 		}
 	}
+	std::cout << std::dec;
+}
 }
 
 auto disassemble(Cpu& cpu) {

@@ -44,10 +44,10 @@ void check_implemented() {
 		) == cend(omitted_8bit_opcodes);
 
 		if (should_be_implemented && !is_implemented) {
-			std::cout << "Instruction 0x" << (int)opcode << " not found among implemented 8bit instructions.\n";
+			std::cout << "Instruction 0x" << static_cast<int>(opcode) << " not found among implemented 8bit instructions.\n";
 		}
 		else if (!should_be_implemented && is_implemented) {
-			std::cout << "Instruction 0x" << (int)opcode << " is implemented but should not be.\n";
+			std::cout << "Instruction 0x" << static_cast<int>(opcode) << " is implemented but should not be.\n";
 		}
 	}
 
@@ -60,7 +60,7 @@ void check_implemented() {
 		) != cend(all_16bit);
 
 		if (!is_implemented) {
-			std::cout << "Instruction 0x" << (int)opcode << " not found among implemented 16bit instructions.\n";
+			std::cout << "Instruction 0x" << static_cast<int>(opcode) << " not found among implemented 16bit instructions.\n";
 		}
 	}
 

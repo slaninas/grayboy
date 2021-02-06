@@ -35,7 +35,7 @@ void p(const T& cont) {
 template<typename T>
 void print_memory(const T& mem) {
 	std::cout << std::hex;
-	for (int i = 0; i < mem.size(); ++i) {
+	for (size_t i = 0; i < mem.size(); ++i) {
 		const auto& value = mem[i];
 		if (value != 0) {
 			std::cout << "Memory 0x" << i << " = 0x" << (int)value <<'\n';
@@ -70,7 +70,7 @@ template<typename Memory>
 auto memory_diff(const Memory& orig_memory, const Memory& new_memory) {
 	auto result = std::vector<MemoryDiff>{};
 
-	for (auto address = 0; address < Memory::ArrayElements; ++address) {
+	for (size_t address = 0; address < Memory::ArrayElements; ++address) {
 		const auto orig_value = orig_memory.read(address);
 		const auto new_value = new_memory.read(address);
 		if (orig_value != new_value) {

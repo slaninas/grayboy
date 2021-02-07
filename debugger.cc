@@ -70,11 +70,11 @@ template<typename Memory>
 auto memory_diff(const Memory& orig_memory, const Memory& new_memory) {
 	auto result = std::vector<MemoryDiff>{};
 
-	for (size_t address = 0; address < Memory::ArrayElements; ++address) {
+	for (auto address = static_cast<Memory::AddressType>(0); address < Memory::ArrayElements; ++address) {
 		const auto orig_value = orig_memory.read(address);
 		const auto new_value = new_memory.read(address);
 		if (orig_value != new_value) {
-			result.push_back({static_cast<typename Memory::AddressType>(address), orig_value, new_value});
+			result.push_back({address, orig_value, new_value});
 		}
 	}
 	return result;

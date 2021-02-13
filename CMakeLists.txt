@@ -8,7 +8,7 @@ option(BUILD_TESTS "Build tests and add them to ctest" ON)
 
 
 # TODO: Add/remove options - check which options are useful
-add_compile_options(-Wall -Wextra -Wpedantic)
+add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 
 add_executable(gameboy main.cc)
 

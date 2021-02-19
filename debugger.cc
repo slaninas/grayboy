@@ -139,6 +139,18 @@ auto get_from_to(const std::vector<DisassemblyInfo>& infos, const uint16_t& neig
 }
 
 int main(int argc, const char** argv) {
+
+	// const auto memory = MakeMemory{{{0x1234, 0x55}, {0x534, 0x21}, {0x0894, 0xab}}}.get();
+	// const auto memory2 = MemoryChanger{{{0x1234, 0x56}, {0x5432, 0xfe}}}.get(memory);
+	// print_memory(memory.dump());
+	// std::cout << "--------------\n";
+	// print_memory(memory2.dump());
+
+	// const auto diff = memory_diff(memory, memory2);
+	// std::cout << diff << '\n';
+
+
+	// return 1;
 	if (argc != 2) {
 		std::cout << "Usage: " << argv[0] << " cartridge_filename\n";
 		return 1;

@@ -13,22 +13,22 @@ add_executable(cpu_utils_tests  cpu_utils_tests.cc)
 target_link_libraries(cpu_utils_tests test_main)
 
 add_executable(cpu_ld_tests  cpu_ld_tests.cc)
-target_link_libraries(cpu_ld_tests test_main)
+target_link_libraries(cpu_ld_tests test_main cpu)
 
 add_executable(cpu_misc_tests  cpu_misc_tests.cc)
-target_link_libraries(cpu_misc_tests test_main)
+target_link_libraries(cpu_misc_tests test_main cpu)
 
 add_executable(cpu_arithmetic_tests  cpu_arithmetic_tests.cc)
-target_link_libraries(cpu_arithmetic_tests test_main)
+target_link_libraries(cpu_arithmetic_tests test_main cpu)
 
 add_executable(cpu_bit_operation_tests  cpu_bit_operation_tests.cc)
-target_link_libraries(cpu_bit_operation_tests test_main)
+target_link_libraries(cpu_bit_operation_tests test_main cpu)
 
 add_executable(cpu_jumpcall_tests  cpu_jumpcall_tests.cc)
-target_link_libraries(cpu_jumpcall_tests test_main)
+target_link_libraries(cpu_jumpcall_tests test_main cpu)
 
 add_executable(cpu_16bit_instruction_tests  cpu_16bit_instruction_tests.cc)
-target_link_libraries(cpu_16bit_instruction_tests test_main)
+target_link_libraries(cpu_16bit_instruction_tests test_main cpu)
 
 add_test("registers_tests " registers_tests)
 add_test("memory_tests " memory_tests)

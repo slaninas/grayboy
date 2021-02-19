@@ -8,7 +8,9 @@
 
 #include "registers.h"
 #include "memory.h"
+
 #include "instructions.h"
+#include "instruction_utils.h"
 
 
 struct DisassemblyInfo {
@@ -18,15 +20,7 @@ struct DisassemblyInfo {
 	std::vector<uint8_t> memory_representation;
 };
 
-[[nodiscard]] const Instruction& find_by_opcode(const uint16_t opcode, const std::vector<Instruction>& instructions) {
-	auto res = std::find_if(begin(instructions), end(instructions), [opcode](const auto& instruction) { return instruction.opcode ==  opcode; });
-	if (res == end(instructions)) {
-		auto stream = std::stringstream{};
-		stream << std::hex << opcode;
-		throw std::runtime_error("Opcode 0x" + stream.str() + " not found.");
-	}
-	return *res;
-}
+[[nodiscard]] const Instruction& find_by_opcode(const uint16_t opcode, const std::vector<Instruction>& instructions);
 
 
 // Make exceptions asserts and run in debug

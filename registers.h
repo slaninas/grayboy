@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <stdexcept>
 #include <cassert>
+#include <optional>
 
 // TODO: Zero registers or do not initialize at all or like original ROM?
 // TODO: Add unit tests for registers
@@ -172,7 +173,7 @@ private:
 
 };
 
-std::ostream& operator<<(std::ostream& os, const Registers& registers) {
+inline std::ostream& operator<<(std::ostream& os, const Registers& registers) {
 	registers.print(os);
 	return os;
 }

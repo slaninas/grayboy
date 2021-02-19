@@ -1,5 +1,9 @@
 #pragma once
 
+#include "registers.h"
+#include "memory.h"
+
+#include <functional>
 
 struct Instruction {
 	std::string mnemonic;
@@ -18,39 +22,39 @@ struct Instruction {
 // TODO: Merge (half) carries somehow?
 // TODO: Are (half) carries correct?
 // Detect half-carry for addition, see https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/
-[[nodiscard]] auto half_carry_add_8bit(const uint16_t a, const uint16_t b) {
+[[nodiscard]] inline auto half_carry_add_8bit(const uint16_t a, const uint16_t b) {
 	return (((a & 0xf) + (b & 0xf)) & 0x10) > 0;
 }
-[[nodiscard]] auto half_carry_add_16bit(const uint16_t a, const uint16_t b) {
+[[nodiscard]] inline auto half_carry_add_16bit(const uint16_t a, const uint16_t b) {
 	return (((a & 0x0fff) + (b & 0x0fff)) & 0x1000) > 0;
 }
 
-[[nodiscard]] auto carry_add_8bit(const uint16_t a, const uint16_t b) {
+[[nodiscard]] inline auto carry_add_8bit(const uint16_t a, const uint16_t b) {
 	return (((a & 0xff) + (b & 0xff)) & 0x100) > 0;
 }
-[[nodiscard]] auto carry_add_16bit(const uint16_t a, const uint16_t b) {
+[[nodiscard]] inline auto carry_add_16bit(const uint16_t a, const uint16_t b) {
 	return (((a & 0xffff) + (b & 0xffff)) & 0x10000) > 0;
 }
 
 // https://www.reddit.com/r/EmuDev/comments/4clh23/trouble_with_halfcarrycarry_flag/
-[[nodiscard]] auto half_carry_sub_8bit(const uint16_t a, const uint16_t b) {
+[[nodiscard]] inline auto half_carry_sub_8bit(const uint16_t a, const uint16_t b) {
 	return ((a & 0x0f) - (b & 0x0f)) < 0;
 }
 
-[[nodiscard]] auto half_carry_sub_16bit(const uint16_t a, const uint16_t b) {
+[[nodiscard]] inline auto half_carry_sub_16bit(const uint16_t a, const uint16_t b) {
 	return ((a & 0x0fff) - (b & 0xfff)) < 0;
 }
 
-[[nodiscard]] auto carry_sub_8bit(const uint16_t a, const uint16_t b) {
+[[nodiscard]] inline auto carry_sub_8bit(const uint16_t a, const uint16_t b) {
 	return ((a & 0xff) - (b & 0xff)) < 0;
 }
-[[nodiscard]] auto carry_sub_16bit(const uint16_t a, const uint16_t b) {
+[[nodiscard]] inline auto carry_sub_16bit(const uint16_t a, const uint16_t b) {
 	return ((a & 0xffff) - (b & 0xffff)) < 0;
 }
 
 // TOOD: Cleanup these instruction_* functions
 
-void instruction_rst(const uint8_t& value, Registers& regs, Memory& memory, const uint16_t& PC) {
+inline void instruction_rst(const uint8_t& value, Registers& regs, Memory& memory, const uint16_t& PC) {
 	const auto PC_high = static_cast<uint8_t>((PC & 0xff00) >> 8);
 	const auto PC_low = static_cast<uint8_t>(PC & 0x00ff);
 	const auto SP = regs.read("SP");
@@ -306,157 +310,157 @@ void instruction_cp(const char(&dest_name)[kDestSize], const char(&second_reg_na
 	instruction_cp(dest_name, regs.read(second_reg_name), regs);
 }
 
-auto rlc(uint8_t old_value) {
+inline auto rlc(uint8_t old_value) {
 	const auto carry = static_cast<bool>(old_value & (1 << 7));
 	const auto new_value = static_cast<uint8_t>((old_value << 1) + carry);
 	return std::pair{new_value, carry};
 }
 
-void set_flags_for_rotate(Registers& regs, const uint8_t new_value, const bool carry) {
+inline void set_flags_for_rotate(Registers& regs, const uint8_t new_value, const bool carry) {
 	regs.set_flag("Z", new_value == 0);
 	regs.set_flag("N", 0);
 	regs.set_flag("H", 0);
 	regs.set_flag("C", carry);
 }
 
-void set_flags_for_shift(Registers& regs, const uint8_t new_value, const bool carry) {
+inline void set_flags_for_shift(Registers& regs, const uint8_t new_value, const bool carry) {
 	set_flags_for_rotate(regs, new_value, carry);
 }
 
-void instruction_rlc(const char (&reg_name)[2], Registers& regs) {
+inline void instruction_rlc(const char (&reg_name)[2], Registers& regs) {
 	const auto old_value = regs.read(reg_name);
 	const auto [new_value, carry] = rlc(old_value);
 	regs.write(reg_name, new_value);
 	set_flags_for_rotate(regs, new_value, carry);
 }
 
-auto rl(uint8_t old_value, const bool carry) {
+inline auto rl(uint8_t old_value, const bool carry) {
 	const auto new_value = static_cast<uint8_t>((old_value << 1) + carry);
 	const auto new_carry = static_cast<bool>(old_value & (1 << 7));
 	return std::pair{new_value, new_carry};
 }
 
-void instruction_rl(const char (&reg_name)[2], Registers& regs) {
+inline void instruction_rl(const char (&reg_name)[2], Registers& regs) {
 	const auto old_value = regs.read(reg_name);
 	const auto [new_value, carry] = rl(old_value, regs.read_flag("C"));
 	regs.write(reg_name, new_value);
 	set_flags_for_rotate(regs, new_value, carry);
 }
 
-auto rrc(uint8_t old_value) {
+inline auto rrc(uint8_t old_value) {
 	const auto carry = static_cast<bool>(old_value & 1);
 	const auto new_value = static_cast<uint8_t>((old_value >> 1) + (carry << 7));
 	return std::pair{new_value, carry};
 }
 
-void instruction_rrc(const char (&reg_name)[2], Registers& regs) {
+inline void instruction_rrc(const char (&reg_name)[2], Registers& regs) {
 	const auto old_value = regs.read(reg_name);
 	const auto [new_value, carry] = rrc(old_value);
 	regs.write(reg_name, new_value);
 	set_flags_for_rotate(regs, new_value, carry);
 }
 
-auto rr(uint8_t old_value, const bool carry) {
+inline auto rr(uint8_t old_value, const bool carry) {
 	const auto new_value = static_cast<uint8_t>((old_value >> 1) + (carry << 7));
 	const auto new_carry = static_cast<bool>(old_value & 1);
 	return std::pair{new_value, new_carry};
 }
 
-void instruction_rr(const char (&reg_name)[2], Registers& regs) {
+inline void instruction_rr(const char (&reg_name)[2], Registers& regs) {
 	const auto old_value = regs.read(reg_name);
 	const auto [new_value, carry] = rr(old_value, regs.read_flag("C"));
 	regs.write(reg_name, new_value);
 	set_flags_for_rotate(regs, new_value, carry);
 }
 
-auto sla(const uint8_t old_value) {
+inline auto sla(const uint8_t old_value) {
 	const auto new_value = static_cast<uint8_t>(old_value << 1);
 	const auto new_carry = static_cast<bool>(old_value & (1 << 7));
 	return std::pair{new_value, new_carry};
 }
 
-void instruction_sla(const char (&reg_name)[2], Registers& regs) {
+inline void instruction_sla(const char (&reg_name)[2], Registers& regs) {
 	const auto old_value = regs.read(reg_name);
 	const auto [new_value, new_carry] = sla(old_value);
 	regs.write(reg_name, new_value);
 	set_flags_for_shift(regs, new_value, new_carry);
 }
 
-auto sra(const uint8_t old_value) {
+inline auto sra(const uint8_t old_value) {
 	const auto new_value = static_cast<uint8_t>((old_value >> 1) + (old_value & (1 << 7)));
 	const auto new_carry = static_cast<bool>(old_value & 1);
 	return std::pair{new_value, new_carry};
 }
 
-void instruction_sra(const char (&reg_name)[2], Registers& regs) {
+inline void instruction_sra(const char (&reg_name)[2], Registers& regs) {
 	const auto old_value = regs.read(reg_name);
 	const auto [new_value, new_carry] = sra(old_value);
 	regs.write(reg_name, new_value);
 	set_flags_for_shift(regs, new_value, new_carry);
 }
 
-void set_flags_for_swap(Registers& regs, const uint8_t new_value) {
+inline void set_flags_for_swap(Registers& regs, const uint8_t new_value) {
 	regs.set_flag("Z", new_value == 0);
 	regs.set_flag("N", false);
 	regs.set_flag("H", false);
 	regs.set_flag("C", false);
 }
 
-auto swap(const uint8_t old_value) {
+inline auto swap(const uint8_t old_value) {
 	const auto lower_byte = static_cast<uint8_t>(old_value & 0x0f);
 	const auto higher_byte = static_cast<uint8_t>((old_value & 0xf0) >> 4);
 	return static_cast<uint8_t>((lower_byte << 4) + higher_byte);
 }
 
-void instruction_swap(const char (&reg_name)[2], Registers& regs) {
+inline void instruction_swap(const char (&reg_name)[2], Registers& regs) {
 	const auto old_value = regs.read(reg_name);
 	const auto new_value = swap(old_value);
 	regs.write(reg_name, new_value);
 	set_flags_for_swap(regs, new_value);
 }
 
-auto srl(const uint8_t old_value) {
+inline auto srl(const uint8_t old_value) {
 	const auto new_value = static_cast<uint8_t>(old_value >> 1);
 	const auto new_carry = static_cast<bool>(old_value & 1);
 	return std::pair{new_value, new_carry};
 }
 
-void instruction_srl(const char (&reg_name)[2], Registers& regs) {
+inline void instruction_srl(const char (&reg_name)[2], Registers& regs) {
 	const auto old_value = regs.read(reg_name);
 	const auto [new_value, new_carry] = srl(old_value);
 	regs.write(reg_name, new_value);
 	set_flags_for_shift(regs, new_value, new_carry);
 }
 
-auto bit(const uint8_t value, const uint8_t position, Registers& regs) {
+inline auto bit(const uint8_t value, const uint8_t position, Registers& regs) {
 	const auto bit_value = static_cast<bool>(value & (1 << position));
 	regs.set_flag("Z", !bit_value);
 	regs.set_flag("N", 0);
 	regs.set_flag("H", 1);
 }
 
-void instruction_bit(const char (&reg_name)[2], const uint8_t position, Registers& regs) {
+inline void instruction_bit(const char (&reg_name)[2], const uint8_t position, Registers& regs) {
 	const auto value = regs.read(reg_name);
 	bit(value, position, regs);
 }
 
-auto set_bit(const uint8_t orig_value, const uint8_t position) {
+inline auto set_bit(const uint8_t orig_value, const uint8_t position) {
 	assert(position <= 7);
 	return static_cast<uint8_t>(orig_value | (1 << position));
 }
 
-void instruction_set_bit(const char (&reg_name)[2], const uint8_t position, Registers& regs) {
+inline void instruction_set_bit(const char (&reg_name)[2], const uint8_t position, Registers& regs) {
 	auto new_value = set_bit(regs.read(reg_name), position);
 	regs.write(reg_name, new_value);
 }
 
-auto reset_bit(const uint8_t orig_value, const uint8_t position) {
+inline auto reset_bit(const uint8_t orig_value, const uint8_t position) {
 	assert(position <= 7);
 	const auto mask = static_cast<uint8_t>(0xff ^ (1 << position));
 	return static_cast<uint8_t>(orig_value & mask);
 }
 
-void instruction_reset_bit(const char (&reg_name)[2], const uint8_t position, Registers& regs) {
+inline void instruction_reset_bit(const char (&reg_name)[2], const uint8_t position, Registers& regs) {
 	auto new_value = reset_bit(regs.read(reg_name), position);
 	regs.write(reg_name, new_value);
 }

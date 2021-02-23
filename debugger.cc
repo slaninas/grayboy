@@ -51,14 +51,14 @@ struct MemoryDiff {
 
 };
 
-std::ostream& operator<<(std::ostream& os, const MemoryDiff& diff) {
+auto operator<<(std::ostream& os, const MemoryDiff& diff) -> std::ostream& {
 	os << std::hex;
 	os << "[0x" << static_cast<int>(diff.address) << "] 0x" << static_cast<int>(diff.orig_value) << " vs 0x" << static_cast<int>(diff.new_value);
 	os << std::dec;
 	return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const std::vector<MemoryDiff>& diff) {
+auto operator<<(std::ostream& os, const std::vector<MemoryDiff>& diff) -> std::ostream& {
 	os << "Diff between two memories:\n";
 	for (const auto& element : diff) {
 		os << '\t' << element << '\n';
@@ -138,7 +138,7 @@ auto get_from_to(const std::vector<DisassemblyInfo>& infos, const uint16_t& neig
 	}
 }
 
-int main(int argc, const char** argv) {
+auto main(int argc, const char** argv) -> int {
 
 	// const auto memory = MakeMemory{{{0x1234, 0x55}, {0x534, 0x21}, {0x0894, 0xab}}}.get();
 	// const auto memory2 = MemoryChanger{{{0x1234, 0x56}, {0x5432, 0xfe}}}.get(memory);

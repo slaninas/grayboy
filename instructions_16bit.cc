@@ -1,7 +1,7 @@
 #include "instructions_16bit.h"
 
 
-std::vector<Instruction>  get_16bit_instructions() {
+auto  get_16bit_instructions() -> std::vector<Instruction> {
 	// TODO: Use macros? It's repeated over and over but C++ macros sucks.
 	return std::vector<Instruction>{
 		// RLC

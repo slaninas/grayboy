@@ -3,7 +3,7 @@
 #include "instructions_8bit.h"
 #include "instructions_16bit.h"
 
-std::vector<Instruction> get_all_instructions() {
+auto get_all_instructions() -> std::vector<Instruction> {
 	auto instructions_8bit = get_8bit_instructions();
 	const auto instructions_16bit = get_16bit_instructions();
 

@@ -146,7 +146,7 @@ public:
 private:
 	std::array<uint8_t, 12> register_array_ = {};
 
-	int register_index(const char* reg_name) const {
+	auto register_index(const char* reg_name) const -> int {
 		const auto reg= std::string_view{reg_name};
 
 		if (reg == "AF") return 0;
@@ -173,7 +173,7 @@ private:
 
 };
 
-inline std::ostream& operator<<(std::ostream& os, const Registers& registers) {
+inline auto operator<<(std::ostream& os, const Registers& registers) -> std::ostream& {
 	registers.print(os);
 	return os;
 }

@@ -4,6 +4,6 @@
 
 #include <vector>
 
-std::vector<Instruction> get_all_instructions();
+auto get_all_instructions() -> std::vector<Instruction>;
 void check_implemented();
 

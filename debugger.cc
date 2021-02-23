@@ -198,7 +198,7 @@ int main(int argc, const char** argv) {
 	auto running = false;
 	// auto instruction_count = static_cast<uint64_t>(0);
 
-	while (1) {
+	while (true) {
 		auto registers_ss = std::ostringstream{};
 		auto ss = std::ostringstream{};
 

@@ -120,7 +120,7 @@ void instruction_add(const char(&dest_name)[kDestSize], const char(&second_reg_n
 		regs.write(dest_name, dest_new);
 
 		regs.set_flag("Z", dest_new == 0); // TODO: This is the only difference between 8 and 16bit, merge rest?
-		regs.set_flag("N", 0);
+		regs.set_flag("N", false);
 		regs.set_flag("H", half_carry_add_16bit(dest_old, second_reg));
 		regs.set_flag("C", carry_add_16bit(dest_old, second_reg));
 	}
@@ -132,7 +132,7 @@ void instruction_add(const char(&dest_name)[kDestSize], const char(&second_reg_n
 
 		regs.write(dest_name, dest_new);
 
-		regs.set_flag("N", 0);
+		regs.set_flag("N", false);
 		regs.set_flag("H", half_carry_add_16bit(dest_old, second_reg));
 		regs.set_flag("C", carry_add_16bit(dest_old, second_reg));
 	}
@@ -318,8 +318,8 @@ inline auto rlc(uint8_t old_value) {
 
 inline void set_flags_for_rotate(Registers& regs, const uint8_t new_value, const bool carry) {
 	regs.set_flag("Z", new_value == 0);
-	regs.set_flag("N", 0);
-	regs.set_flag("H", 0);
+	regs.set_flag("N", false);
+	regs.set_flag("H", false);
 	regs.set_flag("C", carry);
 }
 
@@ -435,8 +435,8 @@ inline void instruction_srl(const char (&reg_name)[2], Registers& regs) {
 inline auto bit(const uint8_t value, const uint8_t position, Registers& regs) {
 	const auto bit_value = static_cast<bool>(value & (1 << position));
 	regs.set_flag("Z", !bit_value);
-	regs.set_flag("N", 0);
-	regs.set_flag("H", 1);
+	regs.set_flag("N", false);
+	regs.set_flag("H", true);
 }
 
 inline void instruction_bit(const char (&reg_name)[2], const uint8_t position, Registers& regs) {

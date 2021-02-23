@@ -1,0 +1,2 @@
+- Figure out which clang-tidy checks are useful
+- Setup clang-format

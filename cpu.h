@@ -20,7 +20,7 @@ struct DisassemblyInfo {
 	std::vector<uint8_t> memory_representation;
 };
 
-[[nodiscard]] const Instruction find_by_opcode(const uint16_t opcode, const std::vector<Instruction>& instructions);
+[[nodiscard]] Instruction find_by_opcode(const uint16_t opcode, const std::vector<Instruction>& instructions);
 
 
 // Make exceptions asserts and run in debug
@@ -110,7 +110,7 @@ private:
 	// See https://meganesulli.com/generate-gb-opcodes/
 	std::vector<Instruction> instructions_ = get_all_instructions();
 
-	[[nodiscard]] const Instruction find_by_opcode(const uint16_t opcode) const {
+	[[nodiscard]] Instruction find_by_opcode(const uint16_t opcode) const {
 		return ::find_by_opcode(opcode, instructions_);
 	}
 

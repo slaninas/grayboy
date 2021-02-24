@@ -1,2 +1,3 @@
-- Figure out which clang-tidy checks are useful
+- Figure out which clang-tidy checks are useful, current command
+$ run-clang-tidy-11 -header-filter=.* -checks="-*,modernize*,clang-*,performance*,-modernize-avoid-c-arrays" 2>/dev/null
 - Setup clang-format

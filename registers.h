@@ -131,7 +131,7 @@ public:
 		print(std::cout);
 	}
 
-	auto dump() const {
+	[[nodiscard]] auto dump() const {
 		return register_array_;
 	}
 

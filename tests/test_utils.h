@@ -32,11 +32,11 @@ public:
 		registers_{registers}
 	{}
 
-	virtual auto match(const Registers& other) const -> bool override {
+	auto match(const Registers& other) const -> bool override {
 		return other.dump() == registers_.dump();
 	}
 
-	virtual auto describe() const -> std::string override {
+	auto describe() const -> std::string override {
 		std::ostringstream ss;
 		// ss << " is equal to " << vector_;
 		ss << " is equal to \n" << registers_;;

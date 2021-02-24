@@ -98,7 +98,7 @@ public:
 		return memory_.dump();
 	}
 
-	[[nodiscard]] auto& registers() {
+	[[nodiscard]] auto registers() -> auto& {
 		return regs_;
 	}
 

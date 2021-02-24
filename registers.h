@@ -9,7 +9,6 @@
 
 // TODO: Zero registers or do not initialize at all or like original ROM?
 // TODO: Add unit tests for registers
-// TODO: Use assert and run in debug instead of throwing when it makes sense
 class Registers{
 public:
 	static const size_t ArrayElementCount = 12;
@@ -167,7 +166,7 @@ private:
 
 		else if (reg == "PC") return 8;
 		else if (reg == "SP") return 10;
-		else throw std::logic_error(std::string("Register ") + reg_name + " doesn't exist");
+		else assert(false && "Used register doesn't exist.");
 	}
 	bool ime_flag_ = false;
 

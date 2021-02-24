@@ -85,8 +85,7 @@ public:
 			memory_representation.push_back(memory.read(address));
 		}
 
-		const auto result = DisassemblyInfo{starting_address, regs.read("PC"), instruction, memory_representation};
-		return result;
+		return DisassemblyInfo{starting_address, regs.read("PC"), instruction, memory_representation};
 	}
 
 

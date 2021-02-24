@@ -12,7 +12,7 @@ struct WindowSize {
 	int height;
 };
 
-// TODO: Hide CursedWindow inside MainCurse, add method to MainCurse for making CursedWindow 
+// TODO: Hide CursedWindow inside MainCurse, add method to MainCurse for making CursedWindow
 class CursedWindow {
 public:
 	CursedWindow(const WindowPosition& position, const WindowSize& size) {
@@ -24,7 +24,7 @@ public:
 		wrefresh(border_window_);
 	}
 	CursedWindow(const CursedWindow&) = delete;
-	CursedWindow(CursedWindow&& window) {
+	CursedWindow(CursedWindow&& window) noexcept {
 		destroy();
 		std::swap(window_, window.window_);
 	}

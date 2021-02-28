@@ -138,7 +138,7 @@ public:
 		ime_flag_ = value;
 	}
 
-	auto read_IME() {
+	auto read_IME() const {
 		return ime_flag_;
 	}
 
@@ -290,7 +290,7 @@ struct MakeFlags {
 	std::optional<bool> C = {};
 	std::optional<uint8_t> unused = {};
 
-	[[nodiscard]] auto get() {
+	[[nodiscard]] auto get() const {
 		auto value = static_cast<uint8_t>(0x00);
 		value += static_cast<uint8_t>(Z.value_or(0x00)) << 7;
 		value += static_cast<uint8_t>(N.value_or(0x00)) << 6;

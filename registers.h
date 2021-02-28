@@ -195,7 +195,7 @@ struct MakeRegisters{
 	std::optional<uint16_t> PC = {};
 	std::optional<uint16_t> SP = {};
 
-	std::optional<uint16_t> IME = {};
+	std::optional<bool> IME = {};
 
 
 	[[nodiscard]] auto get() const {
@@ -216,7 +216,7 @@ struct MakeRegisters{
 		const auto PC_val = static_cast<uint16_t>(PC.value_or(0x0000));
 		const auto SP_val = static_cast<uint16_t>(SP.value_or(0x0000));
 
-		const auto IME_val = static_cast<uint16_t>(IME.value_or(false));
+		const auto IME_val = IME.value_or(false);
 
 		const auto registers_array = std::array<uint8_t, 12>{F_val, A_val, C_val, B_val, E_val, D_val, L_val, H_val};
 		auto registers = Registers{registers_array};
@@ -252,7 +252,7 @@ struct RegistersChanger{
 	std::optional<uint16_t> PC = {};
 	std::optional<uint16_t> SP = {};
 
-	std::optional<uint16_t> IME = {};
+	std::optional<bool> IME = {};
 
 
 	[[nodiscard]] auto get(const Registers& registers) const {

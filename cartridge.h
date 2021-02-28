@@ -1,6 +1,7 @@
 #pragma once
 
 #include <fstream>
+#include <iostream>
 #include <vector>
 #include <iterator>
 #include <algorithm>
@@ -101,7 +102,7 @@ private:
 		auto line_counter = 1;
 		for(auto i = start; i < end; ++i, line_counter++) {
 			std::cout << std::setw(2) << std::to_integer<int>(buffer_[i]) << ' ';
-			if (line_counter % 16 == 0) std::cout << '\n';
+			if (line_counter % 16 == 0) { std::cout << '\n'; }
 		}
 		std::cout << '\n';
 		std::cout << std::dec;

@@ -59,10 +59,10 @@ public:
 		// TODO: Use static_assert
 		assert((kSize == 2) && "Flags are only one letter (+ \n), you cannot address them by more letters.");
 		const auto flag = std::string_view{flag_name};
-		if (flag == "Z") return static_cast<bool>(read("F") & (1 << 7));
-		else if (flag == "N") return static_cast<bool>(read("F") & (1 << 6));
-		else if (flag == "H") return static_cast<bool>(read("F") & (1 << 5));
-		else if (flag == "C") return static_cast<bool>(read("F") & (1 << 4));
+		if (flag == "Z") { return static_cast<bool>(read("F") & (1 << 7)); }
+		else if (flag == "N") { return static_cast<bool>(read("F") & (1 << 6)); }
+		else if (flag == "H") { return static_cast<bool>(read("F") & (1 << 5)); }
+		else if (flag == "C") { return static_cast<bool>(read("F") & (1 << 4)); }
 
 		assert(false && "You should not be here, it means you called read_flag with incorrect flag name.");
 	}
@@ -77,20 +77,20 @@ public:
 
 		switch (flag) {
 			case 'Z':
-				if (value) write("F", F_value | 1 << 7);
-				else if(F_value & (1 << 7)) write("F", F_value ^ (1 << 7));
+				if (value) { write("F", F_value | 1 << 7); }
+				else if(F_value & (1 << 7)) { write("F", F_value ^ (1 << 7)); }
 				break;
 			case 'N':
-				if (value) write("F", F_value | 1 << 6);
-				else if(F_value & (1 << 6)) write("F", F_value ^ (1 << 6));
+				if (value) { write("F", F_value | 1 << 6); }
+				else if(F_value & (1 << 6)) { write("F", F_value ^ (1 << 6)); }
 				break;
 			case 'H':
-				if (value) write("F", F_value | 1 << 5);
-				else if(F_value & (1 << 5)) write("F", F_value ^ (1 << 5));
+				if (value) { write("F", F_value | 1 << 5); }
+				else if(F_value & (1 << 5)) { write("F", F_value ^ (1 << 5)); }
 				break;
 			case 'C':
-				if (value) write("F", F_value | 1 << 4);
-				else if(F_value & (1 << 4)) write("F", F_value ^ (1 << 4));
+				if (value) { write("F", F_value | 1 << 4); }
+				else if(F_value & (1 << 4)) { write("F", F_value ^ (1 << 4)); }
 				break;
 
 			default:

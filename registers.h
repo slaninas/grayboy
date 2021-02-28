@@ -253,28 +253,28 @@ struct RegistersChanger{
 	std::optional<uint16_t> IME = {};
 
 
-	auto get(const Registers& registers) {
+	auto get(const Registers& registers) const {
 		check_consistency();
 		auto changed_regs = registers;
-		if (AF.has_value()) changed_regs.write("AF", AF.value());
-		if (A.has_value()) changed_regs.write("A", A.value());
-		if (F.has_value()) changed_regs.write("F", F.value());
-		if (BC.has_value()) changed_regs.write("BC", BC.value());
-		if (B.has_value()) changed_regs.write("B", B.value());
-		if (C.has_value()) changed_regs.write("C", C.value());
-		if (DE.has_value()) changed_regs.write("DE", DE.value());
-		if (D.has_value()) changed_regs.write("D", D.value());
-		if (E.has_value()) changed_regs.write("E", E.value());
-		if (HL.has_value()) changed_regs.write("HL", HL.value());
-		if (H.has_value()) changed_regs.write("H", H.value());
-		if (L.has_value()) changed_regs.write("L", L.value());
-		if (PC.has_value()) changed_regs.write("PC", PC.value());
-		if (SP.has_value()) changed_regs.write("SP", SP.value());
-		if (IME.has_value()) changed_regs.set_IME(IME.value());
+		if (AF.has_value()) { changed_regs.write("AF", AF.value()); };
+		if (A.has_value()) { changed_regs.write("A", A.value()); }
+		if (F.has_value()) { changed_regs.write("F", F.value()); }
+		if (BC.has_value()) { changed_regs.write("BC", BC.value()); }
+		if (B.has_value()) { changed_regs.write("B", B.value()); }
+		if (C.has_value()) { changed_regs.write("C", C.value()); }
+		if (DE.has_value()) { changed_regs.write("DE", DE.value()); }
+		if (D.has_value()) { changed_regs.write("D", D.value()); }
+		if (E.has_value()) { changed_regs.write("E", E.value()); }
+		if (HL.has_value()) { changed_regs.write("HL", HL.value()); }
+		if (H.has_value()) { changed_regs.write("H", H.value()); }
+		if (L.has_value()) { changed_regs.write("L", L.value()); }
+		if (PC.has_value()) { changed_regs.write("PC", PC.value()); }
+		if (SP.has_value()) { changed_regs.write("SP", SP.value()); }
+		if (IME.has_value()) { changed_regs.set_IME(IME.value()); }
 		return changed_regs;
 	}
 
-	void check_consistency() {
+	void check_consistency() const {
 		assert(!(AF.has_value() && (A.has_value() || F.has_value())) && "You can't change AF and A (or F) at the same time");
 		assert(!(BC.has_value() && (B.has_value() || C.has_value())) && "You can't change BC and B (or C) at the same time");
 		assert(!(DE.has_value() && (D.has_value() || E.has_value())) && "You can't change DE and D (or E) at the same time");
@@ -308,7 +308,7 @@ struct FlagsChanger {
 	std::optional<bool> C = {};
 	std::optional<uint8_t> unused = {};
 
-	[[nodiscard]] auto get(const uint8_t orig_flags) {
+	[[nodiscard]] auto get(const uint8_t orig_flags) const {
 		const auto Z_val = Z.value_or(static_cast<bool>(orig_flags & (1 << 7)));
 		const auto N_val = N.value_or(static_cast<bool>(orig_flags & (1 << 6)));
 		const auto H_val = H.value_or(static_cast<bool>(orig_flags & (1 << 5)));

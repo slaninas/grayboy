@@ -60,9 +60,9 @@ public:
 		assert((kSize == 2) && "Flags are only one letter (+ \n), you cannot address them by more letters.");
 		const auto flag = std::string_view{flag_name};
 		if (flag == "Z") { return static_cast<bool>(read("F") & (1 << 7)); }
-		else if (flag == "N") { return static_cast<bool>(read("F") & (1 << 6)); }
-		else if (flag == "H") { return static_cast<bool>(read("F") & (1 << 5)); }
-		else if (flag == "C") { return static_cast<bool>(read("F") & (1 << 4)); }
+		if (flag == "N") { return static_cast<bool>(read("F") & (1 << 6)); }
+		if (flag == "H") { return static_cast<bool>(read("F") & (1 << 5)); }
+		if (flag == "C") { return static_cast<bool>(read("F") & (1 << 4)); }
 
 		assert(false && "You should not be here, it means you called read_flag with incorrect flag name.");
 	}
@@ -151,24 +151,25 @@ private:
 		const auto reg= std::string_view{reg_name};
 
 		if (reg == "AF") { return 0; }
-		else if (reg == "F") { return 0; }
-		else if (reg == "A") { return 1; }
+		if (reg == "F") { return 0; }
+		if (reg == "A") { return 1; }
 
-		else if (reg == "BC") { return 2; }
-		else if (reg == "C") { return 2; }
-		else if (reg == "B") { return 3; }
+		if (reg == "BC") { return 2; }
+		if (reg == "C") { return 2; }
+		if (reg == "B") { return 3; }
 
-		else if (reg == "DE") { return 4; }
-		else if (reg == "E") { return 4; }
-		else if (reg == "D") { return 5; }
+		if (reg == "DE") { return 4; }
+		if (reg == "E") { return 4; }
+		if (reg == "D") { return 5; }
 
-		else if (reg == "HL") { return 6; }
-		else if (reg == "L") { return 6; }
-		else if (reg == "H") { return 7; }
+		if (reg == "HL") { return 6; }
+		if (reg == "L") { return 6; }
+		if (reg == "H") { return 7; }
 
-		else if (reg == "PC") { return 8; }
-		else if (reg == "SP") { return 10; }
-		else { assert(false && "Used register doesn't exist."); }
+		if (reg == "PC") { return 8; }
+		if (reg == "SP") { return 10; }
+
+		assert(false && "Used register doesn't exist.");
 	}
 	bool ime_flag_ = false;
 

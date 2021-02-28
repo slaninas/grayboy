@@ -145,7 +145,9 @@ public:
 private:
 	std::array<uint8_t, 12> register_array_ = {};
 
-	auto register_index(const char* reg_name) const -> int {
+
+	// TODO: Make it standalone function
+	static auto register_index(const char* reg_name) -> int {
 		const auto reg= std::string_view{reg_name};
 
 		if (reg == "AF") return 0;

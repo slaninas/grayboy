@@ -1630,7 +1630,7 @@ auto get_8bit_instructions() -> std::vector<Instruction> {
 		},
 		{"JP NZ, a16", 0xc2, 3,
 			[](auto& regs, auto& memory, const auto& PC) {
-				if (regs.read_flag("Z") == false) {
+				if (!regs.read_flag("Z")) {
 					const auto PC_new = static_cast<uint16_t>((memory.read(PC + 2) << 8) + memory.read(PC + 1));
 					regs.write("PC", PC_new - 3);
 					return 4;
@@ -1650,7 +1650,7 @@ auto get_8bit_instructions() -> std::vector<Instruction> {
 		},
 		{"JP NC, a16", 0xd2, 3,
 			[](auto& regs, auto& memory, const auto& PC) {
-				if (regs.read_flag("C") == false) {
+				if (!regs.read_flag("C")) {
 					const auto PC_new = static_cast<uint16_t>((memory.read(PC + 2) << 8) + memory.read(PC + 1));
 					regs.write("PC", PC_new - 3);
 					return 4;
@@ -1687,7 +1687,7 @@ auto get_8bit_instructions() -> std::vector<Instruction> {
 		// TODO: Put call functionality into a method and use it
 		{"CALL NZ, a16", 0xc4, 3,
 			[](auto& regs, auto& memory, const auto& PC) {
-				if (regs.read_flag("Z") == false) {
+				if (!regs.read_flag("Z")) {
 					// TODO: Put into method
 					const auto return_address = PC + 3;
 					const auto return_address_high = static_cast<uint8_t>((return_address & 0xff00) >> 8);
@@ -1729,7 +1729,7 @@ auto get_8bit_instructions() -> std::vector<Instruction> {
 		},
 		{"CALL NC, a16", 0xd4, 3,
 			[](auto& regs, auto& memory, const auto& PC) {
-				if (regs.read_flag("C") == false) {
+				if (!regs.read_flag("C")) {
 					// TODO: Put into method
 					const auto return_address = PC + 3;
 					const auto return_address_high = static_cast<uint8_t>((return_address & 0xff00) >> 8);

@@ -186,9 +186,8 @@ auto main(int argc, const char** argv) -> int {
 	auto disassembled_instructions = disassemble(cpu_copy);
 
 	auto should_break = [] (const auto& break_points, const auto& next_addr) {
-		auto iter = std::find(begin(break_points), end(break_points), next_addr);
-		if (iter != end(break_points)) return true;
-		return false;
+		const auto iter = std::find(begin(break_points), end(break_points), next_addr);
+		return iter != end(break_points);
 	};
 
 	// TODO: Fix: with blargg 06-ld r,r.gb test ROM, 0xc221 is correctly disasembled as LD SP, d16 but 0xc222 and 0xc223 are shown as nop,
@@ -217,8 +216,10 @@ auto main(int argc, const char** argv) -> int {
 		}
 
 		if (!running) {
-			auto c = cursed.get_char();
-			if (c == 'r') running = true;
+			const auto c = cursed.get_char();
+			if (c == 'r') {
+				running = true;
+			}
 		}
 		else {
 			if (should_break(break_points, next_addr)) {

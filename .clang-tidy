@@ -1,11 +1,16 @@
 
+# Comments for unused checks:
+# -modernize-avoid-c-array: TODO: Remove and use string_view instead of const char*?
+# -readability-magic-numbers: It's an emulator, I think it's ok to use them
+
 Checks: >
   -*,
   readability*,
   modernize*,
   clang-*,
   performance*,
-  -modernize-avoid-c-arrays
+  -modernize-avoid-c-arrays,
+  -readability-magic-numbers
 
 WarningsAsErrors: "*"
 

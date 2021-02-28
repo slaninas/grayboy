@@ -1,0 +1,12 @@
+
+Checks: >
+  -*,
+  readability*,
+  modernize*,
+  clang-*,
+  performance*,
+  -modernize-avoid-c-arrays
+
+WarningsAsErrors: "*"
+
+HeaderFilterRegex: ".*"

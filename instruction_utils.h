@@ -312,7 +312,7 @@ void instruction_cp(const char(&dest_name)[kDestSize], const char(&second_reg_na
 
 inline auto rlc(uint8_t old_value) {
 	const auto carry = static_cast<bool>(old_value & (1 << 7));
-	const auto new_value = static_cast<uint8_t>((old_value << 1) + carry);
+	const auto new_value = static_cast<uint8_t>(old_value << 1) + static_cast<uint8_t>(carry);
 	return std::pair{new_value, carry};
 }
 
@@ -335,7 +335,7 @@ inline void instruction_rlc(const char (&reg_name)[2], Registers& regs) {
 }
 
 inline auto rl(uint8_t old_value, const bool carry) {
-	const auto new_value = static_cast<uint8_t>((old_value << 1) + carry);
+	const auto new_value = static_cast<uint8_t>(old_value << 1) + static_cast<uint8_t>(carry);
 	const auto new_carry = static_cast<bool>(old_value & (1 << 7));
 	return std::pair{new_value, new_carry};
 }
@@ -349,7 +349,7 @@ inline void instruction_rl(const char (&reg_name)[2], Registers& regs) {
 
 inline auto rrc(uint8_t old_value) {
 	const auto carry = static_cast<bool>(old_value & 1);
-	const auto new_value = static_cast<uint8_t>((old_value >> 1) + (carry << 7));
+	const auto new_value = static_cast<uint8_t>(old_value >> 1) + static_cast<uint8_t>(static_cast<uint8_t>(carry) << 7);
 	return std::pair{new_value, carry};
 }
 
@@ -361,7 +361,7 @@ inline void instruction_rrc(const char (&reg_name)[2], Registers& regs) {
 }
 
 inline auto rr(uint8_t old_value, const bool carry) {
-	const auto new_value = static_cast<uint8_t>((old_value >> 1) + (carry << 7));
+	const auto new_value = static_cast<uint8_t>(old_value >> 1) + static_cast<uint8_t>(static_cast<uint8_t>(carry) << 7);
 	const auto new_carry = static_cast<bool>(old_value & 1);
 	return std::pair{new_value, new_carry};
 }

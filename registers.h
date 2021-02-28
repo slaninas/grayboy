@@ -196,7 +196,7 @@ struct MakeRegisters{
 	std::optional<uint16_t> IME = {};
 
 
-	auto get() {
+	auto get() const {
 		check_consistency();
 
 		const auto A_val = static_cast<uint8_t>(AF.has_value() ? (AF.value() & 0xFF00) >> 8 : A.value_or(0x00));
@@ -216,15 +216,15 @@ struct MakeRegisters{
 
 		const auto IME_val = static_cast<uint16_t>(IME.value_or(false));
 
-		auto array = std::array<uint8_t, 12>{F_val, A_val, C_val, B_val, E_val, D_val, L_val, H_val};
-		auto registers = Registers{array};
+		const auto registers_array = std::array<uint8_t, 12>{F_val, A_val, C_val, B_val, E_val, D_val, L_val, H_val};
+		auto registers = Registers{registers_array};
 		registers.write("PC", PC_val);
 		registers.write("SP", SP_val);
 		registers.set_IME(IME_val);
 		return registers;
 	}
 
-	void check_consistency() {
+	void check_consistency() const {
 		assert(!(AF.has_value() && (A.has_value() || F.has_value())) && "You can't set AF and A (or F) at the same time");
 		assert(!(BC.has_value() && (B.has_value() || C.has_value())) && "You can't set BC and B (or C) at the same time");
 		assert(!(DE.has_value() && (D.has_value() || E.has_value())) && "You can't set DE and D (or E) at the same time");

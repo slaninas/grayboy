@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <cassert>
 #include <optional>
+#include <string>
 
 // TODO: Zero registers or do not initialize at all or like original ROM?
 // TODO: Add unit tests for registers
@@ -147,27 +148,25 @@ private:
 
 
 	// TODO: Make it standalone function
-	static auto register_index(const char* reg_name) -> int {
-		const auto reg= std::string_view{reg_name};
+	static auto register_index(const std::string_view& reg_name) -> int {
+		if (reg_name == "AF") { return 0; }
+		if (reg_name == "F") { return 0; }
+		if (reg_name == "A") { return 1; }
 
-		if (reg == "AF") { return 0; }
-		if (reg == "F") { return 0; }
-		if (reg == "A") { return 1; }
+		if (reg_name == "BC") { return 2; }
+		if (reg_name == "C") { return 2; }
+		if (reg_name == "B") { return 3; }
 
-		if (reg == "BC") { return 2; }
-		if (reg == "C") { return 2; }
-		if (reg == "B") { return 3; }
+		if (reg_name == "DE") { return 4; }
+		if (reg_name == "E") { return 4; }
+		if (reg_name == "D") { return 5; }
 
-		if (reg == "DE") { return 4; }
-		if (reg == "E") { return 4; }
-		if (reg == "D") { return 5; }
+		if (reg_name == "HL") { return 6; }
+		if (reg_name == "L") { return 6; }
+		if (reg_name == "H") { return 7; }
 
-		if (reg == "HL") { return 6; }
-		if (reg == "L") { return 6; }
-		if (reg == "H") { return 7; }
-
-		if (reg == "PC") { return 8; }
-		if (reg == "SP") { return 10; }
+		if (reg_name == "PC") { return 8; }
+		if (reg_name == "SP") { return 10; }
 
 		assert(false && "Used register doesn't exist.");
 	}

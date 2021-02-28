@@ -309,11 +309,11 @@ struct FlagsChanger {
 	std::optional<uint8_t> unused = {};
 
 	[[nodiscard]] auto get(const uint8_t orig_flags) {
-		auto Z_val = Z.value_or(static_cast<bool>(orig_flags & (1 << 7)));
-		auto N_val = N.value_or(static_cast<bool>(orig_flags & (1 << 6)));
-		auto H_val = H.value_or(static_cast<bool>(orig_flags & (1 << 5)));
-		auto C_val = C.value_or(static_cast<bool>(orig_flags & (1 << 4)));
-		auto unused_val = unused.value_or(static_cast<uint8_t>(orig_flags & 0x0F));
+		const auto Z_val = Z.value_or(static_cast<bool>(orig_flags & (1 << 7)));
+		const auto N_val = N.value_or(static_cast<bool>(orig_flags & (1 << 6)));
+		const auto H_val = H.value_or(static_cast<bool>(orig_flags & (1 << 5)));
+		const auto C_val = C.value_or(static_cast<bool>(orig_flags & (1 << 4)));
+		const auto unused_val = unused.value_or(static_cast<uint8_t>(orig_flags & 0x0F));
 
 		return MakeFlags{.Z=Z_val, .N=N_val, .H=H_val, .C=C_val, .unused=unused_val}.get();
 	}

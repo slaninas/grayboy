@@ -150,25 +150,25 @@ private:
 	static auto register_index(const char* reg_name) -> int {
 		const auto reg= std::string_view{reg_name};
 
-		if (reg == "AF") return 0;
-		else if (reg == "F") return 0;
-		else if (reg == "A") return 1;
+		if (reg == "AF") { return 0; }
+		else if (reg == "F") { return 0; }
+		else if (reg == "A") { return 1; }
 
-		else if (reg == "BC") return 2;
-		else if (reg == "C") return 2;
-		else if (reg == "B") return 3;
+		else if (reg == "BC") { return 2; }
+		else if (reg == "C") { return 2; }
+		else if (reg == "B") { return 3; }
 
-		else if (reg == "DE") return 4;
-		else if (reg == "E") return 4;
-		else if (reg == "D") return 5;
+		else if (reg == "DE") { return 4; }
+		else if (reg == "E") { return 4; }
+		else if (reg == "D") { return 5; }
 
-		else if (reg == "HL") return 6;
-		else if (reg == "L") return 6;
-		else if (reg == "H") return 7;
+		else if (reg == "HL") { return 6; }
+		else if (reg == "L") { return 6; }
+		else if (reg == "H") { return 7; }
 
-		else if (reg == "PC") return 8;
-		else if (reg == "SP") return 10;
-		else assert(false && "Used register doesn't exist.");
+		else if (reg == "PC") { return 8; }
+		else if (reg == "SP") { return 10; }
+		else { assert(false && "Used register doesn't exist."); }
 	}
 	bool ime_flag_ = false;
 

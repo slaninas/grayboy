@@ -138,7 +138,7 @@ public:
 		ime_flag_ = value;
 	}
 
-	auto read_IME() const {
+	[[nodiscard]] auto read_IME() const {
 		return ime_flag_;
 	}
 
@@ -196,7 +196,7 @@ struct MakeRegisters{
 	std::optional<uint16_t> IME = {};
 
 
-	auto get() const {
+	[[nodiscard]] auto get() const {
 		check_consistency();
 
 		const auto A_val = static_cast<uint8_t>(AF.has_value() ? (AF.value() & 0xFF00) >> 8 : A.value_or(0x00));
@@ -253,7 +253,7 @@ struct RegistersChanger{
 	std::optional<uint16_t> IME = {};
 
 
-	auto get(const Registers& registers) const {
+	[[nodiscard]] auto get(const Registers& registers) const {
 		check_consistency();
 		auto changed_regs = registers;
 		if (AF.has_value()) { changed_regs.write("AF", AF.value()); };

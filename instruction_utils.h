@@ -138,7 +138,7 @@ void instruction_add(const char(&dest_name)[kDestSize], const char(&second_reg_n
 	}
 }
 
-// TODO: Unit unit test for this
+// TODO: Add unit test for this
 template<size_t kDestSize, typename ValueType>
 void instruction_addc(const char(&dest_name)[kDestSize], const ValueType& value, Registers& regs) {
 	constexpr auto real_size = kDestSize - 1;
@@ -167,7 +167,7 @@ void instruction_addc(const char(&dest_name)[kDestSize], const char(&second_reg_
 	instruction_addc(dest_name, regs.read(second_reg_name), regs);
 }
 
-// TODO: Unit unit test for this
+// TODO: Add unit test for this
 template<size_t kDestSize, typename ValueType>
 void instruction_sub(const char(&dest_name)[kDestSize], const ValueType& value, Registers& regs) {
 	constexpr auto real_size = kDestSize - 1;
@@ -184,13 +184,13 @@ void instruction_sub(const char(&dest_name)[kDestSize], const ValueType& value, 
 	regs.set_flag("C", carry_sub_8bit(dest_old, value));
 }
 
-// TODO: Unit unit test for this
+// TODO: Add unit test for this
 template<size_t kDestSize, size_t kSecondRegNameSize>
 void instruction_sub(const char(&dest_name)[kDestSize], const char(&second_reg_name)[kSecondRegNameSize], Registers& regs) {
 	instruction_sub(dest_name, regs.read(second_reg_name), regs);
 }
 
-// TODO: Unit unit test for this
+// TODO: Add unit test for this
 template<size_t kDestSize, typename ValueType>
 void instruction_subc(const char(&dest_name)[kDestSize], const ValueType& value, Registers& regs) {
 	constexpr auto real_size = kDestSize - 1;
@@ -215,7 +215,7 @@ void instruction_subc(const char(&dest_name)[kDestSize], const ValueType& value,
 	regs.set_flag("C", carry);
 }
 
-// TODO: Unit unit test for this
+// TODO: Add unit test for this
 template<size_t kDestSize, size_t kSecondRegNameSize>
 void instruction_subc(const char(&dest_name)[kDestSize], const char(&second_reg_name)[kSecondRegNameSize], Registers& regs) {
 	instruction_subc(dest_name, regs.read(second_reg_name), regs);

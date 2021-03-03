@@ -100,7 +100,7 @@ auto disassemble(Cpu& cpu) {
 			return a.address < b.address;
 		}
 	);
-	auto new_end = std::unique(begin(disassembled), end(disassembled), [] (const auto& a, const auto&b) { return a.address == b.address; } );
+	const auto new_end = std::unique(begin(disassembled), end(disassembled), [] (const auto& a, const auto&b) { return a.address == b.address; } );
 
 	disassembled.erase(new_end, end(disassembled));
 	return disassembled;

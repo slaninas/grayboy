@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 add_library(test_main test_main.cc)
-include_directories("..")
+include_directories("../src/")
 
 add_executable(registers_tests  registers_tests.cc)
 target_link_libraries(registers_tests test_main)

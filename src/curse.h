@@ -69,6 +69,7 @@ public:
 	{
 		initscr();
 		cbreak();
+		noecho(); // Do not print pressed keys
 		// TODO: raw(); ?
 	}
 

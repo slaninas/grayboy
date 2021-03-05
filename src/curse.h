@@ -41,7 +41,7 @@ public:
 		box(border_window_, 0, 0);
 		wrefresh(border_window_);
 
-		werase(window_);
+		wclear(window_);
 		wprintw(window_, content.c_str());
 		wrefresh(window_);
 	}

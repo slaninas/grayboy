@@ -1,16 +1,16 @@
 #pragma once
 
-#include <iostream>
-#include <sstream>
-#include <iomanip>
-#include <stdexcept>
 #include <cassert>
+#include <iomanip>
+#include <iostream>
 #include <optional>
+#include <sstream>
+#include <stdexcept>
 #include <string>
 
 // TODO: Zero registers or do not initialize at all or like original ROM?
 // TODO: Add unit tests for registers
-class Registers{
+class Registers {
 public:
 	static const size_t ArrayElementCount = 12;
 	using ArrayType = std::array<uint8_t, ArrayElementCount>;
@@ -24,13 +24,14 @@ public:
 	}
 
 	template<size_t kSize>
-	[[nodiscard]] auto read(const char(&reg_name)[kSize]) const {
+	[[nodiscard]] auto read(const char (&reg_name)[kSize]) const {
 		constexpr auto reg_name_size = kSize - 1; // Subtract \0 at the end
 		const auto reg_index = register_index(reg_name);
 
 		// 8bit registers
-		if constexpr(reg_name_size == 1) {
-			return register_array_[reg_index];;
+		if constexpr (reg_name_size == 1) {
+			return register_array_[reg_index];
+			;
 		}
 		// Combined 16bit registers
 		else {
@@ -38,15 +39,16 @@ public:
 		}
 	}
 
-
 	template<size_t kSize>
-	void write(const char(&reg_name)[kSize], uint16_t value) {
+	void write(const char (&reg_name)[kSize], uint16_t value) {
 		constexpr auto reg_name_size = kSize - 1; // Subtract \0 at the end
 		const auto reg_index = register_index(reg_name);
 
 		// 8bit registers
-		if constexpr(reg_name_size == 1) {
-			assert(((value & static_cast<uint16_t>(0xff00)) == 0) && "Writing 16bit value into 8bit register is not allowed.");
+		if constexpr (reg_name_size == 1) {
+			assert(
+			  ((value & static_cast<uint16_t>(0xff00)) == 0) &&
+			  "Writing 16bit value into 8bit register is not allowed.");
 			register_array_[reg_index] = value;
 		}
 		// Combined 16bit registers
@@ -56,7 +58,7 @@ public:
 	}
 
 	template<size_t kSize>
-	[[nodiscard]] auto read_flag(const char(&flag_name)[kSize]) const {
+	[[nodiscard]] auto read_flag(const char (&flag_name)[kSize]) const {
 		// TODO: Use static_assert
 		assert((kSize == 2) && "Flags are only one letter (+ \n), you cannot address them by more letters.");
 		const auto flag = std::string_view{flag_name};
@@ -70,7 +72,7 @@ public:
 
 	// TODO: Use set + reset flag methods instead?
 	template<size_t kSize>
-	void set_flag(const char(&flag_name)[kSize], const bool value) {
+	void set_flag(const char (&flag_name)[kSize], const bool value) {
 		// TODO: Use static_assert
 		assert((kSize == 2) && "Flags are only one letter (+ \n), you cannot address them by more letters.");
 		const char flag = flag_name[0];
@@ -79,19 +81,27 @@ public:
 		switch (flag) {
 			case 'Z':
 				if (value) { write("F", F_value | 1 << 7); }
-				else if(F_value & (1 << 7)) { write("F", F_value ^ (1 << 7)); }
+				else if (F_value & (1 << 7)) {
+					write("F", F_value ^ (1 << 7));
+				}
 				break;
 			case 'N':
 				if (value) { write("F", F_value | 1 << 6); }
-				else if(F_value & (1 << 6)) { write("F", F_value ^ (1 << 6)); }
+				else if (F_value & (1 << 6)) {
+					write("F", F_value ^ (1 << 6));
+				}
 				break;
 			case 'H':
 				if (value) { write("F", F_value | 1 << 5); }
-				else if(F_value & (1 << 5)) { write("F", F_value ^ (1 << 5)); }
+				else if (F_value & (1 << 5)) {
+					write("F", F_value ^ (1 << 5));
+				}
 				break;
 			case 'C':
 				if (value) { write("F", F_value | 1 << 4); }
-				else if(F_value & (1 << 4)) { write("F", F_value ^ (1 << 4)); }
+				else if (F_value & (1 << 4)) {
+					write("F", F_value ^ (1 << 4));
+				}
 				break;
 
 			default:
@@ -122,7 +132,8 @@ public:
 		result << "PC: " << std::setw(4) << std::setfill('0') << static_cast<int>(read("PC")) << '\n';
 
 		result << std::string(15, '-') << '\n';
-		result << "Z=" << read_flag("Z") << " N=" << read_flag("N") << " H=" << read_flag("H") << " C=" << read_flag("C") << '\n';
+		result << "Z=" << read_flag("Z") << " N=" << read_flag("N") << " H=" << read_flag("H")
+		       << " C=" << read_flag("C") << '\n';
 
 		os << result.str();
 	}
@@ -145,7 +156,6 @@ public:
 
 private:
 	std::array<uint8_t, 12> register_array_ = {};
-
 
 	// TODO: Make it standalone function
 	static auto register_index(const std::string_view& reg_name) -> int {
@@ -171,7 +181,6 @@ private:
 		assert(false && "Used register doesn't exist.");
 	}
 	bool ime_flag_ = false;
-
 };
 
 inline auto operator<<(std::ostream& os, const Registers& registers) -> std::ostream& {
@@ -179,7 +188,7 @@ inline auto operator<<(std::ostream& os, const Registers& registers) -> std::ost
 	return os;
 }
 
-struct MakeRegisters{
+struct MakeRegisters {
 	std::optional<uint16_t> AF = {};
 	std::optional<uint8_t> A = {};
 	std::optional<uint8_t> F = {};
@@ -196,7 +205,6 @@ struct MakeRegisters{
 	std::optional<uint16_t> SP = {};
 
 	std::optional<bool> IME = {};
-
 
 	[[nodiscard]] auto get() const {
 		check_consistency();
@@ -227,16 +235,19 @@ struct MakeRegisters{
 	}
 
 	void check_consistency() const {
-		assert(!(AF.has_value() && (A.has_value() || F.has_value())) && "You can't set AF and A (or F) at the same time");
-		assert(!(BC.has_value() && (B.has_value() || C.has_value())) && "You can't set BC and B (or C) at the same time");
-		assert(!(DE.has_value() && (D.has_value() || E.has_value())) && "You can't set DE and D (or E) at the same time");
-		assert(!(HL.has_value() && (H.has_value() || L.has_value())) && "You can't set HL and H (or L) at the same time");
+		assert(
+		  !(AF.has_value() && (A.has_value() || F.has_value())) && "You can't set AF and A (or F) at the same time");
+		assert(
+		  !(BC.has_value() && (B.has_value() || C.has_value())) && "You can't set BC and B (or C) at the same time");
+		assert(
+		  !(DE.has_value() && (D.has_value() || E.has_value())) && "You can't set DE and D (or E) at the same time");
+		assert(
+		  !(HL.has_value() && (H.has_value() || L.has_value())) && "You can't set HL and H (or L) at the same time");
 	}
-
 };
 
 // TODO: Merge from MakeRegisters or inherit?
-struct RegistersChanger{
+struct RegistersChanger {
 	std::optional<uint16_t> AF = {};
 	std::optional<uint8_t> A = {};
 	std::optional<uint8_t> F = {};
@@ -253,7 +264,6 @@ struct RegistersChanger{
 	std::optional<uint16_t> SP = {};
 
 	std::optional<bool> IME = {};
-
 
 	[[nodiscard]] auto get(const Registers& registers) const {
 		check_consistency();
@@ -277,12 +287,15 @@ struct RegistersChanger{
 	}
 
 	void check_consistency() const {
-		assert(!(AF.has_value() && (A.has_value() || F.has_value())) && "You can't change AF and A (or F) at the same time");
-		assert(!(BC.has_value() && (B.has_value() || C.has_value())) && "You can't change BC and B (or C) at the same time");
-		assert(!(DE.has_value() && (D.has_value() || E.has_value())) && "You can't change DE and D (or E) at the same time");
-		assert(!(HL.has_value() && (H.has_value() || L.has_value())) && "You can't change HL and H (or L) at the same time");
+		assert(
+		  !(AF.has_value() && (A.has_value() || F.has_value())) && "You can't change AF and A (or F) at the same time");
+		assert(
+		  !(BC.has_value() && (B.has_value() || C.has_value())) && "You can't change BC and B (or C) at the same time");
+		assert(
+		  !(DE.has_value() && (D.has_value() || E.has_value())) && "You can't change DE and D (or E) at the same time");
+		assert(
+		  !(HL.has_value() && (H.has_value() || L.has_value())) && "You can't change HL and H (or L) at the same time");
 	}
-
 };
 
 struct MakeFlags {
@@ -317,6 +330,6 @@ struct FlagsChanger {
 		const auto C_val = C.value_or(static_cast<bool>(orig_flags & (1 << 4)));
 		const auto unused_val = unused.value_or(static_cast<uint8_t>(orig_flags & 0x0F));
 
-		return MakeFlags{.Z=Z_val, .N=N_val, .H=H_val, .C=C_val, .unused=unused_val}.get();
+		return MakeFlags{.Z = Z_val, .N = N_val, .H = H_val, .C = C_val, .unused = unused_val}.get();
 	}
 };

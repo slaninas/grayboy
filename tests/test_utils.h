@@ -2,8 +2,8 @@
 
 #include "catch2/catch.hpp"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 // TODO: Add script that runs all tests given number of times with different --rng-seed
 
@@ -14,12 +14,9 @@
 template<typename T>
 void p(const T& cont, const size_t num_elements) {
 	std::cout << std::hex;
-	for (size_t i = 0; i < std::min(cont.size(), num_elements); ++i) {
-		std::cout << (int)cont[i] << '\n';
-	}
+	for (size_t i = 0; i < std::min(cont.size(), num_elements); ++i) { std::cout << (int)cont[i] << '\n'; }
 	std::cout << std::dec;
 }
-
 
 template<typename T>
 void p(const T& cont) {
@@ -28,9 +25,7 @@ void p(const T& cont) {
 
 class RegistersCompare : public Catch::MatcherBase<Registers> {
 public:
-	RegistersCompare(const Registers& registers) :
-		registers_{registers}
-	{}
+	RegistersCompare(const Registers& registers) : registers_{registers} {}
 
 	auto match(const Registers& other) const -> bool override {
 		return other.dump() == registers_.dump();
@@ -39,7 +34,8 @@ public:
 	auto describe() const -> std::string override {
 		std::ostringstream ss;
 		// ss << " is equal to " << vector_;
-		ss << " is equal to \n" << registers_;;
+		ss << " is equal to \n" << registers_;
+		;
 		return ss.str();
 		// TODO: implmente
 	}
@@ -51,9 +47,7 @@ private:
 template<size_t kSize>
 auto getRandomArray() {
 	auto array = std::array<uint8_t, kSize>{};
-	for (size_t i = 0; i < kSize; ++i) {
-		array[i] = std::rand();
-	};
+	for (size_t i = 0; i < kSize; ++i) { array[i] = std::rand(); };
 	return array;
 }
 

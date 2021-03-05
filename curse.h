@@ -53,13 +53,12 @@ public:
 	}
 
 private:
-	WINDOW * window_ = nullptr;
-	WINDOW * border_window_ = nullptr;
+	WINDOW* window_ = nullptr;
+	WINDOW* border_window_ = nullptr;
 };
 
 class MainCurse {
 public:
-
 	MainCurse() {
 		initscr();
 		cbreak();
@@ -91,5 +90,4 @@ public:
 
 private:
 	// std::vector<CursedWindow> windows_;
-
 };

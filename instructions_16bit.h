@@ -5,4 +5,3 @@
 #include <vector>
 
 auto get_16bit_instructions() -> std::vector<Instruction>;
-

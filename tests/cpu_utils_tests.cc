@@ -1,5 +1,4 @@
 #include "catch2/catch.hpp"
-
 #include "cpu.h"
 
 TEST_CASE("Half-carry Addition 8bit", "[cpu_utils]") {

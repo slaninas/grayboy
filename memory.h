@@ -20,11 +20,9 @@ public:
 		array_[address] = value;
 	}
 
-
 	[[nodiscard]] auto dump() const {
 		return array_;
 	}
-
 
 private:
 	ArrayType array_ = {};
@@ -35,9 +33,7 @@ struct MakeMemory {
 
 	auto get() {
 		auto array = Memory::ArrayType{};
-		for (const auto& [address, value] : changes) {
-			array[address] = value;
-		}
+		for (const auto& [address, value] : changes) { array[address] = value; }
 		return Memory{array};
 	}
 };
@@ -48,10 +44,7 @@ struct MemoryChanger {
 	auto get(const Memory& orig_memory) {
 		auto array = orig_memory.dump();
 
-		for (const auto& [address, value] : changes) {
-			array[address] = value;
-		}
+		for (const auto& [address, value] : changes) { array[address] = value; }
 		return Memory{array};
 	}
 };
-

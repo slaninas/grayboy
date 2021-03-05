@@ -1,17 +1,15 @@
 #pragma once
 
-#include <vector>
+#include "instruction_utils.h"
+#include "instructions.h"
+#include "memory.h"
+#include "registers.h"
+
+#include <cassert>
 #include <iostream>
 #include <sstream>
-#include <cassert>
 #include <type_traits>
-
-#include "registers.h"
-#include "memory.h"
-
-#include "instructions.h"
-#include "instruction_utils.h"
-
+#include <vector>
 
 struct DisassemblyInfo {
 	uint16_t address;
@@ -22,7 +20,6 @@ struct DisassemblyInfo {
 
 [[nodiscard]] auto find_by_opcode(const uint16_t opcode, const std::vector<Instruction>& instructions) -> Instruction;
 
-
 // Make exceptions asserts and run in debug
 // TODO: Add unit tests
 class Cpu {
@@ -32,14 +29,8 @@ public:
 	Cpu() = default;
 
 	// TODO: Make move possible?
-	Cpu(const MemoryType& memory) :
-		memory_{memory}
-	{}
-	Cpu(const MemoryType& memory, const Registers& regs) :
-		memory_{memory},
-		regs_{regs}
-	{}
-
+	Cpu(const MemoryType& memory) : memory_{memory} {}
+	Cpu(const MemoryType& memory, const Registers& regs) : memory_{memory}, regs_{regs} {}
 
 	void clear_registers() {
 		regs_.clear();
@@ -54,7 +45,6 @@ public:
 		return first_byte;
 	}
 
-
 	[[nodiscard]] auto execute_next() {
 		const auto PC = regs_.read("PC");
 		const auto opcode = get_opcode(PC);
@@ -64,9 +54,9 @@ public:
 		std::cout << "executing 0x" << instruction.mnemonic << '\n';
 		// TODO: Unit test are not prepared for this, if getRandomMemory() set 0xff02 to 0x81, it may fail. Make getRandomMemory() to set 0xff02 not to 0x81?
 		// if (memory_.read(0xff02) == 0x81) {
-			// auto c = static_cast<char>(memory_.read(0xff01));
-			// std::cout << c;
-			// memory_.write(0xff02, 0x00);
+		// auto c = static_cast<char>(memory_.read(0xff01));
+		// std::cout << c;
+		// memory_.write(0xff02, 0x00);
 		// }
 		return cycles;
 	}
@@ -88,7 +78,6 @@ public:
 		return DisassemblyInfo{starting_address, regs.read("PC"), instruction, memory_representation};
 	}
 
-
 	[[nodiscard]] auto registers_dump() const {
 		return regs_;
 	}
@@ -101,7 +90,6 @@ public:
 		return regs_;
 	}
 
-
 private:
 	MemoryType memory_ = {};
 	Registers regs_ = {};
@@ -112,5 +100,4 @@ private:
 	[[nodiscard]] auto find_by_opcode(const uint16_t opcode) const -> Instruction {
 		return ::find_by_opcode(opcode, instructions_);
 	}
-
 };

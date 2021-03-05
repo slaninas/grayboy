@@ -1,7 +1,5 @@
 #include "catch2/catch.hpp"
-
 #include "memory.h"
-
 #include "test_utils.h"
 
 TEST_CASE("Initialization", "[memory]") {

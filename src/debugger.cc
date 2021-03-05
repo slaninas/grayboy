@@ -10,7 +10,8 @@
 
 // TODO: Check why "06-ld r,r.gb" blarggs test ROM crash on different instruction when running "gameboy" vs "debugger" executable
 
-void dprint(const DisassemblyInfo& info, std::ostream& os) {
+void dprint(const DisassemblyInfo& info, std::ostream& os)
+{
 	os << std::hex;
 	os << "0x" << std::setw(4) << std::setfill('0') << info.address << ": " << info.instruction.mnemonic << " | ";
 	for (const auto& val : info.memory_representation) { os << (int)val << ' '; }
@@ -18,17 +19,20 @@ void dprint(const DisassemblyInfo& info, std::ostream& os) {
 	os << std::dec;
 }
 
-void dprint(const DisassemblyInfo& info) {
+void dprint(const DisassemblyInfo& info)
+{
 	dprint(info, std::cout);
 }
 
 template<typename T>
-void p(const T& cont) {
+void p(const T& cont)
+{
 	for (const auto el : cont) { dprint(el); }
 }
 
 template<typename T>
-void print_memory(const T& mem) {
+void print_memory(const T& mem)
+{
 	std::cout << std::hex;
 	for (size_t i = 0; i < mem.size(); ++i) {
 		const auto& value = mem[i];
@@ -43,7 +47,8 @@ struct MemoryDiff {
 	uint8_t new_value;
 };
 
-auto operator<<(std::ostream& os, const MemoryDiff& diff) -> std::ostream& {
+auto operator<<(std::ostream& os, const MemoryDiff& diff) -> std::ostream&
+{
 	os << std::hex;
 	os << "[0x" << static_cast<int>(diff.address) << "] 0x" << static_cast<int>(diff.orig_value) << " vs 0x"
 	   << static_cast<int>(diff.new_value);
@@ -51,14 +56,16 @@ auto operator<<(std::ostream& os, const MemoryDiff& diff) -> std::ostream& {
 	return os;
 }
 
-auto operator<<(std::ostream& os, const std::vector<MemoryDiff>& diff) -> std::ostream& {
+auto operator<<(std::ostream& os, const std::vector<MemoryDiff>& diff) -> std::ostream&
+{
 	os << "Diff between two memories:\n";
 	for (const auto& element : diff) { os << '\t' << element << '\n'; }
 	return os;
 }
 
 template<typename Memory>
-auto memory_diff(const Memory& orig_memory, const Memory& new_memory) {
+auto memory_diff(const Memory& orig_memory, const Memory& new_memory)
+{
 	auto result = std::vector<MemoryDiff>{};
 
 	for (auto address = static_cast<size_t>(0); address < Memory::ArrayElements; ++address) {
@@ -69,7 +76,8 @@ auto memory_diff(const Memory& orig_memory, const Memory& new_memory) {
 	return result;
 }
 
-auto disassemble(Cpu& cpu) {
+auto disassemble(Cpu& cpu)
+{
 	auto addr = static_cast<uint16_t>(cpu.registers().read("PC"));
 
 	// TODO: Use something better than vector
@@ -93,7 +101,8 @@ auto disassemble(Cpu& cpu) {
 
 void update_instructions(
   const std::vector<DisassemblyInfo>& new_instructions,
-  std::vector<DisassemblyInfo>& instructions) {
+  std::vector<DisassemblyInfo>& instructions)
+{
 	std::copy(
 	  begin(new_instructions),
 	  end(new_instructions),
@@ -111,7 +120,8 @@ auto get_from_to(
   const std::vector<DisassemblyInfo>& infos,
   const uint16_t& neighbors,
   const uint16_t& next_addr,
-  std::ostream& os) {
+  std::ostream& os)
+{
 	auto next_addr_element =
 	  std::find_if(begin(infos), end(infos), [next_addr](const auto& info) { return info.address == next_addr; });
 	assert((next_addr_element != end(infos)) && "Well, well, it's broken. next_addr should already be in infos.");
@@ -128,7 +138,8 @@ auto get_from_to(
 	}
 }
 
-auto main(int argc, const char** argv) -> int {
+auto main(int argc, const char** argv) -> int
+{
 	// const auto memory = MakeMemory{{{0x1234, 0x55}, {0x534, 0x21}, {0x0894, 0xab}}}.get();
 	// const auto memory2 = MemoryChanger{{{0x1234, 0x56}, {0x5432, 0xfe}}}.get(memory);
 	// print_memory(memory.dump());

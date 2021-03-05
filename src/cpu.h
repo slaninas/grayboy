@@ -32,11 +32,13 @@ public:
 	Cpu(const MemoryType& memory) : memory_{memory} {}
 	Cpu(const MemoryType& memory, const Registers& regs) : memory_{memory}, regs_{regs} {}
 
-	void clear_registers() {
+	void clear_registers()
+	{
 		regs_.clear();
 	}
 
-	[[nodiscard]] auto get_opcode(const uint16_t& starting_address) const {
+	[[nodiscard]] auto get_opcode(const uint16_t& starting_address) const
+	{
 		const auto first_byte = static_cast<uint16_t>(memory_.read(starting_address));
 		if (first_byte == 0xcb) {
 			const auto second_byte = memory_.read(starting_address + 1);
@@ -45,7 +47,8 @@ public:
 		return first_byte;
 	}
 
-	[[nodiscard]] auto execute_next() {
+	[[nodiscard]] auto execute_next()
+	{
 		const auto PC = regs_.read("PC");
 		const auto opcode = get_opcode(PC);
 
@@ -61,7 +64,8 @@ public:
 		return cycles;
 	}
 
-	[[nodiscard]] auto disassemble_next(const uint16_t& starting_address) const {
+	[[nodiscard]] auto disassemble_next(const uint16_t& starting_address) const
+	{
 		auto regs = regs_;
 		auto memory = memory_;
 		regs.write("PC", starting_address);
@@ -78,15 +82,18 @@ public:
 		return DisassemblyInfo{starting_address, regs.read("PC"), instruction, memory_representation};
 	}
 
-	[[nodiscard]] auto registers_dump() const {
+	[[nodiscard]] auto registers_dump() const
+	{
 		return regs_;
 	}
 
-	[[nodiscard]] auto memory_dump() const {
+	[[nodiscard]] auto memory_dump() const
+	{
 		return memory_.dump();
 	}
 
-	[[nodiscard]] auto registers() -> auto& {
+	[[nodiscard]] auto registers() -> auto&
+	{
 		return regs_;
 	}
 
@@ -97,7 +104,8 @@ private:
 	// See https://meganesulli.com/generate-gb-opcodes/
 	std::vector<Instruction> instructions_ = get_all_instructions();
 
-	[[nodiscard]] auto find_by_opcode(const uint16_t opcode) const -> Instruction {
+	[[nodiscard]] auto find_by_opcode(const uint16_t opcode) const -> Instruction
+	{
 		return ::find_by_opcode(opcode, instructions_);
 	}
 };

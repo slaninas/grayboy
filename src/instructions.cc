@@ -3,7 +3,8 @@
 #include "instructions_16bit.h"
 #include "instructions_8bit.h"
 
-auto get_all_instructions() -> std::vector<Instruction> {
+auto get_all_instructions() -> std::vector<Instruction>
+{
 	auto instructions_8bit = get_8bit_instructions();
 	const auto instructions_16bit = get_16bit_instructions();
 
@@ -12,7 +13,8 @@ auto get_all_instructions() -> std::vector<Instruction> {
 	return instructions_8bit;
 }
 
-void check_implemented() {
+void check_implemented()
+{
 	std::cout << std::hex;
 	const auto omitted_8bit_opcodes =
 	  std::vector<uint8_t>{0xcb, 0xd3, 0xdb, 0xdd, 0xe3, 0xe4, 0xeb, 0xec, 0xed, 0xf4, 0xfc, 0xfd};

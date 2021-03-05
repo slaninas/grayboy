@@ -2,7 +2,8 @@
 
 #include <optional>
 
-[[nodiscard]] auto find_by_opcode(const uint16_t opcode, const std::vector<Instruction>& instructions) -> Instruction {
+[[nodiscard]] auto find_by_opcode(const uint16_t opcode, const std::vector<Instruction>& instructions) -> Instruction
+{
 	auto res = std::find_if(begin(instructions), end(instructions), [opcode](const auto& instruction) {
 		return instruction.opcode == opcode;
 	});

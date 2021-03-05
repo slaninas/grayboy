@@ -1,7 +1,8 @@
 #include "catch2/catch.hpp"
 #include "cpu.h"
 
-TEST_CASE("Half-carry Addition 8bit", "[cpu_utils]") {
+TEST_CASE("Half-carry Addition 8bit", "[cpu_utils]")
+{
 	auto result = half_carry_add_8bit(0x00, 0x00);
 	CHECK(result == false);
 
@@ -21,7 +22,8 @@ TEST_CASE("Half-carry Addition 8bit", "[cpu_utils]") {
 	CHECK(result == true);
 }
 
-TEST_CASE("Half-carry Addition 16bit", "[cpu_utils]") {
+TEST_CASE("Half-carry Addition 16bit", "[cpu_utils]")
+{
 	auto result = half_carry_add_16bit(0x0000, 0x0000);
 	CHECK(result == false);
 
@@ -41,7 +43,8 @@ TEST_CASE("Half-carry Addition 16bit", "[cpu_utils]") {
 	CHECK(result == true);
 }
 
-TEST_CASE("Carry Addition 8bit", "[cpu_utils]") {
+TEST_CASE("Carry Addition 8bit", "[cpu_utils]")
+{
 	auto result = carry_add_8bit(0x00, 0x00);
 	CHECK(result == false);
 
@@ -61,7 +64,8 @@ TEST_CASE("Carry Addition 8bit", "[cpu_utils]") {
 	CHECK(result == true);
 }
 
-TEST_CASE("Carry Addition 16bit", "[cpu_utils]") {
+TEST_CASE("Carry Addition 16bit", "[cpu_utils]")
+{
 	auto result = carry_add_16bit(0x00, 0x00);
 	CHECK(result == false);
 
@@ -81,7 +85,8 @@ TEST_CASE("Carry Addition 16bit", "[cpu_utils]") {
 	CHECK(result == true);
 }
 
-TEST_CASE("Half-carry Subtract 8bit", "[cpu_utils]") {
+TEST_CASE("Half-carry Subtract 8bit", "[cpu_utils]")
+{
 	auto result = half_carry_sub_8bit(0x00, 0x00);
 	CHECK(result == false);
 
@@ -95,7 +100,8 @@ TEST_CASE("Half-carry Subtract 8bit", "[cpu_utils]") {
 	CHECK(result == true);
 }
 
-TEST_CASE("Half-carry Subtract 16bit", "[cpu_utils]") {
+TEST_CASE("Half-carry Subtract 16bit", "[cpu_utils]")
+{
 	auto result = half_carry_sub_16bit(0x0000, 0x0000);
 	CHECK(result == false);
 
@@ -109,7 +115,8 @@ TEST_CASE("Half-carry Subtract 16bit", "[cpu_utils]") {
 	CHECK(result == true);
 }
 
-TEST_CASE("Carry Subtract 8bit", "[cpu_utils]") {
+TEST_CASE("Carry Subtract 8bit", "[cpu_utils]")
+{
 	auto result = carry_sub_8bit(0x00, 0x00);
 	CHECK(result == false);
 
@@ -123,7 +130,8 @@ TEST_CASE("Carry Subtract 8bit", "[cpu_utils]") {
 	CHECK(result == true);
 }
 
-TEST_CASE("Carry Subtract 16bit", "[cpu_utils]") {
+TEST_CASE("Carry Subtract 16bit", "[cpu_utils]")
+{
 	auto result = carry_sub_16bit(0x0000, 0x0000);
 	CHECK(result == false);
 

@@ -19,12 +19,14 @@ public:
 	// TODO: Remove this constructor, use MakeRegisters only
 	Registers(const ArrayType& regs_array) : register_array_{regs_array} {}
 
-	void clear() {
+	void clear()
+	{
 		std::fill(begin(register_array_), end(register_array_), 0x0);
 	}
 
 	template<size_t kSize>
-	[[nodiscard]] auto read(const char (&reg_name)[kSize]) const {
+	[[nodiscard]] auto read(const char (&reg_name)[kSize]) const
+	{
 		constexpr auto reg_name_size = kSize - 1; // Subtract \0 at the end
 		const auto reg_index = register_index(reg_name);
 
@@ -40,7 +42,8 @@ public:
 	}
 
 	template<size_t kSize>
-	void write(const char (&reg_name)[kSize], uint16_t value) {
+	void write(const char (&reg_name)[kSize], uint16_t value)
+	{
 		constexpr auto reg_name_size = kSize - 1; // Subtract \0 at the end
 		const auto reg_index = register_index(reg_name);
 
@@ -58,7 +61,8 @@ public:
 	}
 
 	template<size_t kSize>
-	[[nodiscard]] auto read_flag(const char (&flag_name)[kSize]) const {
+	[[nodiscard]] auto read_flag(const char (&flag_name)[kSize]) const
+	{
 		// TODO: Use static_assert
 		assert((kSize == 2) && "Flags are only one letter (+ \n), you cannot address them by more letters.");
 		const auto flag = std::string_view{flag_name};
@@ -72,7 +76,8 @@ public:
 
 	// TODO: Use set + reset flag methods instead?
 	template<size_t kSize>
-	void set_flag(const char (&flag_name)[kSize], const bool value) {
+	void set_flag(const char (&flag_name)[kSize], const bool value)
+	{
 		// TODO: Use static_assert
 		assert((kSize == 2) && "Flags are only one letter (+ \n), you cannot address them by more letters.");
 		const char flag = flag_name[0];
@@ -110,7 +115,8 @@ public:
 		}
 	}
 
-	void print(std::ostream& os) const {
+	void print(std::ostream& os) const
+	{
 		auto result = std::ostringstream{};
 		result << std::hex;
 		auto print_pair = [&](const auto& name, const auto& hi, const auto& lo) {
@@ -138,19 +144,23 @@ public:
 		os << result.str();
 	}
 
-	void print() const {
+	void print() const
+	{
 		print(std::cout);
 	}
 
-	[[nodiscard]] auto dump() const {
+	[[nodiscard]] auto dump() const
+	{
 		return register_array_;
 	}
 
-	void set_IME(const bool value) {
+	void set_IME(const bool value)
+	{
 		ime_flag_ = value;
 	}
 
-	[[nodiscard]] auto read_IME() const {
+	[[nodiscard]] auto read_IME() const
+	{
 		return ime_flag_;
 	}
 
@@ -158,7 +168,8 @@ private:
 	std::array<uint8_t, 12> register_array_ = {};
 
 	// TODO: Make it standalone function
-	static auto register_index(const std::string_view& reg_name) -> int {
+	static auto register_index(const std::string_view& reg_name) -> int
+	{
 		if (reg_name == "AF") { return 0; }
 		if (reg_name == "F") { return 0; }
 		if (reg_name == "A") { return 1; }
@@ -183,7 +194,8 @@ private:
 	bool ime_flag_ = false;
 };
 
-inline auto operator<<(std::ostream& os, const Registers& registers) -> std::ostream& {
+inline auto operator<<(std::ostream& os, const Registers& registers) -> std::ostream&
+{
 	registers.print(os);
 	return os;
 }
@@ -206,7 +218,8 @@ struct MakeRegisters {
 
 	std::optional<bool> IME = {};
 
-	[[nodiscard]] auto get() const {
+	[[nodiscard]] auto get() const
+	{
 		check_consistency();
 
 		const auto A_val = static_cast<uint8_t>(AF.has_value() ? (AF.value() & 0xFF00) >> 8 : A.value_or(0x00));
@@ -234,7 +247,8 @@ struct MakeRegisters {
 		return registers;
 	}
 
-	void check_consistency() const {
+	void check_consistency() const
+	{
 		assert(
 		  !(AF.has_value() && (A.has_value() || F.has_value())) && "You can't set AF and A (or F) at the same time");
 		assert(
@@ -265,7 +279,8 @@ struct RegistersChanger {
 
 	std::optional<bool> IME = {};
 
-	[[nodiscard]] auto get(const Registers& registers) const {
+	[[nodiscard]] auto get(const Registers& registers) const
+	{
 		check_consistency();
 		auto changed_regs = registers;
 		if (AF.has_value()) { changed_regs.write("AF", AF.value()); };
@@ -286,7 +301,8 @@ struct RegistersChanger {
 		return changed_regs;
 	}
 
-	void check_consistency() const {
+	void check_consistency() const
+	{
 		assert(
 		  !(AF.has_value() && (A.has_value() || F.has_value())) && "You can't change AF and A (or F) at the same time");
 		assert(
@@ -305,7 +321,8 @@ struct MakeFlags {
 	std::optional<bool> C = {};
 	std::optional<uint8_t> unused = {};
 
-	[[nodiscard]] auto get() const {
+	[[nodiscard]] auto get() const
+	{
 		auto value = static_cast<uint8_t>(0x00);
 		value += static_cast<uint8_t>(Z.value_or(0x00)) << 7;
 		value += static_cast<uint8_t>(N.value_or(0x00)) << 6;
@@ -323,7 +340,8 @@ struct FlagsChanger {
 	std::optional<bool> C = {};
 	std::optional<uint8_t> unused = {};
 
-	[[nodiscard]] auto get(const uint8_t orig_flags) const {
+	[[nodiscard]] auto get(const uint8_t orig_flags) const
+	{
 		const auto Z_val = Z.value_or(static_cast<bool>(orig_flags & (1 << 7)));
 		const auto N_val = N.value_or(static_cast<bool>(orig_flags & (1 << 6)));
 		const auto H_val = H.value_or(static_cast<bool>(orig_flags & (1 << 5)));

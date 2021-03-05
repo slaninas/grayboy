@@ -6,7 +6,8 @@
 #include <iostream>
 #include <vector>
 
-auto main(int argc, const char** argv) -> int {
+auto main(int argc, const char** argv) -> int
+{
 	if (argc != 2) {
 		std::cout << "Usage: " << argv[0] << " cartridge_filename\n";
 		return 1;

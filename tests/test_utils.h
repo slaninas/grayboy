@@ -12,14 +12,16 @@
 #include "memory.h"
 
 template<typename T>
-void p(const T& cont, const size_t num_elements) {
+void p(const T& cont, const size_t num_elements)
+{
 	std::cout << std::hex;
 	for (size_t i = 0; i < std::min(cont.size(), num_elements); ++i) { std::cout << (int)cont[i] << '\n'; }
 	std::cout << std::dec;
 }
 
 template<typename T>
-void p(const T& cont) {
+void p(const T& cont)
+{
 	p(cont, cont.size());
 }
 
@@ -27,11 +29,13 @@ class RegistersCompare : public Catch::MatcherBase<Registers> {
 public:
 	RegistersCompare(const Registers& registers) : registers_{registers} {}
 
-	auto match(const Registers& other) const -> bool override {
+	auto match(const Registers& other) const -> bool override
+	{
 		return other.dump() == registers_.dump();
 	}
 
-	auto describe() const -> std::string override {
+	auto describe() const -> std::string override
+	{
 		std::ostringstream ss;
 		// ss << " is equal to " << vector_;
 		ss << " is equal to \n" << registers_;
@@ -45,20 +49,24 @@ private:
 };
 
 template<size_t kSize>
-auto getRandomArray() {
+auto getRandomArray()
+{
 	auto array = std::array<uint8_t, kSize>{};
 	for (size_t i = 0; i < kSize; ++i) { array[i] = std::rand(); };
 	return array;
 }
 
-auto getRandomMemory() {
+auto getRandomMemory()
+{
 	return Memory{getRandomArray<Memory::ArrayElements>()};
 }
 
-auto getRandomRegisters() {
+auto getRandomRegisters()
+{
 	return Registers{getRandomArray<Registers::ArrayElementCount>()};
 }
 
-auto getRandomFlags() {
+auto getRandomFlags()
+{
 	return static_cast<uint8_t>(std::rand());
 }

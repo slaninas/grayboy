@@ -11,7 +11,8 @@ struct Instruction {
 	uint8_t size;
 	std::function<uint8_t(Registers&, Memory&, const uint16_t&)> execute;
 
-	[[nodiscard]] auto operator()(Registers& regs, Memory& mem, const uint16_t& PC) const {
+	[[nodiscard]] auto operator()(Registers& regs, Memory& mem, const uint16_t& PC) const
+	{
 		const auto cycles = execute(regs, mem, PC);
 		const auto PC_new = regs.read("PC");
 		regs.write("PC", PC_new + size);
@@ -22,39 +23,48 @@ struct Instruction {
 // TODO: Merge (half) carries somehow?
 // TODO: Are (half) carries correct?
 // Detect half-carry for addition, see https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/
-[[nodiscard]] inline auto half_carry_add_8bit(const uint16_t a, const uint16_t b) {
+[[nodiscard]] inline auto half_carry_add_8bit(const uint16_t a, const uint16_t b)
+{
 	return (((a & 0xf) + (b & 0xf)) & 0x10) > 0;
 }
-[[nodiscard]] inline auto half_carry_add_16bit(const uint16_t a, const uint16_t b) {
+[[nodiscard]] inline auto half_carry_add_16bit(const uint16_t a, const uint16_t b)
+{
 	return (((a & 0x0fff) + (b & 0x0fff)) & 0x1000) > 0;
 }
 
-[[nodiscard]] inline auto carry_add_8bit(const uint16_t a, const uint16_t b) {
+[[nodiscard]] inline auto carry_add_8bit(const uint16_t a, const uint16_t b)
+{
 	return (((a & 0xff) + (b & 0xff)) & 0x100) > 0;
 }
-[[nodiscard]] inline auto carry_add_16bit(const uint16_t a, const uint16_t b) {
+[[nodiscard]] inline auto carry_add_16bit(const uint16_t a, const uint16_t b)
+{
 	return (((a & 0xffff) + (b & 0xffff)) & 0x10000) > 0;
 }
 
 // https://www.reddit.com/r/EmuDev/comments/4clh23/trouble_with_halfcarrycarry_flag/
-[[nodiscard]] inline auto half_carry_sub_8bit(const uint16_t a, const uint16_t b) {
+[[nodiscard]] inline auto half_carry_sub_8bit(const uint16_t a, const uint16_t b)
+{
 	return ((a & 0x0f) - (b & 0x0f)) < 0;
 }
 
-[[nodiscard]] inline auto half_carry_sub_16bit(const uint16_t a, const uint16_t b) {
+[[nodiscard]] inline auto half_carry_sub_16bit(const uint16_t a, const uint16_t b)
+{
 	return ((a & 0x0fff) - (b & 0xfff)) < 0;
 }
 
-[[nodiscard]] inline auto carry_sub_8bit(const uint16_t a, const uint16_t b) {
+[[nodiscard]] inline auto carry_sub_8bit(const uint16_t a, const uint16_t b)
+{
 	return ((a & 0xff) - (b & 0xff)) < 0;
 }
-[[nodiscard]] inline auto carry_sub_16bit(const uint16_t a, const uint16_t b) {
+[[nodiscard]] inline auto carry_sub_16bit(const uint16_t a, const uint16_t b)
+{
 	return ((a & 0xffff) - (b & 0xffff)) < 0;
 }
 
 // TOOD: Cleanup these instruction_* functions
 
-inline void instruction_rst(const uint8_t& value, Registers& regs, Memory& memory, const uint16_t& PC) {
+inline void instruction_rst(const uint8_t& value, Registers& regs, Memory& memory, const uint16_t& PC)
+{
 	const auto PC_high = static_cast<uint8_t>((PC & 0xff00) >> 8);
 	const auto PC_low = static_cast<uint8_t>(PC & 0x00ff);
 	const auto SP = regs.read("SP");
@@ -68,7 +78,8 @@ inline void instruction_rst(const uint8_t& value, Registers& regs, Memory& memor
 
 template<size_t kSize>
 // TODO: remove _fn from name
-void instruction_inc_fn(const char (&reg_name)[kSize], Registers& regs) {
+void instruction_inc_fn(const char (&reg_name)[kSize], Registers& regs)
+{
 	constexpr auto reg_name_size = kSize - 1; // Subtract \0 at the end
 	// 8bit
 	if constexpr (reg_name_size == 1) {
@@ -87,7 +98,8 @@ void instruction_inc_fn(const char (&reg_name)[kSize], Registers& regs) {
 }
 
 template<size_t kSize>
-void instruction_dec_fn(const char (&reg_name)[kSize], Registers& regs) {
+void instruction_dec_fn(const char (&reg_name)[kSize], Registers& regs)
+{
 	constexpr auto reg_name_size = kSize - 1; // Subtract \0 at the end
 	// 8bit
 	if constexpr (reg_name_size == 1) {
@@ -109,7 +121,8 @@ template<size_t kDestSize, size_t kSecondRegNameSize>
 void instruction_add(
   const char (&dest_name)[kDestSize],
   const char (&second_reg_name)[kSecondRegNameSize],
-  Registers& regs) {
+  Registers& regs)
+{
 	static_assert(kDestSize == kSecondRegNameSize, "Add for 8bit + 16bit or vice versa not implemented.");
 	constexpr auto real_size = kDestSize - 1;
 
@@ -142,7 +155,8 @@ void instruction_add(
 
 // TODO: Add unit test for this
 template<size_t kDestSize, typename ValueType>
-void instruction_addc(const char (&dest_name)[kDestSize], const ValueType& value, Registers& regs) {
+void instruction_addc(const char (&dest_name)[kDestSize], const ValueType& value, Registers& regs)
+{
 	constexpr auto real_size = kDestSize - 1;
 	static_assert(real_size == 1, "Only 8bit add with carry supported.");
 	static_assert(std::is_same_v<ValueType, uint8_t>, "Only 8bit add with carry supported.");
@@ -168,13 +182,15 @@ template<size_t kDestSize, size_t kSecondRegNameSize>
 void instruction_addc(
   const char (&dest_name)[kDestSize],
   const char (&second_reg_name)[kSecondRegNameSize],
-  Registers& regs) {
+  Registers& regs)
+{
 	instruction_addc(dest_name, regs.read(second_reg_name), regs);
 }
 
 // TODO: Add unit test for this
 template<size_t kDestSize, typename ValueType>
-void instruction_sub(const char (&dest_name)[kDestSize], const ValueType& value, Registers& regs) {
+void instruction_sub(const char (&dest_name)[kDestSize], const ValueType& value, Registers& regs)
+{
 	constexpr auto real_size = kDestSize - 1;
 	static_assert(real_size == 1, "Only 8bit sub is supported.");
 	static_assert(std::is_same_v<ValueType, uint8_t>, "Only 8bit sub is supported.");
@@ -194,13 +210,15 @@ template<size_t kDestSize, size_t kSecondRegNameSize>
 void instruction_sub(
   const char (&dest_name)[kDestSize],
   const char (&second_reg_name)[kSecondRegNameSize],
-  Registers& regs) {
+  Registers& regs)
+{
 	instruction_sub(dest_name, regs.read(second_reg_name), regs);
 }
 
 // TODO: Add unit test for this
 template<size_t kDestSize, typename ValueType>
-void instruction_subc(const char (&dest_name)[kDestSize], const ValueType& value, Registers& regs) {
+void instruction_subc(const char (&dest_name)[kDestSize], const ValueType& value, Registers& regs)
+{
 	constexpr auto real_size = kDestSize - 1;
 	static_assert(real_size == 1, "Only 8bit add with carry supported.");
 	static_assert(std::is_same_v<ValueType, uint8_t>, "Only 8bit add with carry supported.");
@@ -228,12 +246,14 @@ template<size_t kDestSize, size_t kSecondRegNameSize>
 void instruction_subc(
   const char (&dest_name)[kDestSize],
   const char (&second_reg_name)[kSecondRegNameSize],
-  Registers& regs) {
+  Registers& regs)
+{
 	instruction_subc(dest_name, regs.read(second_reg_name), regs);
 }
 
 template<size_t kDestSize, typename ValueType>
-void instruction_and(const char (&dest_name)[kDestSize], const ValueType& value, Registers& regs) {
+void instruction_and(const char (&dest_name)[kDestSize], const ValueType& value, Registers& regs)
+{
 	constexpr auto real_size = kDestSize - 1;
 	static_assert(real_size == 1, "Only 8bit AND supported.");
 	static_assert(std::is_same_v<ValueType, uint8_t>, "Only 8bit values supported.");
@@ -251,13 +271,15 @@ template<size_t kDestSize, size_t kSecondRegNameSize>
 void instruction_and(
   const char (&dest_name)[kDestSize],
   const char (&second_reg_name)[kSecondRegNameSize],
-  Registers& regs) {
+  Registers& regs)
+{
 	static_assert(kDestSize == kSecondRegNameSize, "Registers must be of a same size. And only 8bit are supported.");
 	instruction_and(dest_name, regs.read(second_reg_name), regs);
 }
 
 template<size_t kDestSize, typename ValueType>
-void instruction_xor(const char (&dest_name)[kDestSize], const ValueType& value, Registers& regs) {
+void instruction_xor(const char (&dest_name)[kDestSize], const ValueType& value, Registers& regs)
+{
 	constexpr auto real_size = kDestSize - 1;
 	static_assert(real_size == 1, "Only 8bit XOR supported.");
 	static_assert(std::is_same_v<ValueType, uint8_t>, "Only 8bit values supported.");
@@ -275,13 +297,15 @@ template<size_t kDestSize, size_t kSecondRegNameSize>
 void instruction_xor(
   const char (&dest_name)[kDestSize],
   const char (&second_reg_name)[kSecondRegNameSize],
-  Registers& regs) {
+  Registers& regs)
+{
 	static_assert(kDestSize == kSecondRegNameSize, "Registers must be of a same size. And only 8bit are supported.");
 	instruction_xor(dest_name, regs.read(second_reg_name), regs);
 }
 
 template<size_t kDestSize, typename ValueType>
-void instruction_or(const char (&dest_name)[kDestSize], const ValueType& value, Registers& regs) {
+void instruction_or(const char (&dest_name)[kDestSize], const ValueType& value, Registers& regs)
+{
 	constexpr auto real_size = kDestSize - 1;
 	static_assert(real_size == 1, "Only 8bit XOR supported.");
 	static_assert(std::is_same_v<ValueType, uint8_t>, "Only 8bit values supported.");
@@ -299,13 +323,15 @@ template<size_t kDestSize, size_t kSecondRegNameSize>
 void instruction_or(
   const char (&dest_name)[kDestSize],
   const char (&second_reg_name)[kSecondRegNameSize],
-  Registers& regs) {
+  Registers& regs)
+{
 	static_assert(kDestSize == kSecondRegNameSize, "Registers must be of a same size. And only 8bit are supported.");
 	instruction_or(dest_name, regs.read(second_reg_name), regs);
 }
 
 template<size_t kDestSize, typename ValueType>
-void instruction_cp(const char (&dest_name)[kDestSize], const ValueType& value, Registers& regs) {
+void instruction_cp(const char (&dest_name)[kDestSize], const ValueType& value, Registers& regs)
+{
 	constexpr auto real_size = kDestSize - 1;
 	static_assert(real_size == 1, "Only 8bit XOR supported.");
 	static_assert(std::is_same_v<ValueType, uint8_t>, "Only 8bit values supported.");
@@ -323,164 +349,190 @@ template<size_t kDestSize, size_t kSecondRegNameSize>
 void instruction_cp(
   const char (&dest_name)[kDestSize],
   const char (&second_reg_name)[kSecondRegNameSize],
-  Registers& regs) {
+  Registers& regs)
+{
 	static_assert(kDestSize == kSecondRegNameSize, "Registers must be of a same size. And only 8bit are supported.");
 	instruction_cp(dest_name, regs.read(second_reg_name), regs);
 }
 
-inline auto rlc(uint8_t old_value) {
+inline auto rlc(uint8_t old_value)
+{
 	const auto carry = static_cast<bool>(old_value & (1 << 7));
 	const auto new_value = static_cast<uint8_t>(old_value << 1) + static_cast<uint8_t>(carry);
 	return std::pair{new_value, carry};
 }
 
-inline void set_flags_for_rotate(Registers& regs, const uint8_t new_value, const bool carry) {
+inline void set_flags_for_rotate(Registers& regs, const uint8_t new_value, const bool carry)
+{
 	regs.set_flag("Z", new_value == 0);
 	regs.set_flag("N", false);
 	regs.set_flag("H", false);
 	regs.set_flag("C", carry);
 }
 
-inline void set_flags_for_shift(Registers& regs, const uint8_t new_value, const bool carry) {
+inline void set_flags_for_shift(Registers& regs, const uint8_t new_value, const bool carry)
+{
 	set_flags_for_rotate(regs, new_value, carry);
 }
 
-inline void instruction_rlc(const char (&reg_name)[2], Registers& regs) {
+inline void instruction_rlc(const char (&reg_name)[2], Registers& regs)
+{
 	const auto old_value = regs.read(reg_name);
 	const auto [new_value, carry] = rlc(old_value);
 	regs.write(reg_name, new_value);
 	set_flags_for_rotate(regs, new_value, carry);
 }
 
-inline auto rl(uint8_t old_value, const bool carry) {
+inline auto rl(uint8_t old_value, const bool carry)
+{
 	const auto new_value = static_cast<uint8_t>(old_value << 1) + static_cast<uint8_t>(carry);
 	const auto new_carry = static_cast<bool>(old_value & (1 << 7));
 	return std::pair{new_value, new_carry};
 }
 
-inline void instruction_rl(const char (&reg_name)[2], Registers& regs) {
+inline void instruction_rl(const char (&reg_name)[2], Registers& regs)
+{
 	const auto old_value = regs.read(reg_name);
 	const auto [new_value, carry] = rl(old_value, regs.read_flag("C"));
 	regs.write(reg_name, new_value);
 	set_flags_for_rotate(regs, new_value, carry);
 }
 
-inline auto rrc(uint8_t old_value) {
+inline auto rrc(uint8_t old_value)
+{
 	const auto carry = static_cast<bool>(old_value & 1);
 	const auto new_value =
 	  static_cast<uint8_t>(old_value >> 1) + static_cast<uint8_t>(static_cast<uint8_t>(carry) << 7);
 	return std::pair{new_value, carry};
 }
 
-inline void instruction_rrc(const char (&reg_name)[2], Registers& regs) {
+inline void instruction_rrc(const char (&reg_name)[2], Registers& regs)
+{
 	const auto old_value = regs.read(reg_name);
 	const auto [new_value, carry] = rrc(old_value);
 	regs.write(reg_name, new_value);
 	set_flags_for_rotate(regs, new_value, carry);
 }
 
-inline auto rr(uint8_t old_value, const bool carry) {
+inline auto rr(uint8_t old_value, const bool carry)
+{
 	const auto new_value =
 	  static_cast<uint8_t>(old_value >> 1) + static_cast<uint8_t>(static_cast<uint8_t>(carry) << 7);
 	const auto new_carry = static_cast<bool>(old_value & 1);
 	return std::pair{new_value, new_carry};
 }
 
-inline void instruction_rr(const char (&reg_name)[2], Registers& regs) {
+inline void instruction_rr(const char (&reg_name)[2], Registers& regs)
+{
 	const auto old_value = regs.read(reg_name);
 	const auto [new_value, carry] = rr(old_value, regs.read_flag("C"));
 	regs.write(reg_name, new_value);
 	set_flags_for_rotate(regs, new_value, carry);
 }
 
-inline auto sla(const uint8_t old_value) {
+inline auto sla(const uint8_t old_value)
+{
 	const auto new_value = static_cast<uint8_t>(old_value << 1);
 	const auto new_carry = static_cast<bool>(old_value & (1 << 7));
 	return std::pair{new_value, new_carry};
 }
 
-inline void instruction_sla(const char (&reg_name)[2], Registers& regs) {
+inline void instruction_sla(const char (&reg_name)[2], Registers& regs)
+{
 	const auto old_value = regs.read(reg_name);
 	const auto [new_value, new_carry] = sla(old_value);
 	regs.write(reg_name, new_value);
 	set_flags_for_shift(regs, new_value, new_carry);
 }
 
-inline auto sra(const uint8_t old_value) {
+inline auto sra(const uint8_t old_value)
+{
 	const auto new_value = static_cast<uint8_t>((old_value >> 1) + (old_value & (1 << 7)));
 	const auto new_carry = static_cast<bool>(old_value & 1);
 	return std::pair{new_value, new_carry};
 }
 
-inline void instruction_sra(const char (&reg_name)[2], Registers& regs) {
+inline void instruction_sra(const char (&reg_name)[2], Registers& regs)
+{
 	const auto old_value = regs.read(reg_name);
 	const auto [new_value, new_carry] = sra(old_value);
 	regs.write(reg_name, new_value);
 	set_flags_for_shift(regs, new_value, new_carry);
 }
 
-inline void set_flags_for_swap(Registers& regs, const uint8_t new_value) {
+inline void set_flags_for_swap(Registers& regs, const uint8_t new_value)
+{
 	regs.set_flag("Z", new_value == 0);
 	regs.set_flag("N", false);
 	regs.set_flag("H", false);
 	regs.set_flag("C", false);
 }
 
-inline auto swap(const uint8_t old_value) {
+inline auto swap(const uint8_t old_value)
+{
 	const auto lower_byte = static_cast<uint8_t>(old_value & 0x0f);
 	const auto higher_byte = static_cast<uint8_t>((old_value & 0xf0) >> 4);
 	return static_cast<uint8_t>((lower_byte << 4) + higher_byte);
 }
 
-inline void instruction_swap(const char (&reg_name)[2], Registers& regs) {
+inline void instruction_swap(const char (&reg_name)[2], Registers& regs)
+{
 	const auto old_value = regs.read(reg_name);
 	const auto new_value = swap(old_value);
 	regs.write(reg_name, new_value);
 	set_flags_for_swap(regs, new_value);
 }
 
-inline auto srl(const uint8_t old_value) {
+inline auto srl(const uint8_t old_value)
+{
 	const auto new_value = static_cast<uint8_t>(old_value >> 1);
 	const auto new_carry = static_cast<bool>(old_value & 1);
 	return std::pair{new_value, new_carry};
 }
 
-inline void instruction_srl(const char (&reg_name)[2], Registers& regs) {
+inline void instruction_srl(const char (&reg_name)[2], Registers& regs)
+{
 	const auto old_value = regs.read(reg_name);
 	const auto [new_value, new_carry] = srl(old_value);
 	regs.write(reg_name, new_value);
 	set_flags_for_shift(regs, new_value, new_carry);
 }
 
-inline auto bit(const uint8_t value, const uint8_t position, Registers& regs) {
+inline auto bit(const uint8_t value, const uint8_t position, Registers& regs)
+{
 	const auto bit_value = static_cast<bool>(value & (1 << position));
 	regs.set_flag("Z", !bit_value);
 	regs.set_flag("N", false);
 	regs.set_flag("H", true);
 }
 
-inline void instruction_bit(const char (&reg_name)[2], const uint8_t position, Registers& regs) {
+inline void instruction_bit(const char (&reg_name)[2], const uint8_t position, Registers& regs)
+{
 	const auto value = regs.read(reg_name);
 	bit(value, position, regs);
 }
 
-inline auto set_bit(const uint8_t orig_value, const uint8_t position) {
+inline auto set_bit(const uint8_t orig_value, const uint8_t position)
+{
 	assert(position <= 7);
 	return static_cast<uint8_t>(orig_value | (1 << position));
 }
 
-inline void instruction_set_bit(const char (&reg_name)[2], const uint8_t position, Registers& regs) {
+inline void instruction_set_bit(const char (&reg_name)[2], const uint8_t position, Registers& regs)
+{
 	auto new_value = set_bit(regs.read(reg_name), position);
 	regs.write(reg_name, new_value);
 }
 
-inline auto reset_bit(const uint8_t orig_value, const uint8_t position) {
+inline auto reset_bit(const uint8_t orig_value, const uint8_t position)
+{
 	assert(position <= 7);
 	const auto mask = static_cast<uint8_t>(0xff ^ (1 << position));
 	return static_cast<uint8_t>(orig_value & mask);
 }
 
-inline void instruction_reset_bit(const char (&reg_name)[2], const uint8_t position, Registers& regs) {
+inline void instruction_reset_bit(const char (&reg_name)[2], const uint8_t position, Registers& regs)
+{
 	auto new_value = reset_bit(regs.read(reg_name), position);
 	regs.write(reg_name, new_value);
 }

@@ -3,7 +3,8 @@
 #include "cpu.h"
 #include "test_utils.h"
 
-TEST_CASE("RLCA - 0x07", "[bit_operations]") {
+TEST_CASE("RLCA - 0x07", "[bit_operations]")
+{
 	const auto orig_memory = MemoryChanger{{{0x00, 0x07}, {0x01, 0x07}, {0x02, 0x07}}}.get(getRandomMemory());
 	const auto orig_regs = RegistersChanger{.A = 0xbf, .PC = 0x00}.get(getRandomRegisters());
 	auto cpu = Cpu{orig_memory, orig_regs};
@@ -28,7 +29,8 @@ TEST_CASE("RLCA - 0x07", "[bit_operations]") {
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
 }
 
-TEST_CASE("RLA - 0x17", "[bit_operations]") {
+TEST_CASE("RLA - 0x17", "[bit_operations]")
+{
 	const auto orig_memory = MemoryChanger{{{0x00, 0x17}, {0x01, 0x17}, {0x02, 0x17}}}.get(getRandomMemory());
 	const auto orig_flags = FlagsChanger{.C = 1}.get(getRandomFlags());
 	const auto orig_regs = RegistersChanger{.A = 0xbf, .F = orig_flags, .PC = 0x00}.get(getRandomRegisters());
@@ -54,7 +56,8 @@ TEST_CASE("RLA - 0x17", "[bit_operations]") {
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
 }
 
-TEST_CASE("RRCA - 0x0f", "[bit_operations]") {
+TEST_CASE("RRCA - 0x0f", "[bit_operations]")
+{
 	const auto orig_memory = MemoryChanger{{{0x00, 0x0f}, {0x01, 0x0f}, {0x02, 0x0f}}}.get(getRandomMemory());
 	const auto orig_regs = RegistersChanger{.A = 0xFD, .PC = 0x00}.get(getRandomRegisters());
 	auto cpu = Cpu{orig_memory, orig_regs};
@@ -79,7 +82,8 @@ TEST_CASE("RRCA - 0x0f", "[bit_operations]") {
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
 }
 
-TEST_CASE("RRA - 0x1f", "[bit_operations]") {
+TEST_CASE("RRA - 0x1f", "[bit_operations]")
+{
 	const auto orig_memory = MemoryChanger{{{0x00, 0x1f}, {0x01, 0x1f}, {0x02, 0x1f}}}.get(getRandomMemory());
 	const auto orig_flags = FlagsChanger{.C = 0}.get(getRandomFlags());
 	const auto orig_regs = RegistersChanger{.A = 0xFD, .F = orig_flags, .PC = 0x00}.get(getRandomRegisters());

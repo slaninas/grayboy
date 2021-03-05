@@ -1,6 +1,7 @@
 #include "instructions_8bit.h"
 
-auto get_8bit_instructions() -> std::vector<Instruction> {
+auto get_8bit_instructions() -> std::vector<Instruction>
+{
 	return std::vector<Instruction>{
 		// TODO: {"STOP", 0x10, 2, 1},
 		// TODO: DAA - 0x27

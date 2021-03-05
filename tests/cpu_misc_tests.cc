@@ -2,8 +2,10 @@
 #include "cpu.h"
 #include "test_utils.h"
 
-TEST_CASE("NOP - 0x00", "[misc]") {
-	SECTION("Running with PC=0x00, NOP should just increase PC by one") {
+TEST_CASE("NOP - 0x00", "[misc]")
+{
+	SECTION("Running with PC=0x00, NOP should just increase PC by one")
+	{
 		const auto orig_memory = MemoryChanger{{{0x00, 0x00}}}.get(getRandomMemory());
 		const auto orig_regs = RegistersChanger{.PC = 0x00}.get(getRandomRegisters());
 		auto cpu = Cpu{orig_memory, orig_regs};
@@ -18,7 +20,8 @@ TEST_CASE("NOP - 0x00", "[misc]") {
 		CHECK(cpu.memory_dump() == orig_memory.dump());
 	}
 
-	SECTION("Running with PC=0xBE, NOP should just increase PC by one") {
+	SECTION("Running with PC=0xBE, NOP should just increase PC by one")
+	{
 		const auto orig_memory = MemoryChanger{{{0xBE, 0x00}}}.get(getRandomMemory());
 		const auto orig_regs = RegistersChanger{.PC = 0xBE}.get(getRandomRegisters());
 		auto cpu = Cpu{orig_memory, orig_regs};
@@ -34,7 +37,8 @@ TEST_CASE("NOP - 0x00", "[misc]") {
 	}
 }
 
-TEST_CASE("SCF - 0x37", "[misc]") {
+TEST_CASE("SCF - 0x37", "[misc]")
+{
 	const auto orig_memory = MemoryChanger{{{0x00, 0x37}, {0x01, 0x37}}}.get(getRandomMemory());
 	const auto orig_flags = FlagsChanger{.C = 0}.get(getRandomFlags());
 	const auto orig_regs = RegistersChanger{.F = orig_flags, .PC = 0x00}.get(getRandomRegisters());
@@ -55,7 +59,8 @@ TEST_CASE("SCF - 0x37", "[misc]") {
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
 
-TEST_CASE("CPL - 0x2f", "[misc]") {
+TEST_CASE("CPL - 0x2f", "[misc]")
+{
 	const auto orig_memory = MemoryChanger{{{0x00, 0x2f}, {0x01, 0x2f}}}.get(getRandomMemory());
 	const auto orig_flags = getRandomFlags();
 	const auto orig_regs = RegistersChanger{.A = 0xb3, .F = orig_flags, .PC = 0x00}.get(getRandomRegisters());
@@ -76,7 +81,8 @@ TEST_CASE("CPL - 0x2f", "[misc]") {
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
 
-TEST_CASE("CCF - 0x3f", "[misc]") {
+TEST_CASE("CCF - 0x3f", "[misc]")
+{
 	const auto orig_memory = MemoryChanger{{{0x00, 0x3f}, {0x01, 0x3f}}}.get(getRandomMemory());
 	const auto orig_flags = FlagsChanger{.C = 0}.get(getRandomFlags());
 	const auto orig_regs = RegistersChanger{.F = orig_flags, .PC = 0x00}.get(getRandomRegisters());
@@ -97,7 +103,8 @@ TEST_CASE("CCF - 0x3f", "[misc]") {
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
 
-TEST_CASE("DI - 0xf3", "[misc]") {
+TEST_CASE("DI - 0xf3", "[misc]")
+{
 	const auto orig_memory = MemoryChanger{{{0x00, 0xf3}, {0x01, 0xf3}}}.get(getRandomMemory());
 	const auto orig_regs = RegistersChanger{.PC = 0x00, .IME = 1}.get(getRandomRegisters());
 	auto cpu = Cpu{orig_memory, orig_regs};
@@ -115,7 +122,8 @@ TEST_CASE("DI - 0xf3", "[misc]") {
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 }
 
-TEST_CASE("EI - 0xfb", "[misc]") {
+TEST_CASE("EI - 0xfb", "[misc]")
+{
 	const auto orig_memory = MemoryChanger{{{0x00, 0xfb}, {0x01, 0xfb}}}.get(getRandomMemory());
 	const auto orig_regs = RegistersChanger{.PC = 0x00, .IME = 0}.get(getRandomRegisters());
 	auto cpu = Cpu{orig_memory, orig_regs};

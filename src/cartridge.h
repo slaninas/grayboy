@@ -11,7 +11,8 @@
 
 // TODO: Move into utils file
 template<typename TInput, typename TOutput>
-auto convert(const TInput& source, TOutput& destination) {
+auto convert(const TInput& source, TOutput& destination)
+{
 	destination.clear();
 	destination.resize(source.size());
 
@@ -24,7 +25,8 @@ auto convert(const TInput& source, TOutput& destination) {
 // TODO: Add check for header checksum?
 class Cartridge {
 public:
-	Cartridge(const std::string& filename) {
+	Cartridge(const std::string& filename)
+	{
 		auto file = std::ifstream(filename, std::ios::binary);
 		auto buffer = std::vector<uint8_t>(std::istreambuf_iterator<char>(file), {});
 
@@ -42,13 +44,15 @@ public:
 	  {"destination_code", {0x14a, 0x14b}},
 	  {"header_checksum", {0x14d, 0x14e}}};
 
-	auto get_header_checksum() {
+	auto get_header_checksum()
+	{
 		unsigned char sum = 0;
 		for (auto i = 0x134; i < 0x14C + 1; ++i) { sum -= std::to_integer<char>(buffer_[i]) + 1; }
 		return static_cast<int>(sum);
 	}
 
-	void print_info() {
+	void print_info()
+	{
 		std::cout << "Cartridge Info:\n";
 		std::cout << std::string(20, '-') << '\n';
 
@@ -79,19 +83,22 @@ public:
 		std::cout << std::dec;
 	}
 
-	auto dump() {
+	auto dump()
+	{
 		return buffer_;
 	}
 
 private:
-	void print_as_hex(const std::pair<uint16_t, uint16_t>& range) {
+	void print_as_hex(const std::pair<uint16_t, uint16_t>& range)
+	{
 		const auto [start, end] = range;
 		std::cout << std::hex;
 		for (auto i = start; i < end; ++i) { std::cout << std::to_integer<int>(buffer_[i]); }
 		std::cout << std::dec;
 	}
 
-	void print_as_string(const std::pair<uint16_t, uint16_t>& range) {
+	void print_as_string(const std::pair<uint16_t, uint16_t>& range)
+	{
 		const auto [start, end] = range;
 		auto bytes = std::vector(begin(buffer_) + start, begin(buffer_) + end);
 		auto bytes_as_string = std::string{};
@@ -99,7 +106,8 @@ private:
 		std::cout << bytes_as_string;
 	}
 
-	void print_hex_logo() {
+	void print_hex_logo()
+	{
 		const auto [start, end] = addreses["nintendo_logo"];
 
 		std::cout << std::hex;

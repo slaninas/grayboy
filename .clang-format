@@ -25,6 +25,7 @@ BinPackParameters: 'false'
 BreakBeforeBraces: Custom
 BraceWrapping:
   BeforeElse: true
+  AfterFunction: true
 BreakBeforeTernaryOperators: 'true'
 BreakConstructorInitializers: AfterColon
 BreakInheritanceList: AfterColon

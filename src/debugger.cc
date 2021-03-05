@@ -174,7 +174,7 @@ auto main(int argc, const char** argv) -> int
 	auto next_addr = cpu.registers().read("PC");
 
 	auto cursed = MainCurse{};
-	auto reg_window = CursedWindow{{40, 10}, {18, 13}};
+	auto reg_window = CursedWindow{{40, 0}, {18, 13}};
 	auto instruction_window = CursedWindow{{0, 0}, {40, 50}};
 
 	auto cpu_copy = cpu;

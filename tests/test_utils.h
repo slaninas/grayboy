@@ -39,7 +39,6 @@ public:
 		std::ostringstream ss;
 		// ss << " is equal to " << vector_;
 		ss << " is equal to \n" << registers_;
-		;
 		return ss.str();
 		// TODO: implmente
 	}

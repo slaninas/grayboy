@@ -2,6 +2,14 @@
 
 #include <array>
 #include <vector>
+#include <stack>
+#include <cassert>
+
+struct MemoryDiff {
+	uint16_t address;
+	uint8_t orig_value;
+	uint8_t new_value;
+};
 
 class Memory {
 public:
@@ -19,7 +27,9 @@ public:
 
 	void write(const uint16_t address, const uint8_t value)
 	{
+		const auto orig_value = array_[address];
 		array_[address] = value;
+		changes_.push({address, orig_value, value});
 	}
 
 	[[nodiscard]] auto dump() const
@@ -27,8 +37,21 @@ public:
 		return array_;
 	}
 
+	auto go_back(const uint64_t steps) -> void
+	{
+		assert(steps <= changes_.size());
+		// TODO: Check if not going outside
+		for (auto i = uint64_t{0}; i < steps; ++i) {
+			const auto change = changes_.top();
+			array_[change.address] = change.orig_value;
+			changes_.pop();
+		}
+
+	}
+
 private:
 	ArrayType array_ = {};
+	std::stack<MemoryDiff> changes_;
 };
 
 struct MakeMemory {

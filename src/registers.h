@@ -41,6 +41,7 @@ public:
 		}
 	}
 
+	// TODO: Hide this and set_flag methos, use one method instead of write + set_flag
 	template<size_t kSize>
 	void write(const char (&reg_name)[kSize], uint16_t value)
 	{

@@ -316,11 +316,11 @@ struct RegistersChanger {
 };
 
 struct MakeFlags {
-	std::optional<bool> Z = {};
-	std::optional<bool> N = {};
-	std::optional<bool> H = {};
-	std::optional<bool> C = {};
-	std::optional<uint8_t> unused = {};
+	const std::optional<bool> Z = {};
+	const std::optional<bool> N = {};
+	const std::optional<bool> H = {};
+	const std::optional<bool> C = {};
+	const std::optional<uint8_t> unused = {};
 
 	[[nodiscard]] auto get() const
 	{
@@ -335,11 +335,11 @@ struct MakeFlags {
 };
 
 struct FlagsChanger {
-	std::optional<bool> Z = {};
-	std::optional<bool> N = {};
-	std::optional<bool> H = {};
-	std::optional<bool> C = {};
-	std::optional<uint8_t> unused = {};
+	const std::optional<bool> Z = {};
+	const std::optional<bool> N = {};
+	const std::optional<bool> H = {};
+	const std::optional<bool> C = {};
+	const std::optional<uint8_t> unused = {};
 
 	[[nodiscard]] auto get(const uint8_t orig_flags) const
 	{

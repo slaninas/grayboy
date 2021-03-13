@@ -41,6 +41,11 @@ void print_memory(const T& mem)
 	std::cout << std::dec;
 }
 
+struct MemoryDiff {
+	uint16_t address;
+	uint8_t orig_value;
+	uint8_t new_value;
+};
 
 auto operator<<(std::ostream& os, const MemoryDiff& diff) -> std::ostream&
 {

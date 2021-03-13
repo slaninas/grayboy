@@ -103,7 +103,6 @@ public:
 	{
 		assert(steps <= diffs_.size());
 
-		auto diffs_copy = diffs_;
 		auto memory = memory_last_state_;
 
 		for (auto reverse = rbegin(diffs_); reverse < rbegin(diffs_) + steps;++ reverse) {

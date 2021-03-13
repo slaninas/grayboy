@@ -97,6 +97,11 @@ public:
 		return regs_;
 	}
 
+	// TODO: Remove this once I can do snapshots of whole cpu state
+	[[nodiscard]] auto get_memory() const {
+		return memory_;
+	}
+
 private:
 	MemoryType memory_ = {};
 	Registers regs_ = {};

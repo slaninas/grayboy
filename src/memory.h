@@ -2,7 +2,6 @@
 
 #include <array>
 #include <cassert>
-#include <stack>
 #include <vector>
 
 // TODO: Move into utils file
@@ -96,7 +95,7 @@ public:
 	void add(const Memory& current_memory)
 	{
 		const auto diff = memory_diff(memory_last_state_, current_memory);
-		diffs_.push(diff);
+		diffs_.push_back(diff);
 		updateMemory(diff);
 	}
 
@@ -107,10 +106,9 @@ public:
 		auto diffs_copy = diffs_;
 		auto memory = memory_last_state_;
 
-		for (auto i = uint64_t{0}; i < steps; ++i) {
-			const auto reverted_changes = revertChanges(diffs_copy.top());
+		for (auto reverse = rbegin(diffs_); reverse < rbegin(diffs_) + steps;++ reverse) {
+			const auto reverted_changes = revertChanges(*reverse);
 			applyChanges(memory, reverted_changes);
-			diffs_copy.pop();
 		}
 		return memory;
 	}
@@ -122,5 +120,5 @@ private:
 	}
 
 	Memory memory_last_state_;
-	std::stack<std::vector<MemoryDiff>> diffs_;
+	std::vector<std::vector<MemoryDiff>> diffs_;
 };

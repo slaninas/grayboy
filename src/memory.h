@@ -3,6 +3,12 @@
 #include <array>
 #include <vector>
 
+struct MemoryDiff {
+	uint16_t address;
+	uint8_t orig_value;
+	uint8_t new_value;
+};
+
 class Memory {
 public:
 	static const size_t ArrayElements = 1 << 16;

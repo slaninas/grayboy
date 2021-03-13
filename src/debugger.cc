@@ -58,18 +58,6 @@ auto operator<<(std::ostream& os, const std::vector<MemoryDiff>& diff) -> std::o
 	return os;
 }
 
-template<typename Memory>
-auto memory_diff(const Memory& orig_memory, const Memory& new_memory)
-{
-	auto result = std::vector<MemoryDiff>{};
-
-	for (auto address = static_cast<size_t>(0); address < Memory::ArrayElements; ++address) {
-		const auto orig_value = orig_memory.read(address);
-		const auto new_value = new_memory.read(address);
-		if (orig_value != new_value) { result.push_back({static_cast<uint16_t>(address), orig_value, new_value}); }
-	}
-	return result;
-}
 
 auto disassemble(Cpu& cpu)
 {

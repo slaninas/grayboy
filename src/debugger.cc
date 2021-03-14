@@ -6,6 +6,7 @@
 
 #include <array>
 #include <iostream>
+#include <numeric>
 #include <vector>
 
 // TODO: Check why "06-ld r,r.gb" blarggs test ROM crash on different instruction when running "gameboy" vs "debugger" executable
@@ -142,12 +143,16 @@ auto main(int argc, const char** argv) -> int
 
 	const auto rom = cart.dump();
 	auto array = Memory::ArrayType{};
+	// TODO: What to do with the memory at startup?
+	// std::iota(begin(array), end(array), 0);
 
 	std::transform(begin(rom), end(rom), begin(array), [](const auto& el) { return static_cast<uint8_t>(el); });
 
 	// Initializing values same way bgb emualtor does it
 	const auto regs =
-	  RegistersChanger{.AF = 0x1180, .DE = 0xff56, .HL = 0x000d, .PC = 0x0100, .SP = 0xfffe}.get(Registers{});
+		// RegistersChanger{.AF = 0x1180, .DE = 0xff56, .HL = 0x000d, .PC = 0x0100, .SP = 0xfffe}.get(Registers{});
+		// TODO: Use .PC = 0x0100 once the emulator works for the boot rom
+	  RegistersChanger{.AF = 0x1180, .DE = 0xff56, .HL = 0x000d, .PC = 0x0000, .SP = 0xfffe}.get(Registers{});
 
 	auto cpu = Cpu{array, regs};
 	cpu.registers().print();
@@ -169,11 +174,12 @@ auto main(int argc, const char** argv) -> int
 
 	// TODO: Fix: with blargg 06-ld r,r.gb test ROM, 0xc221 is correctly disasembled as LD SP, d16 but 0xc222 and 0xc223 are shown as nop,
 	//       they should be part of the 0xc221 instruction
-	auto break_points = std::vector<uint16_t>{
-	  0xc7f1,
-	  0xc7f9,
-	  0xc24f,
-	  0xc252}; // TODO: Compare with bgb, registers look ok to 0xc7f1 (including), memory not checked, diff at 0xc7f1
+	// const auto break_points = std::vector<uint16_t>{
+	// 0xc7f1,
+	// 0xc7f9,
+	// 0xc24f,
+	// 0xc252}; // TODO: Compare with bgb, registers look ok to 0xc7f1 (including), memory not checked, diff at 0xc7f1
+	// const auto break_points = std::vector<uint16_t>{0x000c};
 
 	auto running = false;
 	// auto instruction_count = static_cast<uint64_t>(0);

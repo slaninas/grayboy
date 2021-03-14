@@ -122,3 +122,33 @@ TEST_CASE("Memory snapshot", "[memory]")
 		CHECK(snapshots.getMemory(1).dump() == correct_memory2.dump());
 	}
 }
+
+TEST_CASE("Last diffs", "[memory]")
+{
+	const auto orig_memory = MemoryChanger{{{0x34, 0x43}, {0xba, 0x12}, {0x01, 0x89}}}.get(getRandomMemory());
+	auto snapshots = MemorySnapshots{orig_memory};
+	auto memory = orig_memory;
+
+	memory.write(0xba, 0x33);
+	snapshots.add(memory);
+
+	memory.write(0x34, 0x97);
+	snapshots.add(memory);
+	snapshots.add(memory);
+
+	memory.write(0x01, 0xba);
+	memory.write(0xba, 0xcd);
+	snapshots.add(memory);
+	snapshots.add(memory);
+	memory.write(0xba, 0x12);
+	snapshots.add(memory);
+
+	const auto last_diffs = snapshots.getLastNonEmptyDiffs(4);
+	const auto correct_diffs = std::vector<MemoryDiff>{
+		{0x34, 0x43, 0x97},
+		{0x01, 0x89, 0xba},
+		{0xba, 0x33, 0xcd},
+		{0xba, 0xcd, 0x12},
+	};
+	CHECK(last_diffs == correct_diffs);
+}

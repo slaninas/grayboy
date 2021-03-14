@@ -13,6 +13,12 @@ struct MemoryDiff {
 	uint8_t new_value;
 };
 
+inline bool operator==(const MemoryDiff& a, const MemoryDiff& b) {
+	return a.address == b.address
+		&& a.orig_value == b.orig_value
+		&& a.new_value == b.new_value;
+}
+
 template<typename Memory>
 auto memory_diff(const Memory& orig_memory, const Memory& new_memory)
 {
@@ -111,6 +117,15 @@ public:
 			applyChanges(memory, reverted_changes);
 		}
 		return memory;
+	}
+
+	auto getLastNonEmptyDiffs(const uint64_t count) {
+		auto flattened = std::vector<MemoryDiff>{};
+		for (const auto& snapshot_diffs : diffs_) {
+			flattened.insert(cend(flattened), cbegin(snapshot_diffs), cend(snapshot_diffs));
+		}
+		const auto actuall_count = std::min(count, flattened.size());
+		return std::vector(cend(flattened) - actuall_count, cend(flattened));
 	}
 
 private:

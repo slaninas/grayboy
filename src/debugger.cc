@@ -187,7 +187,7 @@ auto main(int argc, const char** argv) -> int
 
 	while (true) {
 		auto registers_ss = std::ostringstream{};
-		auto ss = std::ostringstream{};
+		auto instructions_stream = std::ostringstream{};
 		auto memory_changes_stream = std::ostringstream{};
 
 		const auto disassembled = cpu.disassemble_next(next_addr);
@@ -200,9 +200,9 @@ auto main(int argc, const char** argv) -> int
 		memory_changes_stream << mem_diffs << '\n';
 
 		const auto PC = cpu.registers().read("PC");
-		get_from_to(disassembled_instructions, 10, PC, ss);
+		get_from_to(disassembled_instructions, 10, PC, instructions_stream);
 		if (!running) {
-			instruction_window.update(ss.str());
+			instruction_window.update(instructions_stream.str());
 			registers_ss << "IME: " << cpu.registers().read_IME() << '\n';
 			reg_window.update(registers_ss.str());
 			changes_window.update(memory_changes_stream.str());

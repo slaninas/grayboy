@@ -41,11 +41,10 @@ void print_memory(const T& mem)
 	std::cout << std::dec;
 }
 
-
 auto operator<<(std::ostream& os, const MemoryDiff& diff) -> std::ostream&
 {
 	os << std::hex;
-	os << "[0x" << static_cast<int>(diff.address) << "] 0x" << static_cast<int>(diff.orig_value) << " vs 0x"
+	os << "[0x" << static_cast<int>(diff.address) << "] 0x" << static_cast<int>(diff.orig_value) << " -> 0x"
 	   << static_cast<int>(diff.new_value);
 	os << std::dec;
 	return os;
@@ -53,11 +52,9 @@ auto operator<<(std::ostream& os, const MemoryDiff& diff) -> std::ostream&
 
 auto operator<<(std::ostream& os, const std::vector<MemoryDiff>& diff) -> std::ostream&
 {
-	os << "Diff between two memories:\n";
-	for (const auto& element : diff) { os << '\t' << element << '\n'; }
+	for (const auto& element : diff) { os << element << '\n'; }
 	return os;
 }
-
 
 auto disassemble(Cpu& cpu)
 {
@@ -157,8 +154,9 @@ auto main(int argc, const char** argv) -> int
 	auto next_addr = cpu.registers().read("PC");
 
 	auto cursed = MainCurse{};
-	auto reg_window = CursedWindow{{40, 0}, {18, 13}};
 	auto instruction_window = CursedWindow{{0, 0}, {40, 50}};
+	auto reg_window = CursedWindow{{40, 0}, {18, 13}};
+	auto changes_window = CursedWindow{{40, 14}, {24, 13}};
 
 	auto cpu_copy = cpu;
 	auto disassembled_instructions = disassemble(cpu_copy);
@@ -178,15 +176,21 @@ auto main(int argc, const char** argv) -> int
 
 	auto running = false;
 	// auto instruction_count = static_cast<uint64_t>(0);
+	auto memory_snapshots = MemorySnapshots{cpu.get_memory()};
 
 	while (true) {
 		auto registers_ss = std::ostringstream{};
 		auto ss = std::ostringstream{};
+		auto memory_changes_stream = std::ostringstream{};
 
 		const auto disassembled = cpu.disassemble_next(next_addr);
 		next_addr = disassembled.next_address;
 
 		cpu.registers().print(registers_ss);
+
+		memory_changes_stream << "Last memory update:\n";
+		const auto mem_diffs = memory_snapshots.getLastNonEmptyDiffs(10);
+		memory_changes_stream << mem_diffs << '\n';
 
 		const auto PC = cpu.registers().read("PC");
 		get_from_to(disassembled_instructions, 10, PC, ss);
@@ -194,9 +198,8 @@ auto main(int argc, const char** argv) -> int
 			instruction_window.update(ss.str());
 			registers_ss << "IME: " << cpu.registers().read_IME() << '\n';
 			reg_window.update(registers_ss.str());
-		}
+			changes_window.update(memory_changes_stream.str());
 
-		if (!running) {
 			const auto c = cursed.get_char();
 			if (c == 'r') { running = true; }
 		}
@@ -208,5 +211,6 @@ auto main(int argc, const char** argv) -> int
 		cpu_copy = cpu;
 		auto disassembled_new = disassemble(cpu_copy);
 		update_instructions(disassembled_new, disassembled_instructions);
+		memory_snapshots.add(cpu.get_memory());
 	}
 }

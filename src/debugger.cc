@@ -144,7 +144,7 @@ auto main(int argc, const char** argv) -> int
 	const auto rom = cart.dump();
 	auto array = Memory::ArrayType{};
 	// TODO: What to do with the memory at startup?
-	// std::iota(begin(array), end(array), 0);
+	std::iota(begin(array), end(array), 0);
 
 	std::transform(begin(rom), end(rom), begin(array), [](const auto& el) { return static_cast<uint8_t>(el); });
 
@@ -179,7 +179,7 @@ auto main(int argc, const char** argv) -> int
 	// 0xc7f9,
 	// 0xc24f,
 	// 0xc252}; // TODO: Compare with bgb, registers look ok to 0xc7f1 (including), memory not checked, diff at 0xc7f1
-	// const auto break_points = std::vector<uint16_t>{0x000c};
+	const auto break_points = std::vector<uint16_t>{0x000c};
 
 	auto running = false;
 	// auto instruction_count = static_cast<uint64_t>(0);

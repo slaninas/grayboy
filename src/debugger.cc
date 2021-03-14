@@ -186,14 +186,14 @@ auto main(int argc, const char** argv) -> int
 	auto memory_snapshots = MemorySnapshots{cpu.get_memory()};
 
 	while (true) {
-		auto registers_ss = std::ostringstream{};
+		auto registers_stream = std::ostringstream{};
 		auto instructions_stream = std::ostringstream{};
 		auto memory_changes_stream = std::ostringstream{};
 
 		const auto disassembled = cpu.disassemble_next(next_addr);
 		next_addr = disassembled.next_address;
 
-		cpu.registers().print(registers_ss);
+		cpu.registers().print(registers_stream);
 
 		memory_changes_stream << "Last memory update:\n";
 		const auto mem_diffs = memory_snapshots.getLastNonEmptyDiffs(10);
@@ -203,8 +203,8 @@ auto main(int argc, const char** argv) -> int
 		get_from_to(disassembled_instructions, 10, PC, instructions_stream);
 		if (!running) {
 			instruction_window.update(instructions_stream.str());
-			registers_ss << "IME: " << cpu.registers().read_IME() << '\n';
-			reg_window.update(registers_ss.str());
+			registers_stream << "IME: " << cpu.registers().read_IME() << '\n';
+			reg_window.update(registers_stream.str());
 			changes_window.update(memory_changes_stream.str());
 
 			const auto c = cursed.get_char();

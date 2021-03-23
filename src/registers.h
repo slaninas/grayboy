@@ -31,9 +31,7 @@ public:
 		const auto reg_index = register_index(reg_name);
 
 		// 8bit registers
-		if constexpr (reg_name_size == 1) {
-			return register_array_[reg_index];
-		}
+		if constexpr (reg_name_size == 1) { return register_array_[reg_index]; }
 		// Combined 16bit registers
 		else {
 			return *reinterpret_cast<const uint16_t*>(register_array_.data() + reg_index);

@@ -163,10 +163,7 @@ public:
 	{
 		return ime_flag_;
 	}
-
-private:
-	std::array<uint8_t, 12> register_array_ = {};
-
+	//
 	// TODO: Make it standalone function
 	static auto register_index(const std::string_view& reg_name) -> int
 	{
@@ -191,7 +188,37 @@ private:
 
 		assert(false && "Used register doesn't exist.");
 	}
+
+	auto operator==(const Registers& other) const
+	{
+		return register_array_ == other.register_array_ && ime_flag_ == other.ime_flag_;
+	}
+
+private:
+	std::array<uint8_t, 12> register_array_ = {};
+
 	bool ime_flag_ = false;
+};
+
+
+// TODO: Actually do snapshots, do not save whole state
+class RegistersSnaphost {
+public:
+	RegistersSnaphost(const Registers& regs) : states_{regs} {}
+
+	void add(const Registers& regs)
+	{
+		states_.push_back(regs);
+	}
+
+	auto get(const uint64_t steps)
+	{
+		assert(steps <= states_.size() - 1);
+		return *(crbegin(states_) + steps);
+	}
+
+private:
+	std::vector<Registers> states_;
 };
 
 inline auto operator<<(std::ostream& os, const Registers& registers) -> std::ostream&

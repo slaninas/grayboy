@@ -82,11 +82,6 @@ public:
 		return DisassemblyInfo{starting_address, regs.read("PC"), instruction, memory_representation};
 	}
 
-	[[nodiscard]] auto registers_dump() const
-	{
-		return regs_;
-	}
-
 	[[nodiscard]] auto memory_dump() const
 	{
 		return memory_.dump();

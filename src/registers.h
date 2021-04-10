@@ -198,6 +198,30 @@ private:
 	bool ime_flag_ = false;
 };
 
+struct RegistersDiff {
+	const int reg_index = {};
+	const uint16_t orig_value = {};
+	const uint16_t new_value = {};
+};
+
+template<typename T>
+class TD;
+
+inline auto registers_diff(const Registers& orig_registers, const Registers& new_registers)
+{
+	const auto reg_names = std::array<const char[3], 6>{"AF", "BC", "DE", "HL", "PC", "SP"};
+	auto results = std::vector<RegistersDiff>{};
+
+	for (const auto& name : reg_names) {
+		// TD<decltype(name)> td;
+		const auto orig_value = orig_registers.read(name);
+		const auto new_value = new_registers.read(name);
+		if (orig_value != new_value) {
+			results.push_back(RegistersDiff{Registers::register_index(name), orig_value, new_value});
+		}
+	}
+	return results;
+}
 
 // TODO: Actually do snapshots, do not save whole state
 class RegistersSnaphost {

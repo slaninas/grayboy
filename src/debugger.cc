@@ -184,6 +184,7 @@ auto main(int argc, const char** argv) -> int
 	auto running = false;
 	// auto instruction_count = static_cast<uint64_t>(0);
 	auto memory_snapshots = MemorySnapshots{cpu.get_memory()};
+	auto registers_snapshot = RegistersSnaphost{cpu.registers()};
 
 	while (true) {
 		auto registers_stream = std::ostringstream{};

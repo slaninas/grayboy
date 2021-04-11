@@ -162,7 +162,8 @@ auto main(int argc, const char** argv) -> int
 	auto cursed = MainCurse{};
 	auto instruction_window = CursedWindow{{0, 0}, {40, 50}};
 	auto reg_window = CursedWindow{{40, 0}, {18, 13}};
-	auto changes_window = CursedWindow{{40, 14}, {24, 13}};
+	auto changes_window = CursedWindow{{40, 26}, {24, 13}};
+	auto reg_changes_window = CursedWindow{{40, 13}, {24, 13}};
 
 	auto cpu_copy = cpu;
 	auto disassembled_instructions = disassemble(cpu_copy);
@@ -185,11 +186,13 @@ auto main(int argc, const char** argv) -> int
 	// auto instruction_count = static_cast<uint64_t>(0);
 	auto memory_snapshots = MemorySnapshots{cpu.get_memory()};
 	auto registers_snapshot = RegistersSnaphost{cpu.registers()};
+	registers_snapshot.add(cpu.registers());
 
 	while (true) {
 		auto registers_stream = std::ostringstream{};
 		auto instructions_stream = std::ostringstream{};
 		auto memory_changes_stream = std::ostringstream{};
+		auto reg_changes_stream = std::ostringstream{};
 
 		const auto disassembled = cpu.disassemble_next(next_addr);
 		next_addr = disassembled.next_address;
@@ -200,6 +203,9 @@ auto main(int argc, const char** argv) -> int
 		const auto mem_diffs = memory_snapshots.getLastNonEmptyDiffs(10);
 		memory_changes_stream << mem_diffs << '\n';
 
+		reg_changes_stream << "Last register changes:\n";
+		reg_changes_stream << registers_diff(registers_snapshot.get(1), cpu.registers());
+
 		const auto PC = cpu.registers().read("PC");
 		get_from_to(disassembled_instructions, 10, PC, instructions_stream);
 		if (!running) {
@@ -207,6 +213,8 @@ auto main(int argc, const char** argv) -> int
 			registers_stream << "IME: " << cpu.registers().read_IME() << '\n';
 			reg_window.update(registers_stream.str());
 			changes_window.update(memory_changes_stream.str());
+			reg_changes_window.update(reg_changes_stream.str());
+
 
 			const auto c = cursed.get_char();
 			if (c == 'r') { running = true; }
@@ -220,5 +228,6 @@ auto main(int argc, const char** argv) -> int
 		auto disassembled_new = disassemble(cpu_copy);
 		update_instructions(disassembled_new, disassembled_instructions);
 		memory_snapshots.add(cpu.get_memory());
+		registers_snapshot.add(cpu.registers());
 	}
 }

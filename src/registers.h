@@ -223,6 +223,30 @@ inline auto registers_diff(const Registers& orig_registers, const Registers& new
 	return results;
 }
 
+inline auto operator<<(std::ostream& os, const std::vector<RegistersDiff>& reg_diffs) -> auto&
+{
+	const auto reg_names = std::array<const char[3], 6>{"AF", "BC", "DE", "HL", "PC", "SP"};
+	os << std::hex;
+
+	const auto split = [](const auto& orig_value) {
+		const auto higher_bytes = (orig_value & 0xff00) >> 8;
+		const auto lower_bytes = (orig_value & 0x00ff) >> 0;
+		return std::pair{higher_bytes, lower_bytes};
+	};
+
+	for (const auto& [index, orig_value, new_value] : reg_diffs) {
+		const auto orig_split = split(orig_value);
+		const auto new_split = split(new_value);
+		os << reg_names[index / 2] << ": ";
+		os << std::setfill('0');
+		os << std::setw(2) << orig_split.first << ' ' << std::setw(2) << orig_split.second << " -> ";
+		os << std::setw(2) << new_split.first << ' ' << std::setw(2) << new_split.second << '\n';
+	}
+
+	os << std::dec;
+	return os;
+}
+
 // TODO: Actually do snapshots, do not save whole state
 class RegistersSnaphost {
 public:

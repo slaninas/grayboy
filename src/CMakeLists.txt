@@ -19,9 +19,9 @@ target_link_libraries(gameboy
 	cpu
 )
 
-#add_executable(debugger debugger.cc)
-#find_package(curses)
-#target_link_libraries(debugger
-#	ncurses
-#	cpu
-#)
+add_executable(debugger debugger.cc)
+find_package(curses)
+target_link_libraries(debugger
+	ncurses
+	cpu
+)

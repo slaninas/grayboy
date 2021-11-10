@@ -38,7 +38,7 @@ auto get_8bit_instructions() -> std::vector<Instruction>
 		{"LD SP, d16", 0x31, 3,
 			[](auto& regs, auto& memory, const auto& PC) {
 				const auto value = static_cast<uint16_t>(memory.read(PC + 1) + (memory.read(PC + 2) << 8));
-				regs.write("SP", value);
+				regs.write("HL", value);
 				return 3;
 			}
 		},

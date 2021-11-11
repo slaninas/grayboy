@@ -7,5 +7,3 @@ RUN update-alternatives --auto c++
 
 Copy . /app
 CMD cd /app && mkdir build-docker && cd build-docker && cmake .. && /usr/bin/time make -j7 && ctest
-
-CMD bash

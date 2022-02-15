@@ -188,6 +188,7 @@ auto main(int argc, const char** argv) -> int
 	auto registers_snapshot = RegistersSnaphost{cpu.registers()};
 	registers_snapshot.add(cpu.registers());
 
+	// TODO: Speed up, memory_snapshots.add() is causing massive slowdown when running to the checkpoint
 	while (true) {
 		auto registers_stream = std::ostringstream{};
 		auto instructions_stream = std::ostringstream{};

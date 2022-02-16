@@ -70,6 +70,7 @@ public:
 		if (flag == "C") { return static_cast<bool>(read("F") & (1 << 4)); }
 
 		assert(false && "You should not be here, it means you called read_flag with incorrect flag name.");
+		return false;
 	}
 
 	// TODO: Use set + reset flag methods instead?
@@ -185,6 +186,7 @@ public:
 		if (reg_name == "SP") { return 10; }
 
 		assert(false && "Used register doesn't exist.");
+		return 0;
 	}
 
 	auto operator==(const Registers& other) const

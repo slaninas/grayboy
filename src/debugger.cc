@@ -188,7 +188,6 @@ auto main(int argc, const char** argv) -> int
 	auto registers_snapshot = RegistersSnaphost{cpu.registers()};
 	registers_snapshot.add(cpu.registers());
 
-	// TODO: Speed up, memory_snapshots.add() is causing massive slowdown when running to the checkpoint
 	while (true) {
 		auto registers_stream = std::ostringstream{};
 		auto instructions_stream = std::ostringstream{};
@@ -228,7 +227,8 @@ auto main(int argc, const char** argv) -> int
 		cpu_copy = cpu;
 		auto disassembled_new = disassemble(cpu_copy);
 		update_instructions(disassembled_new, disassembled_instructions);
-		memory_snapshots.add(cpu.get_memory());
+		// TODO: Speed up? memory_snapshots.add() is causing massive slowdown when running to the breakpoint (debug build only)
+		// memory_snapshots.add(cpu.get_memory());
 		registers_snapshot.add(cpu.registers());
 	}
 }

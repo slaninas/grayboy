@@ -217,7 +217,15 @@ auto main(int argc, const char** argv) -> int
 
 
 			const auto c = cursed.get_char();
-			if (c == 'r') { running = true; }
+			switch (c) {
+				case 'r':
+					running = true;
+					break;
+				case 'm':
+					raw_dump(cpu.memory_dump(), "memory_dump");
+					continue;
+				default: break;
+			}
 		}
 		else {
 			if (should_break(break_points, next_addr)) { running = false; }

@@ -4,6 +4,7 @@
 #include <array>
 #include <cassert>
 #include <vector>
+#include <fstream>
 
 // TODO: Move into utils file
 
@@ -30,6 +31,12 @@ auto memory_diff(const Memory& orig_memory, const Memory& new_memory)
 		if (orig_value != new_value) { result.push_back({static_cast<uint16_t>(address), orig_value, new_value}); }
 	}
 	return result;
+}
+
+template<typename T>
+auto raw_dump(const T& container, const std::string& filename) {
+	auto file = std::ofstream(filename, std::ios::binary);
+	file.write(reinterpret_cast<const char*>(container.data()), container.size() * sizeof(typename T::value_type));
 }
 
 class Memory {

@@ -67,8 +67,14 @@ auto disassemble(Cpu& cpu)
 
 	// TODO: Unify size of lookup with get_from_to
 	for (int i = 0; i < 10; ++i) {
-		const auto info = cpu.disassemble_next(addr);
-		addr = info.next_address;
+		auto info = DisassemblyInfo{};
+		try {
+			info = cpu.disassemble_next(addr);
+			addr = info.next_address;
+		} catch (const std::runtime_error& e) {
+			info = DisassemblyInfo{addr, static_cast<uint16_t>(addr + 1), Instruction{}, std::vector{cpu.get_memory().read(addr)}};
+			addr = addr + 1;
+		}
 		disassembled.push_back(info);
 	}
 

@@ -16,7 +16,7 @@ void dprint(const DisassemblyInfo& info, std::ostream& os)
 	os << std::hex;
 	os << "0x" << std::setw(4) << std::setfill('0') << std::right << 	info.address << ": " << std::flush;
 	os << std::setw(15) << std::setfill(' ') << std::left << info.instruction.mnemonic  << " | ";
-	for (const auto& val : info.memory_representation) { os << (int)val << ' '; }
+	for (const auto& val : info.memory_representation) { os << std::setfill('0') << std::right << std::setw(2) << (int)val << ' '; }
 	os << '\n';
 	os << std::dec;
 }

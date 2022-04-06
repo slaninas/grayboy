@@ -9,7 +9,7 @@
 #include <numeric>
 #include <vector>
 
-// TODO: Check why "06-ld r,r.gb" blarggs test ROM crash on different instruction when running "gameboy" vs "debugger" executable
+// TODO: Check why "06-ld r,r.gb" blarggs test ROM crash on different instruction when running "grayboy" vs "debugger" executable
 
 void dprint(const DisassemblyInfo& info, std::ostream& os)
 {

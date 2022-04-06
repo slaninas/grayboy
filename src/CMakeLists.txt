@@ -14,8 +14,8 @@ target_link_libraries(cpu
 	instructions
 )
 
-add_executable(gameboy main.cc)
-target_link_libraries(gameboy
+add_executable(grayboy main.cc)
+target_link_libraries(grayboy
 	cpu
 )
 

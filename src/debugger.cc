@@ -71,7 +71,7 @@ auto disassemble(const Cpu& cpu)
 		auto info = DisassemblyInfo{};
 		try {
 			info = cpu.disassemble_next(addr);
-			addr = info.next_address;
+			addr += info.memory_representation.size();
 		} catch (const std::runtime_error& e) {
 			info = DisassemblyInfo{addr, static_cast<uint16_t>(addr + 1), Instruction{}, std::vector{cpu.get_memory().read(addr)}};
 			addr = addr + 1;

@@ -59,7 +59,7 @@ auto operator<<(std::ostream& os, const std::vector<MemoryDiff>& diff) -> std::o
 }
 
 // TODO: Simplify - read X instruction but do not actually follow jumps
-auto disassemble(Cpu& cpu)
+auto disassemble(const Cpu& cpu)
 {
 	auto addr = static_cast<uint16_t>(cpu.registers().read("PC"));
 

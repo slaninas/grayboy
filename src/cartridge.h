@@ -83,7 +83,7 @@ public:
 		std::cout << std::dec;
 	}
 
-	auto dump()
+	auto dump() const
 	{
 		return buffer_;
 	}

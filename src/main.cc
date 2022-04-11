@@ -36,7 +36,7 @@ auto main(int argc, const char** argv) -> int
 
 
 	// Initializing values same way bgb emualtor does it
-	// RegistersChanger{.AF = 0x1180, .DE = 0xff56, .HL = 0x000d, .PC = 0x0100, .SP = 0xfffe}.get(Registers{});
+	// RegistersChanger{.AF = 0x01b0, .BC=0x0013, .DE = 0x00d8, .HL = 0x014d, .PC = 0x0100, .SP = 0xfffe}.get(Registers{});
 	const auto regs =
 		Registers{};
 

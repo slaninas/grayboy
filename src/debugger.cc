@@ -246,7 +246,7 @@ auto main(int argc, const char** argv) -> int
 		auto disassembled_new = disassemble(cpu_copy);
 		update_instructions(disassembled_new, disassembled_instructions);
 		// TODO: Speed up? memory_snapshots.add() is causing massive slowdown when running to the breakpoint (debug build only)
-		// memory_snapshots.add(cpu.get_memory());
+		memory_snapshots.add(cpu.get_memory());
 		registers_snapshot.add(cpu.registers());
 	}
 }

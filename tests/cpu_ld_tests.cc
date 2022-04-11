@@ -1464,7 +1464,7 @@ TEST_CASE("LD (a16), A - 0xea", "[ld]")
 TEST_CASE("LD A, (a16) - 0xfa", "[ld]")
 {
 	const auto orig_memory =
-	  MemoryChanger{{{0x00, 0xfa}, {0x01, 0xfe}, {0x02, 0xc1}, {0xfec1, 0xbc}}}.get(getRandomMemory());
+	  MemoryChanger{{{0x00, 0xfa}, {0x01, 0xfe}, {0x02, 0xc1}, {0xc1fe, 0xbc}}}.get(getRandomMemory());
 	const auto orig_regs = RegistersChanger{.PC = 0x00}.get(getRandomRegisters());
 	auto cpu = Cpu{orig_memory, orig_regs};
 

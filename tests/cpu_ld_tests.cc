@@ -1457,7 +1457,7 @@ TEST_CASE("LD (a16), A - 0xea", "[ld]")
 	CHECK(cycles == 4);
 	const auto correct_regs = RegistersChanger{.PC = 0x03}.get(orig_regs);
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
-	const auto correct_memory = MemoryChanger{{{0xfec1, 0xba}}}.get(orig_memory);
+	const auto correct_memory = MemoryChanger{{{0xc1fe, 0xba}}}.get(orig_memory);
 	CHECK(cpu.memory_dump() == correct_memory.dump());
 }
 

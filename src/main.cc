@@ -5,6 +5,7 @@
 #include <vector>
 
 
+// TODO: At the end run all tests again to check whether the fixes for tests didn't break previous
 // State (BLARGG comparison)
 // ************************
 // - BootRom has no diff compared to https://github.com/wheremyfoodat/Gameboy-logs except last 100 lines but it should be just checksum (and I'm running different cartridge

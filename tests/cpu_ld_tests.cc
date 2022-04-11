@@ -270,7 +270,7 @@ TEST_CASE("LD (HL), d8 - 0x36", "[ld]")
 
 	const auto cycles = cpu.execute_next();
 	CHECK(cycles == 3);
-	const auto correct_regs = RegistersChanger{.PC = 0x01}.get(orig_regs);
+	const auto correct_regs = RegistersChanger{.PC = 0x02}.get(orig_regs);
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
 	const auto correct_memory = MemoryChanger{{{0xfedc, 0x12}}}.get(orig_memory);
 	CHECK(cpu.memory_dump() == correct_memory.dump());

@@ -234,7 +234,7 @@ auto get_8bit_instructions() -> std::vector<Instruction>
 		},
 		// https://meganesulli.com/generate-gb-opcodes/ says it's 1 byte long instruction but it doesn't make sense, right?
 		// TODO: Is 3 cycles correct?
-		{"LD (HL), d8", 0x36, 1,
+		{"LD (HL), d8", 0x36, 2,
 			[](auto& regs, auto& memory, const auto& PC) {
 				const auto address = regs.read("HL");
 				const auto value = memory.read(PC + 1);

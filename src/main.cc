@@ -5,10 +5,11 @@
 #include <vector>
 
 
-// State
+// State (BLARGG comparison)
 // ************************
 // - BootRom has no diff compared to https://github.com/wheremyfoodat/Gameboy-logs except last 100 lines but it should be just checksum (and I'm running different cartridge
 //   than the author of those dumps
+// - Blargg 06 works fine (PC must be set to 0x101 instead of 0x100 at the beginning)
 
 auto main(int argc, const char** argv) -> int
 {

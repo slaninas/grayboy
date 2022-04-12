@@ -155,7 +155,7 @@ void log(const Cpu& cpu) {
 	debug_log << std::hex << get_formatted(cpu.get_memory().read(PC + 2), 2) << ' ';
 	debug_log << std::hex << get_formatted(cpu.get_memory().read(PC + 3), 2);
 	debug_log << ')';
-	debug_log << std::endl;;
+	debug_log << '\n';
 
 
 }

@@ -4,6 +4,8 @@
 
 [[nodiscard]] auto find_by_opcode(const uint16_t opcode, const std::vector<Instruction>& instructions) -> Instruction
 {
+	// const auto index = opcode <= 0xff ? opcode : (opcode & 0xff) + 0x100;
+	// return instructions[opcode];
 	auto res = std::find_if(begin(instructions), end(instructions), [opcode](const auto& instruction) {
 		return instruction.opcode == opcode;
 	});

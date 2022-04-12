@@ -806,26 +806,17 @@ auto get_8bit_instructions() -> std::vector<Instruction>
 		},
 
 		// LD with signed add
-		// TODO: Check if subtraction works correctly
 		{"LD HL, SP+s8", 0xf8, 2,
 			[](auto& regs, auto& memory, const auto& PC) {
 				const auto value = static_cast<int8_t>(memory.read(PC + 1));
 				const auto SP = regs.read("SP");
-				const auto HL_old = regs.read("HL");
 
-				const auto intermediate_result = static_cast<uint16_t>(SP + value);
-				auto half_carry = half_carry_add_16bit(SP, value);
-				auto carry = carry_add_16bit(SP, value);
-
-				const auto HL_new = static_cast<uint16_t>(HL_old + intermediate_result);
-				half_carry |= half_carry_add_16bit(HL_old, intermediate_result);
-				carry |= carry_add_16bit(HL_old, intermediate_result);
-
-				regs.write("HL", HL_new);
+				regs.write("HL", static_cast<uint16_t>(SP + value));
 				regs.set_flag("Z", false);
 				regs.set_flag("N", false);
-				regs.set_flag("H", half_carry);
-				regs.set_flag("C", carry);
+				regs.set_flag("H", half_carry_add_8bit(SP, value));
+				regs.set_flag("C", carry_add_8bit(SP, value));
+
 				return 3;
 			}
 		},
@@ -926,7 +917,7 @@ auto get_8bit_instructions() -> std::vector<Instruction>
 		{"LD (a16), SP", 0x08, 3,
 			[](auto& regs, auto& memory, const auto& PC) {
 				// TODO: Put into method
-				const auto address = static_cast<uint16_t>((memory.read(PC + 1) << 8) + memory.read(PC + 2));
+				const auto address = static_cast<uint16_t>((memory.read(PC + 2) << 8) + memory.read(PC + 1));
 				const auto SP = regs.read("SP");
 				memory.write(address, static_cast<uint8_t>(SP & 0x00ff));
 				memory.write(address + 1, static_cast<uint8_t>((SP & 0xff00) >> 8));
@@ -1528,8 +1519,8 @@ auto get_8bit_instructions() -> std::vector<Instruction>
 				regs.write("SP", SP_new);
 				regs.set_flag("Z", false);
 				regs.set_flag("N", false);
-				regs.set_flag("H", half_carry_add_16bit(SP_old, value));
-				regs.set_flag("C", carry_add_16bit(SP_old, value));
+				regs.set_flag("H", half_carry_add_8bit(SP_old, value));
+				regs.set_flag("C", carry_add_8bit(SP_old, value));
 				return 4;
 			}
 		},

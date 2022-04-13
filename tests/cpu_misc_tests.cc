@@ -40,20 +40,20 @@ TEST_CASE("NOP - 0x00", "[misc]")
 TEST_CASE("SCF - 0x37", "[misc]")
 {
 	const auto orig_memory = MemoryChanger{{{0x00, 0x37}, {0x01, 0x37}}}.get(getRandomMemory());
-	const auto orig_flags = FlagsChanger{.C = 0}.get(getRandomFlags());
+	const auto orig_flags = FlagsChanger{.N = 1, .H = 1, .C = 0}.get(getRandomFlags());
 	const auto orig_regs = RegistersChanger{.F = orig_flags, .PC = 0x00}.get(getRandomRegisters());
 	auto cpu = Cpu{orig_memory, orig_regs};
 
 	auto cycles = cpu.execute_next();
 	CHECK(cycles == 1);
-	auto correct_flags = FlagsChanger{.C = 1}.get(orig_flags);
+	auto correct_flags = FlagsChanger{.N = 0, .H = 0, .C = 1}.get(orig_flags);
 	auto correct_registers = RegistersChanger{.F = correct_flags, .PC = 0x01}.get(orig_regs);
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
 	CHECK(cpu.memory_dump() == orig_memory.dump());
 
 	cycles = cpu.execute_next();
 	CHECK(cycles == 1);
-	correct_flags = FlagsChanger{.C = 1}.get(orig_flags);
+	correct_flags = FlagsChanger{.N = 0, .H = 0, .C = 1}.get(orig_flags);
 	correct_registers = RegistersChanger{.F = correct_flags, .PC = 0x02}.get(orig_regs);
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_registers});
 	CHECK(cpu.memory_dump() == orig_memory.dump());

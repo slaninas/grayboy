@@ -943,6 +943,8 @@ auto get_8bit_instructions() -> std::vector<Instruction>
 
 		{"SCF", 0x37, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				regs.set_flag("N", false);
+				regs.set_flag("H", false);
 				regs.set_flag("C", true);
 				return 1;
 			}

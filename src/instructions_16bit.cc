@@ -147,7 +147,7 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 		},
 		{"RL L", 0xcb15, 2,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
-				instruction_rl("R", regs);
+				instruction_rl("L", regs);
 				return 2;
 			}
 		},

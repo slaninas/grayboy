@@ -28,6 +28,9 @@ public:
 	Cartridge(const std::string& filename)
 	{
 		auto file = std::ifstream(filename, std::ios::binary);
+		if (file.fail()) {
+			throw std::invalid_argument(std::string("Can't open file >") + filename + "<");
+		}
 		auto buffer = std::vector<uint8_t>(std::istreambuf_iterator<char>(file), {});
 
 		convert(buffer, buffer_);

@@ -6,7 +6,6 @@ auto get_8bit_instructions() -> std::vector<Instruction>
 		// TODO: {"STOP", 0x10, 2, 1},
 		// TODO: DAA - 0x27
 		// TODO: HALT - 0x76
-		// TODO: RETI - 0xd9
 		{"NOP", 0x00, 1,
 			[]([[maybe_unused]] auto& regs, [[maybe_unused]] auto& mem, [[maybe_unused]] const auto& PC) {
 				return 1;
@@ -1611,6 +1610,20 @@ auto get_8bit_instructions() -> std::vector<Instruction>
 				return 2;
 			}
 		},
+		// TODO: Add unit test?
+		{"RETI", 0xd9, 1,
+			[](auto& regs,  auto& memory, [[maybe_unused]] const auto& PC) {
+				regs.set_IME(true);
+
+				const auto SP = regs.read("SP");
+				const auto PC_new = static_cast<uint16_t>((memory.read(SP + 1) << 8) + memory.read(SP));
+				regs.write("PC", PC_new - 1);
+				regs.write("SP", SP + 2);
+
+				return 4;
+			}
+		},
+
 		{"RET", 0xc9, 1,
 			[](auto& regs,  auto& memory, [[maybe_unused]] const auto& PC) {
 				const auto SP = regs.read("SP");

@@ -92,7 +92,7 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 		},
 		{"RRC L", 0xcb0d, 2,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
-				instruction_rrc("R", regs);
+				instruction_rrc("L", regs);
 				return 2;
 			}
 		},

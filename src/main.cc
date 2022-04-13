@@ -15,6 +15,7 @@
 // - Blargg 05 works fine
 // - Blargg 06 works fine (PC must be set to 0x101 instead of 0x100 at the beginning)
 // - Blargg 07 prints that test passed but there are differences with the Gameboy-logs - it seems the logs have RST instruction merged with following instructions
+// - Blargg 08 works fine
 
 auto main(int argc, const char** argv) -> int
 {

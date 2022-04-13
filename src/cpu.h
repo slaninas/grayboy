@@ -103,7 +103,11 @@ public:
 	}
 
 	// TODO: Remove this once I can do snapshots of whole cpu state
-	[[nodiscard]] auto get_memory() const {
+	[[nodiscard]] const auto& get_memory() const {
+		return memory_;
+	}
+
+	[[nodiscard]] auto& get_memory() {
 		return memory_;
 	}
 

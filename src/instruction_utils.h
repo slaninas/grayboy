@@ -136,8 +136,8 @@ void instruction_add(
 
 		regs.set_flag("Z", dest_new == 0); // TODO: This is the only difference between 8 and 16bit, merge rest?
 		regs.set_flag("N", false);
-		regs.set_flag("H", half_carry_add_16bit(dest_old, second_reg));
-		regs.set_flag("C", carry_add_16bit(dest_old, second_reg));
+		regs.set_flag("H", half_carry_add_8bit(dest_old, second_reg));
+		regs.set_flag("C", carry_add_8bit(dest_old, second_reg));
 	}
 	// 16bit
 	else {

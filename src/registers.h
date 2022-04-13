@@ -40,7 +40,7 @@ public:
 
 	// TODO: Hide this and set_flag methos, use one method instead of write + set_flag
 	template<size_t kSize>
-	void write(const char (&reg_name)[kSize], uint16_t value)
+	void write(const char (&reg_name)[kSize], const uint16_t& value)
 	{
 		constexpr auto reg_name_size = kSize - 1; // Subtract \0 at the end
 		const auto reg_index = register_index(reg_name);
@@ -54,7 +54,12 @@ public:
 		}
 		// Combined 16bit registers
 		else {
-			*reinterpret_cast<uint16_t*>(register_array_.data() + reg_index) = value;
+			if (std::string(reg_name) == std::string("AF")) {
+				// Only 4 highest bits of F can be written to
+				*reinterpret_cast<uint16_t*>(register_array_.data() + reg_index) = (value & 0xfff0) + (read("F") & 0xf);
+			} else {
+				*reinterpret_cast<uint16_t*>(register_array_.data() + reg_index) = value;
+			}
 		}
 	}
 

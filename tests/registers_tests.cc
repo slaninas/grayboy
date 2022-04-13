@@ -49,7 +49,7 @@ TEST_CASE("RegistersChanger", "[registers]")
 
 	changed_regs =
 	  RegistersChanger{.AF = 0xcd, .BC = 0xfe, .DE = 0x12, .HL = 0x56, .PC = 0x87, .SP = 0x43}.get(orig_regs);
-	CHECK(changed_regs.read("AF") == 0xcd);
+	CHECK(changed_regs.read("AF") == 0xc0 + (orig_regs.read("F") & 0x0f));
 	CHECK(changed_regs.read("BC") == 0xfe);
 	CHECK(changed_regs.read("DE") == 0x12);
 	CHECK(changed_regs.read("HL") == 0x56);

@@ -1408,13 +1408,17 @@ TEST_CASE("PUSH AF - 0xf5", "[ld]")
 {
 	const auto orig_memory = MemoryChanger{{{0x00, 0xf5}}}.get(getRandomMemory());
 	const auto orig_regs = RegistersChanger{.AF = 0xbcde, .PC = 0x00, .SP = 0x3278}.get(getRandomRegisters());
+	// Lower 4 bits of F can't be written - RegistersChanger is setting it but it's ignored so there is a random value from getRandomRegisters()
+	const auto F_orig = orig_regs.read("F");
 	auto cpu = Cpu{orig_memory, orig_regs};
 
 	const auto cycles = cpu.execute_next();
 	CHECK(cycles == 4);
 	const auto correct_regs = RegistersChanger{.PC = 0x01, .SP = 0x3276}.get(orig_regs);
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
-	const auto correct_memory = MemoryChanger{{{0x3277, 0xbc}, {0x3276, 0xde}}}.get(orig_memory);
+	const auto correct_memory = MemoryChanger{{{0x3277, 0xbc}, {0x3276, 0xd0 + (F_orig & 0xf)}}}.get(orig_memory);
+
+	// const auto& memory = cpu.get_memory();
 	CHECK(cpu.memory_dump() == correct_memory.dump());
 }
 

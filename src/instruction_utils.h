@@ -65,8 +65,8 @@ struct Instruction {
 
 inline void instruction_rst(const uint8_t& value, Registers& regs, Memory& memory, const uint16_t& PC)
 {
-	const auto PC_high = static_cast<uint8_t>((PC & 0xff00) >> 8);
-	const auto PC_low = static_cast<uint8_t>(PC & 0x00ff);
+	const auto PC_high = static_cast<uint8_t>(((PC + 1) & 0xff00) >> 8);
+	const auto PC_low = static_cast<uint8_t>((PC + 1) & 0x00ff);
 	const auto SP = regs.read("SP");
 
 	memory.write(SP - 1, PC_high);

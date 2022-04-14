@@ -10,6 +10,7 @@
 // ************************
 // - BootRom has no diff compared to https://github.com/wheremyfoodat/Gameboy-logs except last 100 lines but it should be just checksum (and I'm running different cartridge
 //   than the author of those dumps
+// - Blargg 01 works fine
 // - Blargg 03 works fine
 // - Blargg 04 works fine
 // - Blargg 05 works fine

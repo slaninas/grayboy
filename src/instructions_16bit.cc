@@ -42,12 +42,13 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"RLC (HL)", 0xcb06, 2,
-			[](auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto value = memory.read(address);
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto HL = regs.read("HL");
+				const auto value = memory.read(HL);
 				const auto [new_value, carry] = rlc(value);
 
-				memory.write(address, new_value);
+
+				memory.write(HL, new_value);
 				set_flags_for_rotate(regs, new_value, carry);
 				return 4;
 			}
@@ -97,12 +98,12 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"RRC (HL)", 0xcb0e, 2,
-			[](auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto value = memory.read(address);
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto HL = regs.read("HL");
+				const auto value = memory.read(HL);
 				const auto [new_value, carry] = rrc(value);
 
-				memory.write(address, new_value);
+				memory.write(HL, new_value);
 				set_flags_for_rotate(regs, new_value, carry);
 				return 4;
 			}
@@ -152,13 +153,13 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"RL (HL)", 0xcb16, 2,
-			[](auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto value = memory.read(address);
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto HL = regs.read("HL");
+				const auto value = memory.read(HL);
 				const auto old_carry = regs.read_flag("C");
 				const auto [new_value, carry] = rl(value, old_carry);
 
-				memory.write(address, new_value);
+				memory.write(HL, new_value);
 				set_flags_for_rotate(regs, new_value, carry);
 				return 4;
 			}
@@ -208,13 +209,13 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"RR (HL)", 0xcb1e, 2,
-			[](auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto value = memory.read(address);
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto HL = regs.read("HL");
+				const auto value = memory.read(HL);
 				const auto old_carry = regs.read_flag("C");
 				const auto [new_value, carry] = rr(value, old_carry);
 
-				memory.write(address, new_value);
+				memory.write(HL, new_value);
 				set_flags_for_rotate(regs, new_value, carry);
 				return 4;
 			}
@@ -264,12 +265,12 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"SLA (HL)", 0xcb26, 2,
-			[](auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto value = memory.read(address);
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto HL = regs.read("HL");
+				const auto value = memory.read(HL);
 				const auto [new_value, carry] = sla(value);
 
-				memory.write(address, new_value);
+				memory.write(HL, new_value);
 				set_flags_for_shift(regs, new_value, carry);
 				return 4;
 			}
@@ -319,12 +320,12 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"SRA (HL)", 0xcb2e, 2,
-			[](auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto value = memory.read(address);
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto HL = regs.read("HL");
+				const auto value = memory.read(HL);
 				const auto [new_value, carry] = sra(value);
 
-				memory.write(address, new_value);
+				memory.write(HL, new_value);
 				set_flags_for_shift(regs, new_value, carry);
 				return 4;
 			}
@@ -374,12 +375,12 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"SWAP (HL)", 0xcb36, 2,
-			[](auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto value = memory.read(address);
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto HL = regs.read("HL");
+				const auto value = memory.read(HL);
 				const auto new_value = swap(value);
 
-				memory.write(address, new_value);
+				memory.write(HL, new_value);
 				set_flags_for_swap(regs, new_value);
 				return 4;
 			}
@@ -429,12 +430,12 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"SRL (HL)", 0xcb3e, 2,
-			[](auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto value = memory.read(address);
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto HL = regs.read("HL");
+				const auto value = memory.read(HL);
 				const auto [new_value, carry] = srl(value);
 
-				memory.write(address, new_value);
+				memory.write(HL, new_value);
 				set_flags_for_shift(regs, new_value, carry);
 				return 4;
 			}
@@ -484,9 +485,9 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"BIT 0, (HL)", 0xcb46, 2,
-			[](auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto value = memory.read(address);
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto HL = regs.read("HL");
+				const auto value = memory.read(HL);
 				bit(value, 0, regs);
 				return 4;
 			}
@@ -534,9 +535,9 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"BIT 1, (HL)", 0xcb4e, 2,
-			[](auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto value = memory.read(address);
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto HL = regs.read("HL");
+				const auto value = memory.read(HL);
 				bit(value, 1, regs);
 				return 4;
 			}
@@ -585,9 +586,9 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"BIT 2, (HL)", 0xcb56, 2,
-			[](auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto value = memory.read(address);
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto HL = regs.read("HL");
+				const auto value = memory.read(HL);
 				bit(value, 2, regs);
 				return 4;
 			}
@@ -635,9 +636,9 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"BIT 3, (HL)", 0xcb5e, 2,
-			[](auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto value = memory.read(address);
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto HL = regs.read("HL");
+				const auto value = memory.read(HL);
 				bit(value, 3, regs);
 				return 4;
 			}
@@ -686,9 +687,9 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"BIT 4, (HL)", 0xcb66, 2,
-			[](auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto value = memory.read(address);
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto HL = regs.read("HL");
+				const auto value = memory.read(HL);
 				bit(value, 4, regs);
 				return 4;
 			}
@@ -736,9 +737,9 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"BIT 5, (HL)", 0xcb6e, 2,
-			[](auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto value = memory.read(address);
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto HL = regs.read("HL");
+				const auto value = memory.read(HL);
 				bit(value, 5, regs);
 				return 4;
 			}
@@ -787,9 +788,9 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"BIT 6, (HL)", 0xcb76, 2,
-			[](auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto value = memory.read(address);
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto HL = regs.read("HL");
+				const auto value = memory.read(HL);
 				bit(value, 6, regs);
 				return 4;
 			}
@@ -837,9 +838,9 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"BIT 7, (HL)", 0xcb7e, 2,
-			[](auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto value = memory.read(address);
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto HL = regs.read("HL");
+				const auto value = memory.read(HL);
 				bit(value, 7, regs);
 				return 4;
 			}
@@ -889,12 +890,12 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"RES 0, (HL)", 0xcb86, 2,
-			[]([[maybe_unused]] auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto old_value = memory.read(address);
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto HL = regs.read("HL");
+				const auto old_value = memory.read(HL);
 
 				auto new_value = reset_bit(old_value, 0);
-				memory.write(address, new_value);
+				memory.write(HL, new_value);
 				return 4;
 			}
 		},
@@ -941,12 +942,12 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"RES 1, (HL)", 0xcb8e, 2,
-			[]([[maybe_unused]] auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto old_value = memory.read(address);
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto HL = regs.read("HL");
+				const auto old_value = memory.read(HL);
 
 				auto new_value = reset_bit(old_value, 1);
-				memory.write(address, new_value);
+				memory.write(HL, new_value);
 				return 4;
 			}
 		},
@@ -994,12 +995,12 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"RES 2, (HL)", 0xcb96, 2,
-			[]([[maybe_unused]] auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto old_value = memory.read(address);
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto HL = regs.read("HL");
+				const auto old_value = memory.read(HL);
 
 				auto new_value = reset_bit(old_value, 2);
-				memory.write(address, new_value);
+				memory.write(HL, new_value);
 				return 4;
 			}
 		},
@@ -1046,12 +1047,12 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"RES 3, (HL)", 0xcb9e, 2,
-			[]([[maybe_unused]] auto& regs,  auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto old_value = memory.read(address);
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto HL = regs.read("HL");
+				const auto old_value = memory.read(HL);
 
 				auto new_value = reset_bit(old_value, 3);
-				memory.write(address, new_value);
+				memory.write(HL, new_value);
 				return 4;
 			}
 		},
@@ -1099,12 +1100,12 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"RES 4, (HL)", 0xcba6, 2,
-			[]([[maybe_unused]] auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto old_value = memory.read(address);
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto HL = regs.read("HL");
+				const auto old_value = memory.read(HL);
 
 				auto new_value = reset_bit(old_value, 4);
-				memory.write(address, new_value);
+				memory.write(HL, new_value);
 				return 4;
 			}
 		},
@@ -1151,12 +1152,12 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"RES 5, (HL)", 0xcbae, 2,
-			[]([[maybe_unused]] auto& regs,  auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto old_value = memory.read(address);
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto HL = regs.read("HL");
+				const auto old_value = memory.read(HL);
 
 				auto new_value = reset_bit(old_value, 5);
-				memory.write(address, new_value);
+				memory.write(HL, new_value);
 				return 4;
 			}
 		},
@@ -1204,12 +1205,12 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"RES 6, (HL)", 0xcbb6, 2,
-			[]([[maybe_unused]] auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto old_value = memory.read(address);
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto HL = regs.read("HL");
+				const auto old_value = memory.read(HL);
 
 				auto new_value = reset_bit(old_value, 6);
-				memory.write(address, new_value);
+				memory.write(HL, new_value);
 				return 4;
 			}
 		},
@@ -1256,12 +1257,12 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"RES 7, (HL)", 0xcbbe, 2,
-			[]([[maybe_unused]] auto& regs,  auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto old_value = memory.read(address);
+			[](auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				const auto HL = regs.read("HL");
+				const auto old_value = memory.read(HL);
 
 				auto new_value = reset_bit(old_value, 7);
-				memory.write(address, new_value);
+				memory.write(HL, new_value);
 				return 4;
 			}
 		},
@@ -1309,13 +1310,8 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"SET 0, (HL)", 0xcbc6, 2,
-			[]([[maybe_unused]] auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto old_value = memory.read(address);
-
-				auto new_value = set_bit(old_value, 0);
-				memory.write(address, new_value);
-				return 4;
+			[]([[maybe_unused]] auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				return instruction_set_bit_hl(memory, regs, 0);
 			}
 		},
 		{"SET 0, A", 0xcbc7, 2,
@@ -1361,13 +1357,8 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"SET 1, (HL)", 0xcbce, 2,
-			[]([[maybe_unused]] auto& regs,  auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto old_value = memory.read(address);
-
-				auto new_value = set_bit(old_value, 1);
-				memory.write(address, new_value);
-				return 4;
+			[]([[maybe_unused]] auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				return instruction_set_bit_hl(memory, regs, 1);
 			}
 		},
 		{"SET 1, A", 0xcbcf, 2,
@@ -1414,13 +1405,8 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"SET 2, (HL)", 0xcbd6, 2,
-			[]([[maybe_unused]] auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto old_value = memory.read(address);
-
-				auto new_value = set_bit(old_value, 2);
-				memory.write(address, new_value);
-				return 4;
+			[]([[maybe_unused]] auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				return instruction_set_bit_hl(memory, regs, 2);
 			}
 		},
 		{"SET 2, A", 0xcbd7, 2,
@@ -1466,13 +1452,8 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"SET 3, (HL)", 0xcbde, 2,
-			[]([[maybe_unused]] auto& regs,  auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto old_value = memory.read(address);
-
-				auto new_value = set_bit(old_value, 3);
-				memory.write(address, new_value);
-				return 4;
+			[]([[maybe_unused]] auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				return instruction_set_bit_hl(memory, regs, 3);
 			}
 		},
 		{"SET 3, A", 0xcbdf, 2,
@@ -1519,13 +1500,8 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"SET 4, (HL)", 0xcbe6, 2,
-			[]([[maybe_unused]] auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto old_value = memory.read(address);
-
-				auto new_value = set_bit(old_value, 4);
-				memory.write(address, new_value);
-				return 4;
+			[]([[maybe_unused]] auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				return instruction_set_bit_hl(memory, regs, 4);
 			}
 		},
 		{"SET 4, A", 0xcbe7, 2,
@@ -1571,13 +1547,8 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"SET 5, (HL)", 0xcbee, 2,
-			[]([[maybe_unused]] auto& regs,  auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto old_value = memory.read(address);
-
-				auto new_value = set_bit(old_value, 5);
-				memory.write(address, new_value);
-				return 4;
+			[]([[maybe_unused]] auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				return instruction_set_bit_hl(memory, regs, 5);
 			}
 		},
 		{"SET 5, A", 0xcbef, 2,
@@ -1624,13 +1595,8 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"SET 6, (HL)", 0xcbf6, 2,
-			[]([[maybe_unused]] auto& regs, auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto old_value = memory.read(address);
-
-				auto new_value = set_bit(old_value, 6);
-				memory.write(address, new_value);
-				return 4;
+			[]([[maybe_unused]] auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				return instruction_set_bit_hl(memory, regs, 6);
 			}
 		},
 		{"SET 6, A", 0xcbf7, 2,
@@ -1676,13 +1642,8 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 			}
 		},
 		{"SET 7, (HL)", 0xcbfe, 2,
-			[]([[maybe_unused]] auto& regs,  auto& memory, const auto& PC) {
-				const auto address = memory.read(PC + 1);
-				const auto old_value = memory.read(address);
-
-				auto new_value = set_bit(old_value, 7);
-				memory.write(address, new_value);
-				return 4;
+			[]([[maybe_unused]] auto& regs, auto& memory, [[maybe_unused]] const auto& PC) {
+				return instruction_set_bit_hl(memory, regs, 7);
 			}
 		},
 		{"SET 7, A", 0xcbff, 2,

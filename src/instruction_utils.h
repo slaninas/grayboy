@@ -524,6 +524,15 @@ inline void instruction_set_bit(const char (&reg_name)[2], const uint8_t positio
 	regs.write(reg_name, new_value);
 }
 
+inline auto instruction_set_bit_hl(Memory& memory, const Registers& regs, const uint8_t& bit) -> uint64_t {
+	const auto HL = regs.read("HL");
+	const auto old_value = memory.read(HL);
+
+	auto new_value = set_bit(old_value, bit);
+	memory.write(HL, new_value);
+	return 4;
+}
+
 inline auto reset_bit(const uint8_t orig_value, const uint8_t position)
 {
 	assert(position <= 7);

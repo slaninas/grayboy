@@ -4,7 +4,6 @@ auto get_8bit_instructions() -> std::vector<Instruction>
 {
 	return std::vector<Instruction>{
 		// TODO: {"STOP", 0x10, 2, 1},
-		// TODO: DAA - 0x27
 		// TODO: HALT - 0x76
 		{"NOP", 0x00, 1,
 			[]([[maybe_unused]] auto& regs, [[maybe_unused]] auto& mem, [[maybe_unused]] const auto& PC) {
@@ -940,7 +939,46 @@ auto get_8bit_instructions() -> std::vector<Instruction>
 				return 4;
 			}
 		},
+		// TODO: Add unit test?
+		{"DAA", 0x27, 1,
+			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				// https://forums.nesdev.org/viewtopic.php?p=196282&sid=3441048d6a2d28d493f69044754e4e42#p196282
+				const auto A = regs.read("A");
 
+				const auto N = regs.read_flag("N");
+				const auto H = regs.read_flag("H");
+				const auto C = regs.read_flag("C");
+
+
+				auto A_new = A;
+				auto C_new = C;
+
+				if (!N) {
+					if (C_new || A_new > 0x99) {
+						A_new += 0x60;
+						C_new = true;
+					}
+					if (H || (A_new & 0xf) > 0x09)  {
+						A_new += 0x6;
+					}
+				} else {
+					if (C_new) {
+						A_new -= 0x60;
+					}
+					if (H) {
+						A_new -= 0x6;
+					}
+				}
+
+				regs.write("A", A_new);
+				regs.set_flag("Z", A_new == 0);
+				regs.set_flag("H", 0);
+				regs.set_flag("C", C_new);
+
+
+				return 1;
+			}
+		},
 		{"SCF", 0x37, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				regs.set_flag("N", false);

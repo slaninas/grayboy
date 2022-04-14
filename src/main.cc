@@ -18,6 +18,7 @@
 // - Blargg 08 works fine
 // - Blargg 09 works fine
 // - Blargg 10 works fine
+// - Blargg 11 works fine
 
 auto main(int argc, const char** argv) -> int
 {

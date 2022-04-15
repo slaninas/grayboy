@@ -79,7 +79,7 @@ public:
 
 		if (ff02 == 0x81) {
 			const auto c = static_cast<char>(cpu_.get_memory().read(0xff01));
-			std::cout << c;
+			// std::cout << c;
 			serial_link_ += c;
 			cpu_.get_memory().write(0xff02, 0x80);
 		}

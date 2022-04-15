@@ -53,7 +53,7 @@ public:
 
 	[[nodiscard]] auto execute_next()
 	{
-		log(*this);
+		// log(*this);
 		const auto PC = regs_.read("PC");
 		const auto opcode = get_opcode(PC);
 

@@ -4,7 +4,6 @@ auto get_8bit_instructions() -> std::vector<Instruction>
 {
 	return std::vector<Instruction>{
 		// TODO: {"STOP", 0x10, 2, 1},
-		// TODO: HALT - 0x76
 		{"NOP", 0x00, 1,
 			[]([[maybe_unused]] auto& regs, [[maybe_unused]] auto& mem, [[maybe_unused]] const auto& PC) {
 				return 1;
@@ -984,6 +983,12 @@ auto get_8bit_instructions() -> std::vector<Instruction>
 				regs.set_flag("N", false);
 				regs.set_flag("H", false);
 				regs.set_flag("C", true);
+				return 1;
+			}
+		},
+		{"HALT", 0x76, 1,
+			[]([[maybe_unused]] auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
+				regs.set_halt(true);
 				return 1;
 			}
 		},

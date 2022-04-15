@@ -167,6 +167,15 @@ public:
 	{
 		return ime_flag_;
 	}
+
+	auto set_halt(const bool& value) {
+		halt_ = value;
+	}
+
+	[[nodiscard]] auto read_halt() const {
+		return halt_;
+	}
+
 	//
 	// TODO: Make it standalone function
 	static auto register_index(const std::string_view& reg_name) -> int
@@ -203,6 +212,7 @@ private:
 	std::array<uint8_t, 12> register_array_ = {};
 
 	bool ime_flag_ = false;
+	bool halt_ = false;
 };
 
 struct RegistersDiff {

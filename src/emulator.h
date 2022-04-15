@@ -104,46 +104,42 @@ public:
 
 	auto execute_next() -> uint64_t {
 
-		// Interupts
-		if (cpu_.registers().read_IME()) {
-			auto& mem = cpu_.get_memory();
-			if (mem.read(0xffff) & 0x1 && mem.read(0xff0f) & 0x1) {
-				// V-Blank
-				return handle_interupt(0x1);
+		auto cycles = 0;
 
-			} else if (mem.read(0xffff) & 0x2 && mem.read(0xff0f) & 0x2) {
-				// LCD Stat
-				return handle_interupt(0x2);
+		if (cpu_.registers().read_halt()) {
+			const auto interupt = check_interupts();
+			if (interupt > 0) {
+				cpu_.registers().set_halt(false);
 
-			} else if (mem.read(0xffff) & 0x4 && mem.read(0xff0f) & 0x4) {
-				// Timer
-				return handle_interupt(0x4);
+				if (cpu_.registers().read_IME()) {
+					cycles = handle_interupt(interupt);
+				}
+			} else {
+				cycles = 1;
+			}
 
-			} else if (mem.read(0xffff) & 0x8 && mem.read(0xff0f) & 0x8) {
-				// Serial
-				return handle_interupt(0x8);
+		}
+		else {
 
-			} else if (mem.read(0xffff) & 0x16 && mem.read(0xff0f) & 0x16) {
-				// Joypad
-				return handle_interupt(0x16);
+			// Interupts
+			if (cpu_.registers().read_IME()) {
+				check_handle_interupts();
+			}
 
+			cycles = cpu_.execute_next();
+
+			const auto ff02 = cpu_.get_memory().read(0xff02);
+
+			if (ff02 == 0x81) {
+				const auto c = static_cast<char>(cpu_.get_memory().read(0xff01));
+				std::cout << c;
+				serial_link_ += c;
+				cpu_.get_memory().write(0xff02, 0x80);
 			}
 
 		}
 
-		const auto cycles = cpu_.execute_next();
-
-		const auto ff02 = cpu_.get_memory().read(0xff02);
-
-		if (ff02 == 0x81) {
-			const auto c = static_cast<char>(cpu_.get_memory().read(0xff01));
-			// std::cout << c;
-			serial_link_ += c;
-			cpu_.get_memory().write(0xff02, 0x80);
-		}
-
 		timer_.update(cpu_.get_memory(), cycles);
-
 		return cycles;
 	}
 
@@ -163,6 +159,39 @@ public:
 
 
 private:
+
+	auto check_handle_interupts() -> void {
+		const auto interupt = check_interupts();
+		if (interupt > 0) {
+			handle_interupt(interupt);
+		}
+
+	}
+
+	auto check_interupts() -> uint8_t {
+		auto& mem = cpu_.get_memory();
+		if (mem.read(0xffff) & 0x1 && mem.read(0xff0f) & 0x1) {
+			// V-Blank
+			return 0x1;
+
+		} else if (mem.read(0xffff) & 0x2 && mem.read(0xff0f) & 0x2) {
+			// LCD Stat
+			return 0x2;
+
+		} else if (mem.read(0xffff) & 0x4 && mem.read(0xff0f) & 0x4) {
+			// Timer
+			return 0x4;
+
+		} else if (mem.read(0xffff) & 0x8 && mem.read(0xff0f) & 0x8) {
+			// Serial
+			return 0x8;
+
+		} else if (mem.read(0xffff) & 0x16 && mem.read(0xff0f) & 0x16) {
+			// Joypad
+			return 0x16;
+		}
+		return 0x00;
+	}
 
 	// TODO: Unit test?
 	auto handle_interupt(const uint8_t& bit) -> uint64_t {
@@ -205,4 +234,5 @@ private:
 	Cpu cpu_ = Cpu{};
 	std::string serial_link_ = {};
 	Timer timer_ = {};
+	uint64_t cycles_ = 0;
 };

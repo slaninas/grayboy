@@ -12,6 +12,12 @@ add_test("01-special.gb" tests-blargg "${CMAKE_SOURCE_DIR}/gb-test-roms/cpu_inst
 Passed
 ")
 
+add_test("02-interrupts.gb" tests-blargg "${CMAKE_SOURCE_DIR}/gb-test-roms/cpu_instrs/individual/02-interrupts.gb" "161501" "02-interrupts
+
+
+Passed
+")
+
 add_test("03-op_sp,hl.gb" tests-blargg "${CMAKE_SOURCE_DIR}/gb-test-roms/cpu_instrs/individual/03-op sp,hl.gb" "1068421" "03-op sp,hl
 
 

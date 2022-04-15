@@ -14,6 +14,11 @@ target_link_libraries(cpu
 	instructions
 )
 
+add_library(emulator emulator.cc)
+target_link_libraries(emulator
+	cpu
+)
+
 add_executable(grayboy main.cc)
 target_link_libraries(grayboy
 	cpu

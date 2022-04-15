@@ -86,6 +86,12 @@ public:
 		return cycles;
 	}
 
+	auto execute_instructions(const uint64_t& count) {
+		for (auto i = static_cast<uint64_t>(0); i < count; ++i) {
+			execute_next();
+		}
+	}
+
 	auto get_serial_link() const -> const std::string& {
 		return serial_link_;
 	}

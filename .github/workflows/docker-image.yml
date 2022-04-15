@@ -14,9 +14,9 @@ jobs:
 
     steps:
     - name: Checkout repository
-    uses: actions/checkout@v2
-      with:
-        submodules: 'true'
+      uses: actions/checkout@v2
+        with:
+          submodules: 'true'
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name
     - name: Run Docker

@@ -234,5 +234,4 @@ private:
 	Cpu cpu_ = Cpu{};
 	std::string serial_link_ = {};
 	Timer timer_ = {};
-	uint64_t cycles_ = 0;
 };

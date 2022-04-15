@@ -139,34 +139,34 @@ auto main(int argc, const char** argv) -> int
 	// std::cout << diff << '\n';
 
 	// return 1;
-	if (argc != 3) {
-		std::cout << "Usage: " << argv[0] << " boot_rom cartridge_filename\n";
+	if (argc != 2) {
+		std::cout << "Usage: " << argv[0] << "cartridge_filename\n";
 		return 1;
 	}
 
-	const auto filename_boot_rom = std::string(argv[1]);
-	const auto filename = std::string(argv[2]);
+	const auto filename = std::string(argv[1]);
 
 	auto cart = Cartridge{filename};
 
 	const auto rom = cart.dump();
-	const auto boot_rom = Cartridge{filename_boot_rom}.dump();
 	auto array = Memory::ArrayType{};
 	// TODO: What to do with the memory at startup?
-	std::iota(begin(array), end(array), 0);
+	// std::iota(begin(array), end(array), 0);
 
-	std::transform(begin(boot_rom), end(boot_rom), begin(array), [](const auto& el) { return static_cast<uint8_t>(el); });
 
 	// TODO: Remove hardcoded values, do this properly - extract Cpu construction a use it in the main executable as well
-	std::transform(begin(rom) + 0x104, begin(rom) + 0x104 + 32000, begin(array) + 0x104, []([[maybe_unused]] const auto& el) { return static_cast<uint8_t>(el); });
+	std::transform(
+		begin(rom) + 0x100,
+		begin(rom) + 0x100 + std::min(static_cast<decltype(rom.size())>(32768), rom.size()),
+		begin(array) + 0x100,
+		[]([[maybe_unused]] const auto& el) { return static_cast<uint8_t>(el); });
+
 	// Initializing values same way bgb emualtor does it
-	const auto regs =
-		// RegistersChanger{.AF = 0x1180, .DE = 0xff56, .HL = 0x000d, .PC = 0x0100, .SP = 0xfffe}.get(Registers{});
-		// TODO: Use .PC = 0x0100 once the emulator works for the boot rom
-	  // RegistersChanger{.AF = 0x1180, .DE = 0xff56, .HL = 0x000d, .PC = 0x0000, .SP = 0xfffe}.get(Registers{});
-	  Registers{};
+		const auto regs =
+			RegistersChanger{.AF = 0x01b0, .BC=0x0013, .DE = 0x00d8, .HL = 0x014d, .PC = 0x0100, .SP = 0xfffe}.get(Registers{});
 
 	auto cpu = Cpu{array, regs};
+	raw_dump(cpu.memory_dump(), "init_memory_dump");
 	cpu.registers().print();
 
 	auto next_addr = cpu.registers().read("PC");
@@ -185,12 +185,8 @@ auto main(int argc, const char** argv) -> int
 		return iter != end(break_points);
 	};
 
-	// const auto break_points = std::vector<uint16_t>{
-	// 0xc7f1,
-	// 0xc7f9,
-	// 0xc24f,
-	// 0xc252}; // TODO: Compare with bgb, registers look ok to 0xc7f1 (including), memory not checked, diff at 0xc7f1
-	const auto break_points = std::vector<uint16_t>{0x000c};
+	const auto break_points = std::vector<uint16_t>{
+		0xc0a3};
 
 	auto running = false;
 	// auto instruction_count = static_cast<uint64_t>(0);

@@ -78,9 +78,16 @@ public:
 		const auto ff02 = cpu_.get_memory().read(0xff02);
 
 		if (ff02 == 0x81) {
-			std::cout << static_cast<char>(cpu_.get_memory().read(0xff01)) << '\n';
+			const auto c = static_cast<char>(cpu_.get_memory().read(0xff01));
+			std::cout << c;
+			serial_link_ += c;
+			cpu_.get_memory().write(0xff02, 0x80);
 		}
 		return cycles;
+	}
+
+	auto get_serial_link() const -> const std::string& {
+		return serial_link_;
 	}
 
 	auto dump_memory(const std::string& filename) -> void {
@@ -129,4 +136,5 @@ private:
 	}
 
 	Cpu cpu_ = Cpu{};
+	std::string serial_link_ = {};
 };

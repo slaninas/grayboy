@@ -3,6 +3,7 @@
 #include <array>
 #include <iostream>
 #include <vector>
+#include <chrono>
 
 
 // TODO: At the end run all tests again to check whether the fixes for tests didn't break previous
@@ -31,10 +32,25 @@ auto main(int argc, const char** argv) -> int
 	auto emu = argc == 2 ? Emulator{argv[1]} : Emulator{argv[1], argv[2]};
 
 
-	auto counter = static_cast<uint64_t>(0);
+	auto counter = static_cast<uint64_t>(1);
+	auto total_cycles = static_cast<uint64_t>(0);
+
+	const auto start = std::chrono::high_resolution_clock::now();
 	while (1) {
-		[[maybe_unused]] const auto cycles = emu.execute_next();
-		std::cout << "instructions executed: " << counter++ << '\n';
+
+		const auto cycles = emu.execute_next();
+		total_cycles += cycles;
+		// std::cout << "INFO: instructions executed: " << std::dec << counter << '\n';
+
+		if (counter > 10'000'000) {
+		// if (counter > 200'000) {
+			const auto stop = std::chrono::high_resolution_clock::now();
+			const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+			std::cout << "\nINFO: total_cycles " << total_cycles << ", duration " << duration.count() << '\n';
+			std::cout << emu.get_serial_link() << '\n';
+			break;
+		}
+		++counter;
 	}
 	//
 	// check_implemented();

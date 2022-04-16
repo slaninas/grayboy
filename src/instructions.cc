@@ -10,20 +10,17 @@ auto get_all_instructions() -> std::vector<Instruction>
 
 	std::copy(begin(instructions_16bit), end(instructions_16bit), std::back_inserter(instructions_8bit));
 
-	return instructions_8bit;
+	auto sorted = std::vector<Instruction>(256 * 2);
+	for (const auto& orig_instr : instructions_8bit) {
+		const auto opcode = orig_instr.opcode <= 0xff ? orig_instr.opcode : (orig_instr.opcode & 0xff) + 0x100;
+		auto& instr = sorted[opcode];
+		instr.mnemonic = orig_instr.mnemonic;
+		instr.opcode = orig_instr.opcode;
+		instr.size = orig_instr.size;
+		instr.execute = orig_instr.execute;
+	}
 
-	// auto sorted = std::vector<Instruction>(256 * 2);
-	// for (const auto& orig_instr : instructions_8bit) {
-		// const auto opcode = orig_instr.opcode <= 0xff ? orig_instr.opcode : (orig_instr.opcode & 0xff) + 0x100;
-		// std::cout << "INFO: opcode 0x" <<  std::hex << orig_instr.opcode << " 0x" << opcode << " \n";
-		// auto& instr = sorted[opcode];
-		// instr.mnemonic = orig_instr.mnemonic;
-		// instr.opcode = orig_instr.opcode;
-		// instr.size = orig_instr.size;
-		// instr.execute = orig_instr.execute;
-	// }
-
-	// return sorted;
+	return sorted;
 }
 
 void check_implemented()

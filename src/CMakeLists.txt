@@ -14,14 +14,19 @@ target_link_libraries(cpu
 	instructions
 )
 
+find_package(PkgConfig)
+
+PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
 add_library(emulator emulator.cc)
 target_link_libraries(emulator
 	cpu
 )
 
+
 add_executable(grayboy main.cc)
 target_link_libraries(grayboy
 	cpu
+	${pkgcfg_lib_SDL2_SDL2}
 )
 
 add_executable(debugger debugger.cc)

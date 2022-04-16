@@ -48,6 +48,7 @@ auto main(int argc, const char** argv) -> int
 			const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 			std::cout << "\nINFO: total_cycles " << total_cycles << ", duration " << duration.count() << '\n';
 			std::cout << emu.get_serial_link() << '\n';
+			emu.update_display();
 			break;
 		}
 		++counter;

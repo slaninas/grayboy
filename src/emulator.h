@@ -82,6 +82,7 @@ public:
 		raw_dump(cpu_.memory_dump(), "init_memory_dump");
 	}
 
+	// TODO: Disable boot romm after it's finished
 	Emulator(const std::string& bootrom_path, const std::string& cartridge_path) {
 
 		const auto boot_rom = Cartridge{bootrom_path}.dump();

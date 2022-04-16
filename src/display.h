@@ -53,7 +53,6 @@ public:
 
 
 		for (auto y = 0; y < 256; ++y) {
-				std::cout << "INFO: " << (int)((y + SCY) % 256) << '\n';
 			for (auto x = 0; x < 256; ++x) {
 				const auto pixel = video[x][(y + SCY) % 256];
 				SDL_SetRenderDrawColor(renderer_, colors[pixel][0], colors[pixel][1], colors[pixel][2], 255);

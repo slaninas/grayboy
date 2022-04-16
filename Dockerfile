@@ -1,7 +1,7 @@
 FROM ubuntu:20.04
 
 RUN apt update
-RUN apt install -y cmake libncurses5-dev clang time
+RUN apt install -y cmake libncurses5-dev clang time libsdl2-dev
 RUN update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 100
 RUN update-alternatives --auto c++
 

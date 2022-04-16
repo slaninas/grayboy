@@ -2,7 +2,6 @@
 
 #include "cartridge.h"
 #include "cpu.h"
-#include "display.h"
 
 class Timer {
 public:
@@ -157,15 +156,13 @@ public:
 		return serial_link_;
 	}
 
+	auto get_memory() -> Memory& {
+		return cpu_.get_memory();
+	}
+
 	auto dump_memory(const std::string& filename) -> void {
 		raw_dump(cpu_.memory_dump(), filename);
 	}
-
-	auto update_display() -> bool {
-		dump_memory("display_dump");
-		return display_.update(cpu_.get_memory());
-	}
-
 
 private:
 
@@ -240,7 +237,6 @@ private:
 		return 5;
 	}
 
-	Display display_ = Display{};
 	Cpu cpu_ = Cpu{};
 	std::string serial_link_ = {};
 	Timer timer_ = {};

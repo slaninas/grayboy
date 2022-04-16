@@ -6,6 +6,8 @@
 #include <chrono>
 #include <thread>
 
+#include "display.h"
+
 
 // TODO: At the end run all tests again to check whether the fixes for tests didn't break previous
 // State (BLARGG comparison)
@@ -36,6 +38,7 @@ auto main(int argc, const char** argv) -> int
 	auto counter = static_cast<uint64_t>(1);
 	auto total_cycles = static_cast<uint64_t>(0);
 
+	auto display = Display{};
 	const auto start = std::chrono::high_resolution_clock::now();
 	const auto display_update = 1'000'000 / 16;
 	auto display_counter = display_update;
@@ -47,7 +50,7 @@ auto main(int argc, const char** argv) -> int
 
 		if (++display_counter > display_update) {
 			display_counter -= display_update;
-			if (!emu.update_display()) {
+			if (!display.update(emu.get_memory())) {
 				return 0;
 			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));

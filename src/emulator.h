@@ -161,9 +161,9 @@ public:
 		raw_dump(cpu_.memory_dump(), filename);
 	}
 
-	auto update_display() -> void {
+	auto update_display() -> bool {
 		dump_memory("display_dump");
-		display_.update(cpu_.get_memory());
+		return display_.update(cpu_.get_memory());
 	}
 
 

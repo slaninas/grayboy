@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
+#include <thread>
 
 
 // TODO: At the end run all tests again to check whether the fixes for tests didn't break previous
@@ -36,19 +37,28 @@ auto main(int argc, const char** argv) -> int
 	auto total_cycles = static_cast<uint64_t>(0);
 
 	const auto start = std::chrono::high_resolution_clock::now();
+	const auto display_update = 1'000'000;
+	auto display_counter = display_update;
 	while (1) {
 
 		const auto cycles = emu.execute_next();
 		total_cycles += cycles;
 		// std::cout << "INFO: instructions executed: " << std::dec << counter << '\n';
 
-		if (counter > 10'000'000) {
+		if (++display_counter > display_update) {
+			display_counter -= display_update;
+			if (!emu.update_display()) {
+				return 0;
+			}
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		}
+
+		if (counter > 500'000'000) {
 		// if (counter > 200'000) {
 			const auto stop = std::chrono::high_resolution_clock::now();
 			const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 			std::cout << "\nINFO: total_cycles " << total_cycles << ", duration " << duration.count() << '\n';
 			std::cout << emu.get_serial_link() << '\n';
-			emu.update_display();
 			break;
 		}
 		++counter;

@@ -2,7 +2,9 @@
 #include "memory.h"
 
 
-//https://stackoverflow.com/a/35989490/1112468
+// Useful sources:
+// - https://stackoverflow.com/a/35989490/1112468
+// - http://emudev.de/gameboy-emulator/%e2%af%88-ppu-rgb-arrays-and-sdl/
 class Display {
 public:
 

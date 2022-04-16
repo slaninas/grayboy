@@ -25,7 +25,7 @@
 auto main(int argc, const char** argv) -> int
 {
 	if (argc < 2 || argc > 3) {
-		std::cout << "Usage: " << argv[0] << " boot_rom cartridge_filename\n";
+		std::cout << "Usage: " << argv[0] << " <boot_rom> cartridge_filename\n";
 		return 1;
 	}
 

@@ -55,7 +55,7 @@ public:
 
 		for (auto y = 0; y < 256; ++y) {
 			for (auto x = 0; x < 256; ++x) {
-				const auto pixel = video[x][(y + SCY) % 256];
+				const auto pixel = video[(x + SCX) % 256][(y + SCY) % 256];
 				SDL_SetRenderDrawColor(renderer_, colors[pixel][0], colors[pixel][1], colors[pixel][2], 255);
 				SDL_RenderDrawPoint(renderer_, x, y);
 			}

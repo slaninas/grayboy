@@ -68,6 +68,7 @@ public:
 		const auto rom = Cartridge{cartridge_path}.dump();
 
 		auto array = Memory::ArrayType{};
+		std::fill(begin(array) + 0xa000, begin(array) + 0xe000, 0xff);
 
 		std::transform(begin(rom), end(rom), begin(array), [](const auto& el) { return static_cast<uint8_t>(el); });
 
@@ -89,6 +90,7 @@ public:
 		const auto rom = Cartridge{cartridge_path}.dump();
 
 		auto array = Memory::ArrayType{};
+		std::fill(begin(array) + 0xa000, begin(array) + 0xe000, 0xff);
 
 		std::transform(begin(boot_rom), end(boot_rom), begin(array), [](const auto& el) { return static_cast<uint8_t>(el); });
 		std::transform(begin(rom) + 0x100, end(rom), begin(array) + 0x100, [](const auto& el) { return static_cast<uint8_t>(el); });

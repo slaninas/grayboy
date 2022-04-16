@@ -10,7 +10,7 @@ public:
 
 	Display() {
 		 SDL_Init(SDL_INIT_VIDEO);
-		 SDL_CreateWindowAndRenderer(160*5, 144 * 5, 0, &window_, &renderer_);
+		 SDL_CreateWindowAndRenderer(160 * 5, 144 * 5, 0, &window_, &renderer_);
 		 SDL_RenderSetScale(renderer_, 5.0, 5.0);
 	}
 
@@ -22,29 +22,45 @@ public:
 			{155, 155, 155},
 			{255, 255, 255},
 		};
+		const auto SCY = mem.read(0xff42);
+		const auto SCX = mem.read(0xff43);
+
 		const auto tile_map = (((mem.read(0xff40) >> 3) & 1) == 1) ? 0x9c00 : 0x9800;
 
 		SDL_SetRenderDrawColor(renderer_, 255, 255, 255, 255);
 		SDL_RenderClear(renderer_);
 		SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);
 
-		for (auto ty = 0; ty < 18; ++ty) {
-			for (auto tx = 0; tx < 20; ++tx) {
+		uint8_t video[256][256] = {};
 
-				const auto index = tile_map + ty * 32 + tx;
+		for (auto ty = 0; ty < 32; ++ty) {
+			for (auto tx = 0; tx < 32; ++tx) {
+
+				// std::cout << std::hex << "SCY " << (int)SCY << '\n';
+				const auto index = tile_map + (ty) * 32 + tx;
 				const auto tile_id = mem.read(index);
 				const auto tile = load_tile(mem, 0x8000 + tile_id * 0x10);
 
 				for (auto x = 0; x < 8; ++x) {
 					for (auto y = 0; y < 8; ++y) {
 						const auto& pixel = tile[y * 8 + x];
-						SDL_SetRenderDrawColor(renderer_, colors[pixel][0], colors[pixel][1], colors[pixel][2], 255);
-						SDL_RenderDrawPoint(renderer_, x + tx * 8, y + ty * 8);
+						video[x + tx * 8][y + ty * 8] = pixel;
 					}
 				}
 
 			}
 		}
+
+
+		for (auto y = 0; y < 256; ++y) {
+				std::cout << "INFO: " << (int)((y + SCY) % 256) << '\n';
+			for (auto x = 0; x < 256; ++x) {
+				const auto pixel = video[x][(y + SCY) % 256];
+				SDL_SetRenderDrawColor(renderer_, colors[pixel][0], colors[pixel][1], colors[pixel][2], 255);
+				SDL_RenderDrawPoint(renderer_, x, y);
+			}
+		}
+
 		SDL_RenderPresent(renderer_);
 		SDL_Event e;
 

@@ -37,7 +37,7 @@ auto main(int argc, const char** argv) -> int
 	auto total_cycles = static_cast<uint64_t>(0);
 
 	const auto start = std::chrono::high_resolution_clock::now();
-	const auto display_update = 1'000'000;
+	const auto display_update = 1'000'000 / 16;
 	auto display_counter = display_update;
 	while (1) {
 

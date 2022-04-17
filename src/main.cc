@@ -9,17 +9,17 @@
 #include "display.h"
 
 
-// TODO: At the end run all tests again to check whether the fixes for tests didn't break previous
 // State (BLARGG comparison)
 // ************************
 // - BootRom has no diff compared to https://github.com/wheremyfoodat/Gameboy-logs except last 100 lines but it should be just checksum (and I'm running different cartridge
 //   than the author of those dumps
 // - Blargg 01 works fine
+// - Blargg 02 works fine
 // - Blargg 03 works fine
 // - Blargg 04 works fine
 // - Blargg 05 works fine
-// - Blargg 06 works fine (PC must be set to 0x101 instead of 0x100 at the beginning)
-// - Blargg 07 prints that test passed but there are differences with the Gameboy-logs - it seems the logs have RST instruction merged with following instructions
+// - Blargg 06 works fine
+// - Blargg 07 works fine
 // - Blargg 08 works fine
 // - Blargg 09 works fine
 // - Blargg 10 works fine

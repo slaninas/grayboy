@@ -55,11 +55,12 @@ public:
 		auto i = mem.read(0x0000);
 		i++;
 
+		// bgb palette
 		uint8_t colors[4][3] = {
-			{0, 0, 0},
-			{77, 77, 77},
-			{155, 155, 155},
-			{255, 255, 255},
+			{0xe0, 0xf8, 0xd0},
+			{0x88, 0xc0, 0x70},
+			{0x34, 0x68, 0x56},
+			{0x80, 0x18, 0x20},
 		};
 
 		SDL_SetRenderDrawColor(renderer_, 255, 255, 255, 255);

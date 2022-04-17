@@ -22,6 +22,9 @@ public:
 		// TODO: Don't do it every update
 		scanline_cycles_ += cycles;
 
+		const auto palette = mem.read(0xff47);
+		const auto colors = std::array{palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6};
+
 		const auto SCY = mem.read(0xff42);
 		const auto SCX = mem.read(0xff43);
 
@@ -42,7 +45,7 @@ public:
 			if (scanline < 0x90) {
 
 				for (auto x = 0; x < 160; ++x) {
-					display_[x][scanline] = buffer_[(x + SCX) % 256][(scanline + SCY) % 256];
+					display_[x][scanline] = colors[buffer_[(x + SCX) % 256][(scanline + SCY) % 256]];
 				}
 			}
 
@@ -58,9 +61,9 @@ public:
 		// bgb palette
 		uint8_t colors[4][3] = {
 			{0xe0, 0xf8, 0xd0},
-			{0x88, 0xc0, 0x70},
 			{0x34, 0x68, 0x56},
-			{0x80, 0x18, 0x20},
+			{0x88, 0xc0, 0x70},
+			{0x08, 0x18, 0x20},
 		};
 
 		SDL_SetRenderDrawColor(renderer_, 255, 255, 255, 255);
@@ -136,19 +139,14 @@ private:
 		for (auto row = 0; row < 8; ++row) {
 			const auto first_byte = mem.read(addr + row * 2 + 0);
 			const auto second_byte = mem.read(addr + row * 2 + 1);
-			result[8 * row + 0] = ((first_byte & 0x80) >> 7) + ((second_byte & 0x80) >> 7);
-			result[8 * row + 1] = ((first_byte & 0x40) >> 6) + ((second_byte & 0x40) >> 6);
-			result[8 * row + 2] = ((first_byte & 0x20) >> 5) + ((second_byte & 0x20) >> 5);
-			result[8 * row + 3] = ((first_byte & 0x10) >> 4) + ((second_byte & 0x10) >> 4);
-			result[8 * row + 4] = ((first_byte & 0x08) >> 3) + ((second_byte & 0x08) >> 3);
-			result[8 * row + 5] = ((first_byte & 0x04) >> 2) + ((second_byte & 0x04) >> 2);
-			result[8 * row + 6] = ((first_byte & 0x02) >> 1) + ((second_byte & 0x02) >> 1);
-			result[8 * row + 7] = ((first_byte & 0x01) >> 0) + ((second_byte & 0x01) >> 0);
-		}
-
-			for (auto row = 0; row < 8; ++row) {
-				for (auto column = 0; column < 8; ++column) {
-			}
+			result[8 * row + 0] = ((first_byte & 0x80) >> 6) + ((second_byte & 0x80) >> 7);
+			result[8 * row + 1] = ((first_byte & 0x40) >> 5) + ((second_byte & 0x40) >> 6);
+			result[8 * row + 2] = ((first_byte & 0x20) >> 4) + ((second_byte & 0x20) >> 5);
+			result[8 * row + 3] = ((first_byte & 0x10) >> 3) + ((second_byte & 0x10) >> 4);
+			result[8 * row + 4] = ((first_byte & 0x08) >> 2) + ((second_byte & 0x08) >> 3);
+			result[8 * row + 5] = ((first_byte & 0x04) >> 1) + ((second_byte & 0x04) >> 2);
+			result[8 * row + 6] = ((first_byte & 0x02) >> 0) + ((second_byte & 0x02) >> 1);
+			result[8 * row + 7] = ((first_byte & 0x01) << 1) + ((second_byte & 0x01) >> 0);
 		}
 
 		return result;

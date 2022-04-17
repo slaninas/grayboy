@@ -30,7 +30,7 @@ public:
 
 		const auto scanline = mem.read(0xff44);
 		if (scanline == 0) {
-			update_map(mem);
+			update_tile_map(mem);
 		}
 
 		if (scanline_cycles_ > CYCLES_PER_SCANLINE) {
@@ -45,7 +45,7 @@ public:
 			if (scanline < 0x90) {
 
 				for (auto x = 0; x < 160; ++x) {
-					display_[x][scanline] = colors[buffer_[(x + SCX) % 256][(scanline + SCY) % 256]];
+					display_[x][scanline] = colors[bg_buffer_[(x + SCX) % 256][(scanline + SCY) % 256]];
 				}
 			}
 
@@ -91,7 +91,7 @@ public:
 	}
 
 private:
-	auto update_map(const Memory& mem) -> void {
+	auto update_tile_map(const Memory& mem) -> void {
 		auto counter = 0;
 		const auto tile_map = (((mem.read(0xff40) >> 3) & 1) == 1) ? 0x9c00 : 0x9800;
 		for (auto ty = 0; ty < 32; ++ty) {
@@ -109,7 +109,7 @@ private:
 				for (auto x = 0; x < 8; ++x) {
 					for (auto y = 0; y < 8; ++y) {
 						const auto& pixel = tile[y * 8 + x];
-						buffer_[x + tx * 8][y + ty * 8] = pixel;
+						bg_buffer_[x + tx * 8][y + ty * 8] = pixel;
 					}
 				}
 
@@ -155,7 +155,7 @@ private:
 
 	SDL_Renderer* renderer_ = {};
 	SDL_Window* window_ = {};
-	uint8_t buffer_[256][256] = {};
+	uint8_t bg_buffer_[256][256] = {};
 	uint8_t display_[160][144] = {};
 
 	uint64_t scanline_cycles_ = {};

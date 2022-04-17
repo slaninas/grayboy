@@ -6,6 +6,7 @@
 // Useful sources:
 // - https://stackoverflow.com/a/35989490/1112468
 // - http://emudev.de/gameboy-emulator/%e2%af%88-ppu-rgb-arrays-and-sdl/
+// - http://www.codeslinger.co.uk/pages/projects/gameboy.html
 class Display {
 public:
 

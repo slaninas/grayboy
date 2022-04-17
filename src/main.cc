@@ -25,8 +25,12 @@
 // - Blargg 10 works fine
 // - Blargg 11 works fine
 
+
 auto main(int argc, const char** argv) -> int
 {
+	const uint64_t CPU_FREQUENCY = 4'194'304 / 4;
+	const uint64_t CYCLES_PER_FRAME = CPU_FREQUENCY / 60;
+
 	if (argc < 2 || argc > 3) {
 		std::cout << "Usage: " << argv[0] << " <boot_rom> cartridge_filename\n";
 		return 1;
@@ -36,34 +40,33 @@ auto main(int argc, const char** argv) -> int
 
 
 	auto counter = static_cast<uint64_t>(1);
+	auto frame_cycles = static_cast<uint64_t>(0);
 	auto total_cycles = static_cast<uint64_t>(0);
 
 	auto display = Display{};
-	const auto start = std::chrono::high_resolution_clock::now();
-	const auto display_update = 1'000'000 / 16;
-	auto display_counter = display_update;
+	auto start = std::chrono::high_resolution_clock::now();
 	while (1) {
 
 		const auto cycles = emu.execute_next();
 		total_cycles += cycles;
+		frame_cycles += cycles;
+		display.update(emu.get_memory(), cycles);
 		// std::cout << "INFO: instructions executed: " << std::dec << counter << '\n';
 
-		if (++display_counter > display_update) {
-			display_counter -= display_update;
-			if (!display.update(emu.get_memory())) {
+		if (frame_cycles > CYCLES_PER_FRAME) {
+			frame_cycles -= CYCLES_PER_FRAME;
+
+			const auto end = std::chrono::high_resolution_clock::now();
+			const auto diff = duration_cast<std::chrono::milliseconds>(end - start).count();
+
+			std::this_thread::sleep_for(std::chrono::milliseconds{static_cast<int>(1000.0/60.0 -diff)});
+			if (!display.render(emu.get_memory())) {
 				return 0;
 			}
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+			start = std::chrono::high_resolution_clock::now();
 		}
 
-		if (counter > 500'000'000) {
-		// if (counter > 200'000) {
-			const auto stop = std::chrono::high_resolution_clock::now();
-			const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-			std::cout << "\nINFO: total_cycles " << total_cycles << ", duration " << duration.count() << '\n';
-			std::cout << emu.get_serial_link() << '\n';
-			break;
-		}
 		++counter;
 	}
 	//

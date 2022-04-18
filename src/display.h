@@ -211,7 +211,6 @@ private:
 		const auto palette = mem.read(0xff47);
 		const auto colors = std::array{palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6};
 
-		auto counter = 0;
 		const auto tile_map = (((mem.read(0xff40) >> 3) & 1) == 1) ? 0x9c00 : 0x9800;
 		for (auto ty = 0; ty < 32; ++ty) {
 			for (auto tx = 0; tx < 32; ++tx) {
@@ -219,11 +218,6 @@ private:
 				const auto index = tile_map + (ty) * 32 + tx;
 				const auto tile_id = mem.read(index);
 				const auto tile = load_tile(mem, 0x8000 + tile_id * 0x10);
-
-				// std::cout << std::hex;
-				// std::cout << "INFO: index " << index << '\n';
-				// std::cout << "INFO: " << counter++ << ") tile_id " << (int)tile_id << '\n';
-				// std::cout << std::dec;
 
 				for (auto x = 0; x < 8; ++x) {
 					for (auto y = 0; y < 8; ++y) {
@@ -241,7 +235,7 @@ private:
 	auto update_sprites(const Memory& mem) -> void {
 
 		// TODO: Use flips, background/sprite priority, large sprites etc.
-		const auto large_sprites = mem.read(0xff40) & 0x4;
+		// const auto large_sprites = mem.read(0xff40) & 0x4;
 		raw_dump(mem.dump(), "update_sprites_mem");
 
 		for (auto y = 0; y < 144; ++y) {
@@ -284,7 +278,6 @@ private:
 			if (x_flip) {
 				for (auto y = 0; y < 8; ++y) {
 					for (auto x = 0; x < 4; ++x) {
-						const auto tmp = tile[y * 8 + x];
 						std::swap(tile[y * 8 + x], tile[y * 8 + (7 - x)]);
 					}
 				}

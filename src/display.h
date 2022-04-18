@@ -164,8 +164,8 @@ private:
 
 		for (auto sprite = 0; sprite < 40; ++sprite) {
 			const auto index = sprite * 4;
-			const auto x_pos = mem.read(0xfe00 + index + 1) - 0x10;
-			const auto y_pos = mem.read(0xfe00 + index) - 0x08;
+			const auto x_pos = mem.read(0xfe00 + index + 1) - 0x8;
+			const auto y_pos = mem.read(0xfe00 + index) - 0x10;
 			const auto tile_number = mem.read(0xfe00 + index + 2);
 
 			// TODO: Proper selection

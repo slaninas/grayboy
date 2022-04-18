@@ -48,8 +48,21 @@ public:
 	Memory() = default;
 	Memory(const ArrayType& array) : array_{array} {}
 
+	[[nodiscard]] auto direct_read(const uint16_t address) const
+	{
+		return array_[address];
+	}
+
 	[[nodiscard]] auto read(const uint16_t address) const
 	{
+
+		if (address == 0xff00) {
+			if (~direct_read(0xff00) & (1 << 4)) {
+				return static_cast<uint8_t>(~(joypad_state_ & 0x0f));
+			} else if (~direct_read(0xff00) & (1 << 5)) {
+				return static_cast<uint8_t>(~((joypad_state_ >> 4) & 0x0f));
+			}
+		}
 		return array_[address];
 	}
 
@@ -78,6 +91,7 @@ public:
 		return array_;
 	}
 
+	uint8_t joypad_state_ = {};
 private:
 	ArrayType array_ = {};
 };

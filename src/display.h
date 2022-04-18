@@ -75,7 +75,7 @@ public:
 		}
 	}
 
-	auto render(const Memory& mem) -> bool {
+	auto render(Memory& mem) -> bool {
 
 		auto i = mem.read(0x0000);
 		i++;
@@ -105,18 +105,107 @@ public:
 		}
 
 		SDL_RenderPresent(renderer_);
-		SDL_Event e;
+		SDL_Event event;
 
-		while(SDL_PollEvent(&e) != 0 ) {
+		while(SDL_PollEvent(&event) != 0 ) {
 			//User requests quit
-			if(e.type == SDL_QUIT ) {
-				return false;
+			//event.type == SDL_KEYDOWN
+			if (event.type == SDL_QUIT) {
+					return false;
+			} else if (event.type == SDL_KEYDOWN) {
+				switch(event.key.keysym.sym) {
+					case SDLK_RIGHT:
+						pressed_key(mem, 0);
+						break;
+					case SDLK_LEFT:
+						pressed_key(mem, 1);
+						break;
+					case SDLK_UP:
+						pressed_key(mem, 2);
+						break;
+					case SDLK_DOWN:
+						pressed_key(mem, 3);
+						break;
+					case SDLK_a:
+						pressed_key(mem, 4);
+						break;
+					case SDLK_s:
+						pressed_key(mem, 5);
+						break;
+					case SDLK_SPACE:
+						pressed_key(mem, 6);
+						break;
+					case SDLK_RETURN:
+						pressed_key(mem, 7);
+						break;
+				}
+
+			} else if (event.type == SDL_KEYUP) {
+				switch(event.key.keysym.sym) {
+					case SDLK_RIGHT:
+						released_key(mem, 0);
+						break;
+					case SDLK_LEFT:
+						released_key(mem, 1);
+						break;
+					case SDLK_UP:
+						released_key(mem, 2);
+						break;
+					case SDLK_DOWN:
+						released_key(mem, 3);
+						break;
+					case SDLK_a:
+						released_key(mem, 4);
+						break;
+					case SDLK_s:
+						released_key(mem, 5);
+						break;
+					case SDLK_SPACE:
+						released_key(mem, 6);
+						break;
+					case SDLK_RETURN:
+						released_key(mem, 7);
+						break;
+				}
+
 			}
+
 		}
 		return true;
 	}
 
 private:
+
+	// see http://www.codeslinger.co.uk/pages/projects/gameboy/joypad.html
+	auto pressed_key(Memory& mem, const int& key) -> void {
+		auto was_unsed = false;
+
+		if ((mem.joypad_state_ & (1 << key)) == false) {
+			was_unsed = true;
+		}
+
+		mem.joypad_state_ = (mem.joypad_state_ ^ (1 << key));
+		const auto action_button_pressed = key > 3 ? true : false;
+
+		auto request_interupt = false;
+
+		if (!(mem.direct_read(0xff00) & (1 << 5)) && action_button_pressed) {
+			request_interupt = true;
+		}
+		if (!(mem.direct_read(0xff00) & (1 << 4)) && !action_button_pressed) {
+			request_interupt = true;
+		}
+
+		if (was_unsed && request_interupt) {
+			mem.write(0xff0f, mem.read(0xff0f) | 0x16);
+		}
+
+	}
+
+	auto released_key(Memory& mem, const uint8_t& key) -> void {
+		mem.joypad_state_ ^= 1 << key;
+	}
+
 	auto update_tile_map(const Memory& mem) -> void {
 
 		const auto palette = mem.read(0xff47);

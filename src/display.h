@@ -212,12 +212,16 @@ private:
 		const auto colors = std::array{palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6};
 
 		const auto tile_map = (((mem.read(0xff40) >> 3) & 1) == 1) ? 0x9c00 : 0x9800;
+		const auto tile_data = ((mem.read(0xff40) >> 4) & 1) ? 0x8000 : 0x8800;
+
 		for (auto ty = 0; ty < 32; ++ty) {
 			for (auto tx = 0; tx < 32; ++tx) {
 
 				const auto index = tile_map + (ty) * 32 + tx;
 				const auto tile_id = mem.read(index);
-				const auto tile = load_tile(mem, 0x8000 + tile_id * 0x10);
+				const auto tile_address = tile_data == 0x8000 ? (0x8000 + tile_id * 0x10) : ((tile_id < 128 ? 0x9000 + tile_id * 0x10 : 0x8800 + (tile_id - 128) * 0x10));
+
+				const auto tile = load_tile(mem, tile_address);
 
 				for (auto x = 0; x < 8; ++x) {
 					for (auto y = 0; y < 8; ++y) {

@@ -14,8 +14,8 @@ public:
 
 	Display() {
 		 SDL_Init(SDL_INIT_VIDEO);
-		 SDL_CreateWindowAndRenderer(160 * 5, 144 * 5, 0, &window_, &renderer_);
-		 SDL_RenderSetScale(renderer_, 5.0, 5.0);
+		 SDL_CreateWindowAndRenderer(160 * 4, 144 * 4, 0, &window_, &renderer_);
+		 SDL_RenderSetScale(renderer_, 4.0, 4.0);
 	}
 
 	auto update(Memory& mem, const uint16_t& cycles) {

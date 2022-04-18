@@ -173,13 +173,34 @@ private:
 
 			const auto attributes = mem.read(0xfe00 + index + 3);
 			const auto render_priority = static_cast<bool>(attributes & (1 << 7));
+			const auto y_flip = static_cast<bool>(attributes & (1 << 6));
+			const auto x_flip = static_cast<bool>(attributes & (1 << 5));
+			// const auto x_flip = false;
+			// const auto y_flip = false;
 			const auto palette_address = (attributes & (1 << 4)) ? 0xff49 : 0xff48;
 
 
 			const auto palette = mem.read(palette_address);
 			const auto colors = std::array{palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6};
 
-			const auto tile = load_tile(mem, tile_address);
+			auto tile = load_tile(mem, tile_address);
+
+			if (y_flip) {
+				for (auto y = 0; y < 4; ++y) {
+					for (auto x = 0; x < 8; ++x) {
+						std::swap(tile[y * 8 + x], tile[(7-y)*8 + x]);
+					}
+				}
+			}
+			if (x_flip) {
+				for (auto y = 0; y < 8; ++y) {
+					for (auto x = 0; x < 4; ++x) {
+						const auto tmp = tile[y * 8 + x];
+						std::cout << "INFO: swapping " << (int)tile[y*8+x] << " and " << (int)tile[y*8+7-x] << '\n';
+						std::swap(tile[y * 8 + x], tile[y * 8 + (7 - x)]);
+					}
+				}
+			}
 
 
 			if (x_pos >= 0 && x_pos < 160 && y_pos >= 0 && y_pos < 144) {

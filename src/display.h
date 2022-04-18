@@ -196,7 +196,6 @@ private:
 				for (auto y = 0; y < 8; ++y) {
 					for (auto x = 0; x < 4; ++x) {
 						const auto tmp = tile[y * 8 + x];
-						std::cout << "INFO: swapping " << (int)tile[y*8+x] << " and " << (int)tile[y*8+7-x] << '\n';
 						std::swap(tile[y * 8 + x], tile[y * 8 + (7 - x)]);
 					}
 				}

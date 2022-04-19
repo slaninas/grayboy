@@ -5,9 +5,6 @@
 #include <iostream>
 #include <sstream>
 
-// TODO: Add script that runs all tests given number of times with different --rng-seed
-
-// TODO: Fix - don't use .../
 #include "cpu.h"
 #include "memory.h"
 
@@ -37,10 +34,8 @@ public:
 	auto describe() const -> std::string override
 	{
 		std::ostringstream ss;
-		// ss << " is equal to " << vector_;
 		ss << " is equal to \n" << registers_;
 		return ss.str();
-		// TODO: implmente
 	}
 
 private:

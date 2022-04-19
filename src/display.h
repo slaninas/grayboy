@@ -52,7 +52,6 @@ public:
 
 					const auto sprite_val = sprites_buffer_[x][scanline];
 					if (sprite_val != 3) {
-						// std::cout << "INFO: writting sprites_buffer_ " << (int)sprites_buffer_[x][scanline] << '\n';
 						if (sprite_val & 0x4) {
 							display_[x][scanline] = sprites_buffer_[x][scanline] - 0x4;
 						} else {
@@ -69,7 +68,6 @@ public:
 			if (scanline == 0x90) {
 				mem.write(0xff0f, mem.read(0xff0f) | 0x1);
 			}
-			// TOOD: Write sprites to display_ buffer
 
 			mem.write(0xff44, scanline + 1);
 		}
@@ -108,8 +106,6 @@ public:
 		SDL_Event event;
 
 		while(SDL_PollEvent(&event) != 0 ) {
-			//User requests quit
-			//event.type == SDL_KEYDOWN
 			if (event.type == SDL_QUIT) {
 					return false;
 			} else if (event.type == SDL_KEYDOWN) {
@@ -238,12 +234,13 @@ private:
 
 	auto update_sprites(const Memory& mem) -> void {
 
-		// TODO: Use flips, background/sprite priority, large sprites etc.
+		// TODO: Large sprites
 		// const auto large_sprites = mem.read(0xff40) & 0x4;
 		raw_dump(mem.dump(), "update_sprites_mem");
 
-		for (auto y = 0; y < 144; ++y) {
-			for (auto x = 0; x < 160; ++x) {
+
+		for (auto y = static_cast<uint64_t>(0); y < sprites_buffer_[0].size(); ++y) {
+			for (auto x = static_cast<uint64_t>(0); x < sprites_buffer_.size(); ++x) {
 				sprites_buffer_[x][y] = 3;
 			}
 
@@ -333,9 +330,9 @@ private:
 
 	SDL_Renderer* renderer_ = {};
 	SDL_Window* window_ = {};
-	uint8_t bg_buffer_[256][256] = {};
-	uint8_t sprites_buffer_[160][144] = {};
-	uint8_t display_[160][144] = {};
+	std::array<std::array<uint8_t, 256>, 256> bg_buffer_;
+	std::array<std::array<uint8_t, 144>, 160> sprites_buffer_;
+	std::array<std::array<uint8_t, 144>, 160> display_;
 
 	uint64_t scanline_cycles_ = {};
 };

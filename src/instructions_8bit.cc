@@ -1116,37 +1116,37 @@ auto get_8bit_instructions() -> std::vector<Instruction>
 		{"ADC A, B", 0x88, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				instruction_addc("A", "B", regs);
-				return 2;
+				return 1;
 			}
 		},
 		{"ADC A, C", 0x89, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				instruction_addc("A", "C", regs);
-				return 2;
+				return 1;
 			}
 		},
 		{"ADC A, D", 0x8a, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				instruction_addc("A", "D", regs);
-				return 2;
+				return 1;
 			}
 		},
 		{"ADC A, E", 0x8b, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				instruction_addc("A", "E", regs);
-				return 2;
+				return 1;
 			}
 		},
 		{"ADC A, H", 0x8c, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				instruction_addc("A", "H", regs);
-				return 2;
+				return 1;
 			}
 		},
 		{"ADC A, L", 0x8d, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				instruction_addc("A", "L", regs);
-				return 2;
+				return 1;
 			}
 		},
 		{"ADC A, (HL)", 0x8e, 1,
@@ -1160,7 +1160,7 @@ auto get_8bit_instructions() -> std::vector<Instruction>
 		{"ADC A, A", 0x8f, 1,
 			[](auto& regs, [[maybe_unused]] auto& memory, [[maybe_unused]] const auto& PC) {
 				instruction_addc("A", "A", regs);
-				return 2;
+				return 1;
 			}
 		},
 		{"ADC A, d8", 0xce, 2,
@@ -1213,7 +1213,7 @@ auto get_8bit_instructions() -> std::vector<Instruction>
 				const auto address = regs.read("HL");
 				const auto value = memory.read(address);
 				instruction_sub("A", value, regs);
-				return 1;
+				return 2;
 			}
 		},
 		{"SUB A", 0x97, 1,
@@ -1322,7 +1322,7 @@ auto get_8bit_instructions() -> std::vector<Instruction>
 				const auto address = regs.read("HL");
 				const auto value = memory.read(address);
 				instruction_and("A", value, regs);
-				return 1;
+				return 2;
 			}
 		},
 		{"AND A", 0xa7, 1,
@@ -1374,7 +1374,7 @@ auto get_8bit_instructions() -> std::vector<Instruction>
 				const auto address = regs.read("HL");
 				const auto value = memory.read(address);
 				instruction_xor("A", value, regs);
-				return 1;
+				return 2;
 			}
 		},
 		{"XOR A", 0xaf, 1,
@@ -1433,7 +1433,7 @@ auto get_8bit_instructions() -> std::vector<Instruction>
 				const auto address = regs.read("HL");
 				const auto value = memory.read(address);
 				instruction_or("A", value, regs);
-				return 1;
+				return 2;
 			}
 		},
 		{"OR A", 0xb7, 1,
@@ -1485,7 +1485,7 @@ auto get_8bit_instructions() -> std::vector<Instruction>
 				const auto address = regs.read("HL");
 				const auto value = memory.read(address);
 				instruction_cp("A", value, regs);
-				return 1;
+				return 2;
 			}
 		},
 		{"CP A", 0xbf, 1,

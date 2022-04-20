@@ -489,7 +489,7 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 				const auto HL = regs.read("HL");
 				const auto value = memory.read(HL);
 				bit(value, 0, regs);
-				return 4;
+				return 3;
 			}
 		},
 		{"BIT 0, A", 0xcb47, 2,
@@ -539,7 +539,7 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 				const auto HL = regs.read("HL");
 				const auto value = memory.read(HL);
 				bit(value, 1, regs);
-				return 4;
+				return 3;
 			}
 		},
 		{"BIT 1, A", 0xcb4f, 2,
@@ -590,7 +590,7 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 				const auto HL = regs.read("HL");
 				const auto value = memory.read(HL);
 				bit(value, 2, regs);
-				return 4;
+				return 3;
 			}
 		},
 		{"BIT 2, A", 0xcb57, 2,
@@ -640,7 +640,7 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 				const auto HL = regs.read("HL");
 				const auto value = memory.read(HL);
 				bit(value, 3, regs);
-				return 4;
+				return 3;
 			}
 		},
 		{"BIT 3, A", 0xcb5f, 2,
@@ -691,7 +691,7 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 				const auto HL = regs.read("HL");
 				const auto value = memory.read(HL);
 				bit(value, 4, regs);
-				return 4;
+				return 3;
 			}
 		},
 		{"BIT 4, A", 0xcb67, 2,
@@ -741,7 +741,7 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 				const auto HL = regs.read("HL");
 				const auto value = memory.read(HL);
 				bit(value, 5, regs);
-				return 4;
+				return 3;
 			}
 		},
 		{"BIT 5, A", 0xcb6f, 2,
@@ -792,7 +792,7 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 				const auto HL = regs.read("HL");
 				const auto value = memory.read(HL);
 				bit(value, 6, regs);
-				return 4;
+				return 3;
 			}
 		},
 		{"BIT 6, A", 0xcb77, 2,
@@ -842,7 +842,7 @@ auto get_16bit_instructions() -> std::vector<Instruction>
 				const auto HL = regs.read("HL");
 				const auto value = memory.read(HL);
 				bit(value, 7, regs);
-				return 4;
+				return 3;
 			}
 		},
 		{"BIT 7, A", 0xcb7f, 2,

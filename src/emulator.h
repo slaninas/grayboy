@@ -259,24 +259,34 @@ private:
 		// TODO: Add PPU
 		const auto PC = cpu_.registers().read("PC");
 		debug_log << std::hex;
-		debug_log << "A: " << format(cpu_.registers().read("A"), 2) << ' ';
-		debug_log << "F: " << (cpu_.registers().read_flag("Z") ? 'Z' : '-');
+		debug_log << "A:" << format(cpu_.registers().read("A"), 2) << ' ';
+		debug_log << "F:";
+		debug_log << (cpu_.registers().read_flag("Z") ? 'Z' : '-');
 		debug_log << (cpu_.registers().read_flag("N") ? 'N' : '-');
 		debug_log << (cpu_.registers().read_flag("H") ? 'H' : '-');
 		debug_log << (cpu_.registers().read_flag("C") ? 'C' : '-');
 		debug_log << ' ';
-		debug_log << "BC: " << format(cpu_.registers().read("B"), 2) << format(cpu_.registers().read("C"), 2) << ' ';
-		debug_log << "DE: " << format(cpu_.registers().read("D"), 2) << format(cpu_.registers().read("E"), 2) << ' ';
-		debug_log << "HL: " << format(cpu_.registers().read("H"), 2) << format(cpu_.registers().read("L"), 2) << ' ';
-		debug_log << "SP: " << format(cpu_.registers().read("SP"), 4) << ' ';
-		debug_log << "PC: " << PC << ' ';
+		debug_log << "BC:" << format(cpu_.registers().read("B"), 2) << format(cpu_.registers().read("C"), 2) << ' ';
+		debug_log << "DE:" << format(cpu_.registers().read("D"), 2) << format(cpu_.registers().read("E"), 2) << ' ';
+		debug_log << "HL:" << format(cpu_.registers().read("H"), 2) << format(cpu_.registers().read("L"), 2) << ' ';
+		debug_log << "SP:" << format(cpu_.registers().read("SP"), 4) << ' ';
+		debug_log << "PC:" << format(PC, 4) << ' ';
 		debug_log << "(cy: " << std::dec << total_cycles_ * 4 << ") " << std::hex;
-		debug_log << "|[00]0x" << PC << ": ";
-		const auto info = cpu_.disassemble_next(PC);
+		// debug_log << "|[00]0x" << format(PC, 4) << ": ";
+		// const auto info = cpu_.disassemble_next(PC);
 
-		for (auto i = size_t{0}; i < info.memory_representation.size(); ++i) {
-			debug_log << format(info.memory_representation[i], 2) << ' ';
-		}
+		// for (auto i = size_t{0}; i < info.memory_representation.size(); ++i) {
+			// debug_log << format(info.memory_representation[i], 2) << ' ';
+		// }
+
+		// debug_log << ' ' << info.instruction.mnemonic << ' ';
+
+		// const auto mem = cpu_.get_memory();
+
+		// debug_log << " | 0xff04 [DIV]: " << format(mem.read(0xff04), 2);
+		// debug_log << " 0xff05 [TIMA]: " << format(mem.read(0xff05), 2);
+		// debug_log << " 0xff06 [TMA]: " << format(mem.read(0xff06), 2);
+		// debug_log << " 0xff07 [TAC]: " << format(mem.read(0xff07), 2);
 		debug_log << '\n';
 		debug_log << std::dec;
 	}

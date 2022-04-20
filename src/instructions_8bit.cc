@@ -1675,7 +1675,7 @@ auto get_8bit_instructions() -> std::vector<Instruction>
 				const auto PC_new = static_cast<uint16_t>((memory.read(SP + 1) << 8) + memory.read(SP));
 				regs.write("PC", PC_new - 1);
 				regs.write("SP", SP + 2);
-				return 5;
+				return 4;
 			}
 		},
 		{"JP NZ, a16", 0xc2, 3,

@@ -23,12 +23,12 @@ public:
 		div_register_cycles_ += new_cycles;
 
 		if (div_register_cycles_ > DIV_REGISTER_CYCLES_PER_UPDATE) {
-			div_register_cycles_ = div_register_cycles_ % DIV_REGISTER_CYCLES_PER_UPDATE;
+			div_register_cycles_ -= DIV_REGISTER_CYCLES_PER_UPDATE;
 			memory.direct_write(0xff04, memory.read(0xff04) + 1);
 		}
 
 		const auto TAC = memory.read(0xff07);
-		if (TAC & 0x4) {
+		if (TAC & (1 << 2)) {
 			timer_counter_cycles_ += new_cycles;
 
 			auto frequency = 4096;
@@ -48,10 +48,11 @@ public:
 
 			const auto timer_counter_cycles_per_update = CPU_FREQUENCY / frequency;
 			while (timer_counter_cycles_ >= timer_counter_cycles_per_update) {
+
 				memory.write(0xff05, memory.read(0xff05) + 1);
 
 				if (memory.read(0xff05) == 0x00) {
-					memory.write(0xff0f, memory.read(0xff0f) | 0x4);
+					memory.write(0xff0f, memory.read(0xff0f) | (1 << 2));
 
 					const auto TMA = memory.read(0xff06);
 					memory.write(0xff05, TMA);

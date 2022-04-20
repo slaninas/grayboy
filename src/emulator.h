@@ -71,6 +71,9 @@ public:
 		std::fill(begin(array) + 0xa000, begin(array) + 0xe000, 0xff);
 
 		std::transform(begin(rom), end(rom), begin(array), [](const auto& el) { return static_cast<uint8_t>(el); });
+		//
+		// TODO: Remove?
+		array[0xff44] = 0x90;
 
 		// TODO: Init the RAM as well somehow? Check boot rom
 		const auto regs =
@@ -92,7 +95,7 @@ public:
 		std::transform(begin(boot_rom), end(boot_rom), begin(array), [](const auto& el) { return static_cast<uint8_t>(el); });
 		std::transform(begin(rom) + 0x100, end(rom), begin(array) + 0x100, [](const auto& el) { return static_cast<uint8_t>(el); });
 
-		// TODO: Remove, for debug purposes only
+		// TODO: Remove?
 		array[0xff44] = 0x90;
 
 		const auto regs =

@@ -24,7 +24,7 @@ public:
 
 		if (div_register_cycles_ > DIV_REGISTER_CYCLES_PER_UPDATE) {
 			div_register_cycles_ = div_register_cycles_ % DIV_REGISTER_CYCLES_PER_UPDATE;
-			memory.write(0xff04, memory.read(0xff04) + 1);
+			memory.direct_write(0xff04, memory.read(0xff04) + 1);
 		}
 
 		const auto TAC = memory.read(0xff07);

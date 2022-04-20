@@ -66,6 +66,11 @@ public:
 		return array_[address];
 	}
 
+	void direct_write(const uint16_t address, const uint8_t value)
+	{
+		array_[address] = value;
+	}
+
 	void write(const uint16_t address, const uint8_t value)
 	{
 		// Scanline reset
@@ -79,6 +84,10 @@ public:
 			for (auto i = 0; i < 0xa0; ++i) {
 				array_[0xfe00 + i] = array_[source + i];
 			}
+		}
+		// Write to DIV resets it
+		else if (address == 0xff04) {
+			array_[address] = 0x00;
 		}
 
 		else {

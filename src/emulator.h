@@ -3,6 +3,15 @@
 #include "cartridge.h"
 #include "cpu.h"
 
+inline auto format(const int& value, const uint32_t& width) -> std::string {
+	auto s = std::stringstream{};
+	s << std::setfill('0') << std::setw(width) << std::hex << value;
+	auto result = s.str();
+
+
+	return result;
+}
+
 class Timer {
 public:
 	const uint64_t CPU_FREQUENCY = 4'194'304 / 4;
@@ -106,6 +115,7 @@ public:
 	}
 
 	auto execute_next() -> uint64_t {
+		// save_debug();
 
 		auto cycles = 0;
 
@@ -143,6 +153,7 @@ public:
 		}
 
 		timer_.update(cpu_.get_memory(), cycles);
+		total_cycles_ += cycles;
 		return cycles;
 	}
 
@@ -163,6 +174,7 @@ public:
 	auto dump_memory(const std::string& filename) -> void {
 		raw_dump(cpu_.memory_dump(), filename);
 	}
+
 
 private:
 
@@ -237,7 +249,37 @@ private:
 		return 5;
 	}
 
+	// binjbg format
+	auto save_debug() -> void {
+		// TODO: Add PPU
+		const auto PC = cpu_.registers().read("PC");
+		debug_log << std::hex;
+		debug_log << "A: " << format(cpu_.registers().read("A"), 2) << ' ';
+		debug_log << "F: " << (cpu_.registers().read_flag("Z") ? 'Z' : '-');
+		debug_log << (cpu_.registers().read_flag("N") ? 'N' : '-');
+		debug_log << (cpu_.registers().read_flag("H") ? 'H' : '-');
+		debug_log << (cpu_.registers().read_flag("C") ? 'C' : '-');
+		debug_log << ' ';
+		debug_log << "BC: " << format(cpu_.registers().read("B"), 2) << format(cpu_.registers().read("C"), 2) << ' ';
+		debug_log << "DE: " << format(cpu_.registers().read("D"), 2) << format(cpu_.registers().read("E"), 2) << ' ';
+		debug_log << "HL: " << format(cpu_.registers().read("H"), 2) << format(cpu_.registers().read("L"), 2) << ' ';
+		debug_log << "SP: " << format(cpu_.registers().read("SP"), 4) << ' ';
+		debug_log << "PC: " << PC << ' ';
+		debug_log << "(cy: " << std::dec << total_cycles_ * 4 << ") " << std::hex;
+		debug_log << "|[00]0x" << PC << ": ";
+		const auto info = cpu_.disassemble_next(PC);
+
+		for (auto i = size_t{0}; i < info.memory_representation.size(); ++i) {
+			debug_log << format(info.memory_representation[i], 2) << ' ';
+		}
+		debug_log << '\n';
+		debug_log << std::dec;
+	}
+
 	Cpu cpu_ = Cpu{};
 	std::string serial_link_ = {};
 	Timer timer_ = {};
+
+	uint64_t total_cycles_ = {};
+	std::ofstream debug_file = std::ofstream("debug_log");
 };

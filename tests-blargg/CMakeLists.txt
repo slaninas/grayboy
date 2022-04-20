@@ -5,6 +5,8 @@ include_directories("../src/")
 add_executable(tests-blargg tests-blargg.cc)
 target_link_libraries(tests-blargg emulator)
 
+# TODO: Add instruction timing test
+
 # Number of instruction is taken from https://github.com/wheremyfoodat/Gameboy-logs
 add_test("01-special.gb" tests-blargg "${CMAKE_SOURCE_DIR}/gb-test-roms/cpu_instrs/individual/01-special.gb" "1258894" "01-special
 

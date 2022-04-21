@@ -91,7 +91,7 @@ public:
 
 		// TODO: Init the RAM as well somehow? Check boot rom
 		const auto regs =
-			RegistersChanger{.AF = 0x11b0, .BC=0x0013, .DE = 0x00d8, .HL = 0x014d, .PC = 0x0100, .SP = 0xfffe}.get(Registers{});
+			RegistersChanger{.AF = 0x01b0, .BC=0x0013, .DE = 0x00d8, .HL = 0x014d, .PC = 0x0100, .SP = 0xfffe}.get(Registers{});
 
 		cpu_ = Cpu{array, regs};
 		raw_dump(cpu_.memory_dump(), "init_memory_dump");

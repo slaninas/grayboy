@@ -811,7 +811,7 @@ TEST_CASE("ADC A, B - 0x88", "[arithmetic]")
 	auto cpu = Cpu{orig_memory, orig_regs};
 
 	const auto cycles = cpu.execute_next();
-	CHECK(cycles == 2);
+	CHECK(cycles == 1);
 
 	const auto correct_flags = FlagsChanger{.Z = 0, .N = 0, .H = 1, .C = 0}.get(orig_regs.read("F"));
 	const auto correct_regs = RegistersChanger{.A = 0x22, .F = correct_flags, .PC = 0x01}.get(orig_regs);
@@ -828,7 +828,7 @@ TEST_CASE("ADC A, C - 0x89", "[arithmetic]")
 	auto cpu = Cpu{orig_memory, orig_regs};
 
 	const auto cycles = cpu.execute_next();
-	CHECK(cycles == 2);
+	CHECK(cycles == 1);
 
 	const auto correct_flags = FlagsChanger{.Z = 0, .N = 0, .H = 1, .C = 0}.get(orig_regs.read("F"));
 	const auto correct_regs = RegistersChanger{.A = 0x22, .F = correct_flags, .PC = 0x01}.get(orig_regs);
@@ -845,7 +845,7 @@ TEST_CASE("ADC A, D - 0x8a", "[arithmetic]")
 	auto cpu = Cpu{orig_memory, orig_regs};
 
 	const auto cycles = cpu.execute_next();
-	CHECK(cycles == 2);
+	CHECK(cycles == 1);
 
 	const auto correct_flags = FlagsChanger{.Z = 0, .N = 0, .H = 1, .C = 0}.get(orig_regs.read("F"));
 	const auto correct_regs = RegistersChanger{.A = 0x22, .F = correct_flags, .PC = 0x01}.get(orig_regs);
@@ -862,7 +862,7 @@ TEST_CASE("ADC A, E - 0x8b", "[arithmetic]")
 	auto cpu = Cpu{orig_memory, orig_regs};
 
 	const auto cycles = cpu.execute_next();
-	CHECK(cycles == 2);
+	CHECK(cycles == 1);
 
 	const auto correct_flags = FlagsChanger{.Z = 0, .N = 0, .H = 1, .C = 0}.get(orig_regs.read("F"));
 	const auto correct_regs = RegistersChanger{.A = 0x22, .F = correct_flags, .PC = 0x01}.get(orig_regs);
@@ -879,7 +879,7 @@ TEST_CASE("ADC A, H - 0x8c", "[arithmetic]")
 	auto cpu = Cpu{orig_memory, orig_regs};
 
 	const auto cycles = cpu.execute_next();
-	CHECK(cycles == 2);
+	CHECK(cycles == 1);
 
 	const auto correct_flags = FlagsChanger{.Z = 0, .N = 0, .H = 1, .C = 0}.get(orig_regs.read("F"));
 	const auto correct_regs = RegistersChanger{.A = 0x22, .F = correct_flags, .PC = 0x01}.get(orig_regs);
@@ -896,7 +896,7 @@ TEST_CASE("ADC A, L - 0x8d", "[arithmetic]")
 	auto cpu = Cpu{orig_memory, orig_regs};
 
 	const auto cycles = cpu.execute_next();
-	CHECK(cycles == 2);
+	CHECK(cycles == 1);
 
 	const auto correct_flags = FlagsChanger{.Z = 0, .N = 0, .H = 1, .C = 0}.get(orig_regs.read("F"));
 	const auto correct_regs = RegistersChanger{.A = 0x22, .F = correct_flags, .PC = 0x01}.get(orig_regs);
@@ -929,7 +929,7 @@ TEST_CASE("ADC A, A - 0x8f", "[arithmetic]")
 	auto cpu = Cpu{orig_memory, orig_regs};
 
 	const auto cycles = cpu.execute_next();
-	CHECK(cycles == 2);
+	CHECK(cycles == 1);
 
 	const auto correct_flags = FlagsChanger{.Z = 0, .N = 0, .H = 0, .C = 0}.get(orig_regs.read("F"));
 	const auto correct_regs = RegistersChanger{.A = 0x25, .F = correct_flags, .PC = 0x01}.get(orig_regs);
@@ -1050,7 +1050,7 @@ TEST_CASE("SUB (HL) - 0x96", "[arithmetic]")
 	auto cpu = Cpu{orig_memory, orig_regs};
 
 	const auto cycles = cpu.execute_next();
-	CHECK(cycles == 1);
+	CHECK(cycles == 2);
 
 	const auto correct_flags = FlagsChanger{.Z = 0, .N = 1, .H = 0, .C = 0}.get(orig_regs.read("F"));
 	const auto correct_regs = RegistersChanger{.A = 0x44, .F = correct_flags, .PC = 0x01}.get(orig_regs);
@@ -1322,7 +1322,7 @@ TEST_CASE("AND A, (HL) - 0xa6", "[arithmetic]")
 	auto cpu = Cpu{orig_memory, orig_regs};
 
 	const auto cycles = cpu.execute_next();
-	CHECK(cycles == 1);
+	CHECK(cycles == 2);
 
 	const auto correct_flags = FlagsChanger{.Z = 0, .N = 0, .H = 1, .C = 0}.get(orig_regs.read("F"));
 	const auto correct_regs = RegistersChanger{.A = 0xc3, .F = correct_flags, .PC = 0x01}.get(orig_regs);
@@ -1444,7 +1444,7 @@ TEST_CASE("XOR A, (HL) - 0xae", "[arithmetic]")
 	auto cpu = Cpu{orig_memory, orig_regs};
 
 	const auto cycles = cpu.execute_next();
-	CHECK(cycles == 1);
+	CHECK(cycles == 2);
 
 	const auto correct_flags = FlagsChanger{.Z = 0, .N = 0, .H = 0, .C = 0}.get(orig_regs.read("F"));
 	const auto correct_regs = RegistersChanger{.A = 0x38, .F = correct_flags, .PC = 0x01}.get(orig_regs);
@@ -1581,7 +1581,7 @@ TEST_CASE("OR (HL) - 0xb6", "[arithmetic]")
 	auto cpu = Cpu{orig_memory, orig_regs};
 
 	const auto cycles = cpu.execute_next();
-	CHECK(cycles == 1);
+	CHECK(cycles == 2);
 
 	const auto correct_flags = FlagsChanger{.Z = 0, .N = 0, .H = 0, .C = 0}.get(orig_regs.read("F"));
 	const auto correct_regs = RegistersChanger{.A = 0xfb, .F = correct_flags, .PC = 0x01}.get(orig_regs);
@@ -1703,7 +1703,7 @@ TEST_CASE("CP (HL) - 0xbe", "[arithmetic]")
 	auto cpu = Cpu{orig_memory, orig_regs};
 
 	const auto cycles = cpu.execute_next();
-	CHECK(cycles == 1);
+	CHECK(cycles == 2);
 
 	const auto correct_flags = FlagsChanger{.Z = 0, .N = 1, .H = 0, .C = 1}.get(orig_regs.read("F"));
 	const auto correct_regs = RegistersChanger{.F = correct_flags, .PC = 0x01}.get(orig_regs);

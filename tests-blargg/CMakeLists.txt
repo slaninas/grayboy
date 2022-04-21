@@ -73,3 +73,10 @@ add_test("11-op_a,hl.gb" tests-blargg "${CMAKE_SOURCE_DIR}/gb-test-roms/cpu_inst
 
 Passed
 ")
+
+# TODO: Check how much instructions is needed to run
+add_test("instr_timing" tests-blargg "${CMAKE_SOURCE_DIR}/gb-test-roms/instr_timing/instr_timing.gb" "255000" "instr_timing
+
+
+Passed
+")

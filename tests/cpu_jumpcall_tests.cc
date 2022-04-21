@@ -201,7 +201,7 @@ TEST_CASE("RET - 0xc9", "[jump/call]")
 	auto cpu = Cpu{orig_memory, orig_regs};
 
 	auto cycles = cpu.execute_next();
-	CHECK(cycles == 5);
+	CHECK(cycles == 4);
 	auto correct_regs = RegistersChanger{.PC = 0xaecb, .SP = 0x1236}.get(orig_regs);
 	CHECK_THAT(cpu.registers(), RegistersCompare{correct_regs});
 	CHECK(cpu.memory_dump() == orig_memory.dump());

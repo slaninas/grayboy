@@ -49,6 +49,7 @@ public:
 				for (auto x = 0; x < 160; ++x) {
 					display_[x][scanline] = bg_buffer_[(x + SCX) % 256][(scanline + SCY) % 256];
 
+					// TODO: Fix sprites rendering
 					const auto sprite_val = sprites_buffer_[x][scanline];
 					if (sprite_val != 3) {
 						if (sprite_val & 0x4) {

@@ -13,6 +13,7 @@ public:
 
 	Display() {
 		 SDL_Init(SDL_INIT_VIDEO);
+		 // SDL_CreateWindowAndRenderer((160 + 256) * 4, 144 * 4, 0, &window_, &renderer_);
 		 SDL_CreateWindowAndRenderer(160 * 4, 144 * 4, 0, &window_, &renderer_);
 		 SDL_RenderSetScale(renderer_, 4.0, 4.0);
 	}
@@ -158,6 +159,23 @@ public:
 			}
 		}
 
+		// Render vram
+		// const auto tile_colors = palettes[6];
+		// for (auto y = 0; y < 16; ++y) {
+			// for (auto x = 0; x < 16; ++x) {
+				// const auto tile = load_tile(mem, 0x8000 + 0x10 * x + 0x100 * y);
+
+				// for (auto tile_y = 0; tile_y < 8; ++tile_y) {
+					// for (auto tile_x = 0; tile_x < 8; ++tile_x) {
+						// const auto pixel = tile[tile_x + tile_y * 8];
+						// SDL_SetRenderDrawColor(renderer_, tile_colors[pixel][0], tile_colors[pixel][1], tile_colors[pixel][2], tile_colors[pixel][3]);
+						// SDL_RenderDrawPoint(renderer_, x * 8 + tile_x + 160, y * 8 + tile_y);
+					// }
+				// }
+			// }
+
+		// }
+
 		SDL_RenderPresent(renderer_);
 		SDL_Event event;
 
@@ -190,6 +208,9 @@ public:
 					case SDLK_RETURN:
 						pressed_key(mem, 7);
 						break;
+					// case SDLK_d:
+						// render_bg = !render_bg;
+						// break;
 				}
 
 			} else if (event.type == SDL_KEYUP) {

@@ -362,16 +362,20 @@ private:
 			}
 
 
-			if (x_pos >= 0 && x_pos < 160 && y_pos >= 0 && y_pos < 144) {
+			if (x_pos + 8 >= 0 && x_pos < 160 && y_pos + 8>= 0 && y_pos < 144) {
 
 				// TODO: FIx case when top left corner of the sprite is out of display but part is
-				for (auto y = y_pos; y < std::min(y_pos + 8, 140); ++y) {
-					for (auto x = x_pos; x < std::min(x_pos + 8, 160); ++x) {
+				for (auto y = std::max(0, y_pos); y < std::min(y_pos + 8, 144); ++y) {
+					for (auto x = std::max(0, x_pos); x < std::min(x_pos + 8, 160); ++x) {
 						const auto value = tile[(y - y_pos) * 8 + x - x_pos];
 						// Sprite data 00 is transparent (https://gbdev.gg8.se/wiki/articles/Video_Display#LCD_Monochrome_Palettes)
 						if (value != 0) {
 							sprites_buffer_[x][y] = colors[value];
 							if (render_priority) {
+								if (x < 0 || x >= 160)
+									throw std::exception{};
+								if (y < 0 || y >= 144)
+									throw std::exception{};
 								sprites_buffer_[x][y] += 0x4;
 							}
 						}

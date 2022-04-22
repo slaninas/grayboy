@@ -43,22 +43,24 @@ public:
 			if (scanline < 0x90) {
 
 				for (auto x = 0; x < 160; ++x) {
-					display_[x][scanline] = 3;
+					display_[x][scanline] = 0;
 				}
 
 				for (auto x = 0; x < 160; ++x) {
 					display_[x][scanline] = bg_buffer_[(x + SCX) % 256][(scanline + SCY) % 256];
 
+				}
+				for (auto x = 0; x < 160; ++x) {
 					// TODO: Fix sprites rendering
-					const auto sprite_val = sprites_buffer_[x][scanline];
-					if (sprite_val != 3) {
-						if (sprite_val & 0x4) {
-							display_[x][scanline] = sprites_buffer_[x][scanline] - 0x4;
-						} else {
-							if (display_[x][scanline] == 3) {
-								display_[x][scanline] = sprites_buffer_[x][scanline];
-							}
+					const auto render_priority = sprites_buffer_[x][scanline] & 0x4;
+					const auto sprite_val = sprites_buffer_[x][scanline] & 0x3;
 
+					if (sprite_val != 0) {
+						// Sprite is under background
+						if (!render_priority) {
+							display_[x][scanline] = sprite_val;
+						} else if (display_[x][scanline] == 0) {
+							display_[x][scanline] = sprite_val;
 						}
 					}
 				}
@@ -295,7 +297,7 @@ private:
 
 		for (auto y = static_cast<uint64_t>(0); y < sprites_buffer_[0].size(); ++y) {
 			for (auto x = static_cast<uint64_t>(0); x < sprites_buffer_.size(); ++x) {
-				sprites_buffer_[x][y] = 3;
+				sprites_buffer_[x][y] = 0;
 			}
 
 		}
@@ -348,7 +350,7 @@ private:
 						// Sprite data 00 is transparent (https://gbdev.gg8.se/wiki/articles/Video_Display#LCD_Monochrome_Palettes)
 						if (value != 0) {
 							sprites_buffer_[x][y] = colors[value];
-							if (!render_priority) {
+							if (render_priority) {
 								sprites_buffer_[x][y] += 0x4;
 							}
 						}

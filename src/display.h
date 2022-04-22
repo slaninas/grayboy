@@ -26,7 +26,7 @@ public:
 
 		const auto scanline = mem.read(0xff44);
 
-		if (scanline_cycles_ > CYCLES_PER_SCANLINE) {
+		if (scanline_cycles_ >= CYCLES_PER_SCANLINE) {
 			scanline_cycles_ -= CYCLES_PER_SCANLINE;
 
 			if (scanline == 0) {

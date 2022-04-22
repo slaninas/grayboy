@@ -73,6 +73,10 @@ public:
 
 	void write(const uint16_t address, const uint8_t value)
 	{
+		// ROM
+		if (address <= 0x7fff) {
+			return;
+		}
 		// Scanline reset
 		// if (address == 0xff44) {
 			// array_[address] = 0;

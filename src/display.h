@@ -145,7 +145,7 @@ public:
 			{0x00, 0x00, 0x00, 0x00}},
 		};
 
-		const auto colors = palettes[2];
+		const auto colors = palettes[6];
 
 		SDL_SetRenderDrawColor(renderer_, 255, 255, 255, 255);
 		SDL_RenderClear(renderer_);

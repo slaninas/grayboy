@@ -2,6 +2,17 @@
 #include <SDL2/SDL.h>
 #include "memory.h"
 
+struct SpritePixel {
+	uint8_t render_color = {};
+	uint8_t raw_color = {};
+	bool render_over_bg = {};
+};
+
+struct BackgroundPixel {
+	uint8_t render_color = {};
+	uint8_t raw_color = {};
+};
+
 // Useful sources:
 // - https://stackoverflow.com/a/35989490/1112468
 // - http://emudev.de/gameboy-emulator/%e2%af%88-ppu-rgb-arrays-and-sdl/
@@ -48,20 +59,17 @@ public:
 				}
 
 				for (auto x = 0; x < 160; ++x) {
-					display_[x][scanline] = bg_buffer_[(x + SCX) % 256][(scanline + SCY) % 256];
+					const auto background_pixel = bg_buffer_[(x + SCX) % 256][(scanline + SCY) % 256];
+					display_[x][scanline] = background_pixel.render_color;
 
-				}
-				for (auto x = 0; x < 160; ++x) {
-					// TODO: Fix sprites rendering
-					const auto render_priority = sprites_buffer_[x][scanline] & 0x4;
-					const auto sprite_val = sprites_buffer_[x][scanline] & 0x3;
+					const auto sprite_pixel = sprites_buffer_[x][scanline];
 
-					if (sprite_val != 0) {
+					if (sprite_pixel.raw_color != 0) {
 						// Sprite is under background
-						if (!render_priority) {
-							display_[x][scanline] = sprite_val;
-						} else if (display_[x][scanline] == 0) {
-							display_[x][scanline] = sprite_val;
+						if (sprite_pixel.render_over_bg) {
+							display_[x][scanline] = sprite_pixel.render_color;
+						} else if (background_pixel.raw_color == 0) {
+							display_[x][scanline] = sprite_pixel.render_color;
 						}
 					}
 				}
@@ -300,7 +308,7 @@ private:
 					for (auto y = 0; y < 8; ++y) {
 						const auto& pixel = tile[y * 8 + x];
 						// std::cout << "INFO: map, putting " << (int)colors[pixel] << " at the place of " << (int)pixel << '\n';
-						bg_buffer_[x + tx * 8][y + ty * 8] = colors[pixel];
+						bg_buffer_[x + tx * 8][y + ty * 8] = {static_cast<uint8_t>(colors[pixel]), pixel};
 					}
 				}
 
@@ -318,7 +326,7 @@ private:
 
 		for (auto y = static_cast<uint64_t>(0); y < sprites_buffer_[0].size(); ++y) {
 			for (auto x = static_cast<uint64_t>(0); x < sprites_buffer_.size(); ++x) {
-				sprites_buffer_[x][y] = 0;
+				sprites_buffer_[x][y] = {};
 			}
 
 		}
@@ -370,14 +378,7 @@ private:
 						const auto value = tile[(y - y_pos) * 8 + x - x_pos];
 						// Sprite data 00 is transparent (https://gbdev.gg8.se/wiki/articles/Video_Display#LCD_Monochrome_Palettes)
 						if (value != 0) {
-							sprites_buffer_[x][y] = colors[value];
-							if (render_priority) {
-								if (x < 0 || x >= 160)
-									throw std::exception{};
-								if (y < 0 || y >= 144)
-									throw std::exception{};
-								sprites_buffer_[x][y] += 0x4;
-							}
+							sprites_buffer_[x][y] = {static_cast<uint8_t>(colors[value]), value, !render_priority};
 						}
 					}
 
@@ -411,8 +412,8 @@ private:
 
 	SDL_Renderer* renderer_ = {};
 	SDL_Window* window_ = {};
-	std::array<std::array<uint8_t, 256>, 256> bg_buffer_;
-	std::array<std::array<uint8_t, 144>, 160> sprites_buffer_;
+	std::array<std::array<BackgroundPixel, 256>, 256> bg_buffer_;
+	std::array<std::array<SpritePixel, 144>, 160> sprites_buffer_;
 	std::array<std::array<uint8_t, 144>, 160> display_;
 
 	uint64_t scanline_cycles_ = {};

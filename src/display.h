@@ -190,68 +190,124 @@ public:
 		while(SDL_PollEvent(&event) != 0 ) {
 			if (event.type == SDL_QUIT) {
 					return false;
-			} else if (event.type == SDL_KEYDOWN) {
-				switch(event.key.keysym.sym) {
-					case SDLK_RIGHT:
-						pressed_key(mem, 0);
-						break;
-					case SDLK_LEFT:
-						pressed_key(mem, 1);
-						break;
-					case SDLK_UP:
-						pressed_key(mem, 2);
-						break;
-					case SDLK_DOWN:
-						pressed_key(mem, 3);
-						break;
-					case SDLK_a:
-						pressed_key(mem, 4);
-						break;
-					case SDLK_s:
-						pressed_key(mem, 5);
-						break;
-					case SDLK_SPACE:
-						pressed_key(mem, 6);
-						break;
-					case SDLK_RETURN:
-						pressed_key(mem, 7);
-						break;
+			}
+		}
+
+		const auto keys_state = SDL_GetKeyboardState(nullptr);
+		if (keys_state[SDL_SCANCODE_RIGHT]) {
+			pressed_key(mem, 0);
+		} else {
+			released_key(mem, 0);
+		}
+
+		if (keys_state[SDL_SCANCODE_LEFT]) {
+			pressed_key(mem, 1);
+		} else {
+			released_key(mem, 1);
+		}
+
+		if (keys_state[SDL_SCANCODE_UP]) {
+			pressed_key(mem, 2);
+		} else {
+			released_key(mem, 2);
+		}
+
+		if (keys_state[SDL_SCANCODE_DOWN]) {
+			pressed_key(mem, 3);
+		} else {
+			released_key(mem, 3);
+		}
+
+		if (keys_state[SDL_SCANCODE_A]) {
+			pressed_key(mem, 4);
+		} else {
+			released_key(mem, 4);
+		}
+
+		if (keys_state[SDL_SCANCODE_S]) {
+			pressed_key(mem, 5);
+		} else {
+			released_key(mem, 5);
+		}
+
+		if (keys_state[SDL_SCANCODE_SPACE]) {
+			pressed_key(mem, 6);
+		} else {
+			released_key(mem, 6);
+		}
+
+		if (keys_state[SDL_SCANCODE_RETURN]) {
+			pressed_key(mem, 7);
+		} else {
+			released_key(mem, 7);
+		}
+			// else if (event.type == SDL_KEYDOWN) {
+				// switch(event.key.keysym.sym) {
+					// case SDLK_RIGHT:
+						// std::cout << "INFO: " << frame_counter << ") RIGHT pressed\n";
+						// pressed_key(mem, 0);
+						// break;
+					// case SDLK_LEFT:
+						// std::cout << "INFO: " << frame_counter << ") LEFT pressed\n";
+						// pressed_key(mem, 1);
+						// break;
+					// case SDLK_UP:
+						// pressed_key(mem, 2);
+						// break;
+					// case SDLK_DOWN:
+						// pressed_key(mem, 3);
+						// break;
+					// case SDLK_a:
+						// pressed_key(mem, 4);
+						// break;
+					// case SDLK_s:
+						// pressed_key(mem, 5);
+						// break;
+					// case SDLK_d:
+						// always_left = !always_left;
+						// break;
+					// case SDLK_SPACE:
+						// pressed_key(mem, 6);
+						// break;
+					// case SDLK_RETURN:
+						// pressed_key(mem, 7);
+						// break;
 					// case SDLK_d:
 						// render_bg = !render_bg;
 						// break;
-				}
+				// }
 
-			} else if (event.type == SDL_KEYUP) {
-				switch(event.key.keysym.sym) {
-					case SDLK_RIGHT:
-						released_key(mem, 0);
-						break;
-					case SDLK_LEFT:
-						released_key(mem, 1);
-						break;
-					case SDLK_UP:
-						released_key(mem, 2);
-						break;
-					case SDLK_DOWN:
-						released_key(mem, 3);
-						break;
-					case SDLK_a:
-						released_key(mem, 4);
-						break;
-					case SDLK_s:
-						released_key(mem, 5);
-						break;
-					case SDLK_SPACE:
-						released_key(mem, 6);
-						break;
-					case SDLK_RETURN:
-						released_key(mem, 7);
-						break;
-				}
+			// } else if (event.type == SDL_KEYUP) {
+				// switch(event.key.keysym.sym) {
+					// case SDLK_RIGHT:
+						// released_key(mem, 0);
+						// break;
+					// case SDLK_LEFT:
+						// released_key(mem, 1);
+						// break;
+					// case SDLK_UP:
+						// released_key(mem, 2);
+						// break;
+					// case SDLK_DOWN:
+						// released_key(mem, 3);
+						// break;
+					// case SDLK_a:
+						// released_key(mem, 4);
+						// break;
+					// case SDLK_s:
+						// released_key(mem, 5);
+						// break;
+					// case SDLK_SPACE:
+						// released_key(mem, 6);
+						// break;
+					// case SDLK_RETURN:
+						// released_key(mem, 7);
+						// break;
+				// }
 
-			}
+			// }
 
-		}
+		// }
 		return true;
 	}
 

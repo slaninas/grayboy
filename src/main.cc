@@ -56,15 +56,9 @@ auto main(int argc, const char** argv) -> int
 		if (frame_cycles > CYCLES_PER_FRAME) {
 			frame_cycles -= CYCLES_PER_FRAME;
 
-			const auto end = std::chrono::high_resolution_clock::now();
-			const auto diff = duration_cast<std::chrono::milliseconds>(end - start).count();
-
-			std::this_thread::sleep_for(std::chrono::milliseconds{static_cast<int>(1000.0/60.0 -diff)});
 			if (!display.render(emu.get_memory())) {
 				return 0;
 			}
-
-			start = std::chrono::high_resolution_clock::now();
 		}
 
 		++counter;

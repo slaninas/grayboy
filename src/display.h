@@ -27,6 +27,8 @@ public:
 		 // SDL_CreateWindowAndRenderer((160 + 256) * 4, 144 * 4, 0, &window_, &renderer_);
 		 SDL_CreateWindowAndRenderer(160 * 4, 144 * 4, 0, &window_, &renderer_);
 		 SDL_RenderSetScale(renderer_, 4.0, 4.0);
+
+		 frame_start_ = SDL_GetTicks();
 	}
 
 	auto update(Memory& mem, const uint16_t& cycles) {
@@ -308,6 +310,16 @@ public:
 			// }
 
 		// }
+
+		const auto frame_should_take = 1000 / 60;
+		const auto frame_time = SDL_GetTicks() - frame_start_;
+
+		if (frame_time < frame_should_take) {
+			SDL_Delay(frame_should_take - frame_time);
+		}
+
+		frame_start_ = SDL_GetTicks();
+
 		return true;
 	}
 
@@ -473,5 +485,6 @@ private:
 	std::array<std::array<uint8_t, 144>, 160> display_;
 
 	uint64_t scanline_cycles_ = {};
+	Uint32 frame_start_ = {};
 };
 

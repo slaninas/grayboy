@@ -321,7 +321,7 @@ private:
 			was_unsed = true;
 		}
 
-		mem.joypad_state_ = (mem.joypad_state_ ^ (1 << key));
+		mem.joypad_state_ = (mem.joypad_state_ | (1 << key));
 		const auto action_button_pressed = key > 3 ? true : false;
 
 		auto request_interupt = false;

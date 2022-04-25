@@ -44,7 +44,6 @@ auto main(int argc, const char** argv) -> int
 	auto total_cycles = static_cast<uint64_t>(0);
 
 	auto display = Display{};
-	auto start = std::chrono::high_resolution_clock::now();
 	while (1) {
 
 		const auto cycles = emu.execute_next();

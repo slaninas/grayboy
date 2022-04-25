@@ -50,7 +50,7 @@ public:
 	auto get_header_checksum()
 	{
 		unsigned char sum = 0;
-		for (auto i = 0x134; i < 0x14C + 1; ++i) { sum -= std::to_integer<char>(buffer_[i]) + 1; }
+		for (auto i = 0x134; i < 0x14C + 1; ++i) { sum -= buffer_[i] + 1; }
 		return static_cast<int>(sum);
 	}
 
@@ -96,7 +96,7 @@ private:
 	{
 		const auto [start, end] = range;
 		std::cout << std::hex;
-		for (auto i = start; i < end; ++i) { std::cout << std::to_integer<int>(buffer_[i]); }
+		for (auto i = start; i < end; ++i) { std::cout << buffer_[i]; }
 		std::cout << std::dec;
 	}
 
@@ -116,13 +116,12 @@ private:
 		std::cout << std::hex;
 		auto line_counter = 1;
 		for (auto i = start; i < end; ++i, line_counter++) {
-			std::cout << std::setw(2) << std::to_integer<int>(buffer_[i]) << ' ';
+			std::cout << std::setw(2) << buffer_[i] << ' ';
 			if (line_counter % 16 == 0) { std::cout << '\n'; }
 		}
 		std::cout << '\n';
 		std::cout << std::dec;
 	}
 
-	// TODO: Use uint8_t
-	std::vector<std::byte> buffer_;
+	std::vector<uint8_t> buffer_;
 };

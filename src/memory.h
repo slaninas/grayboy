@@ -6,7 +6,7 @@
 #include <vector>
 #include <fstream>
 
-// TODO: Move into utils file
+#include "cartridge.h"
 
 struct MemoryDiff {
 	uint16_t address;
@@ -46,6 +46,17 @@ public:
 	using AddressType = uint16_t;
 
 	Memory() = default;
+
+	Memory(Cartridge&& cartridge) {
+		cartridge_ = cartridge;
+		std::fill(begin(array_) + 0xa000, begin(array_) + 0xe000, 0xff);
+
+		// Timer setup
+		array_[0xff04] = 0xac;
+		array_[0xff07] = 0xf8;
+
+	}
+
 	Memory(const ArrayType& array) : array_{array} {}
 
 	[[nodiscard]] auto direct_read(const uint16_t address) const
@@ -55,6 +66,10 @@ public:
 
 	[[nodiscard]] auto read(const uint16_t address) const
 	{
+
+		if (address <= 0x7fff) {
+			return cartridge_.read(address);
+		}
 
 		if (address == 0xff00) {
 			if (~direct_read(0xff00) & (1 << 4)) {
@@ -74,8 +89,9 @@ public:
 	void write(const uint16_t address, const uint8_t value)
 	{
 		// ROM
-		if (address <= 0x7fff) {
-			return;
+		if (address <= 0x7fff || (address >= 0xa000 && address <= 0xbfff)) {
+		// std::cout << "INFO: attempt to write to 0x" << std::hex << (int)address << " value 0x" << (int)value << std::dec << '\n';
+			cartridge_.write(address, value);
 		}
 		// Scanline reset
 		// if (address == 0xff44) {
@@ -107,6 +123,7 @@ public:
 	uint8_t joypad_state_ = {};
 private:
 	ArrayType array_ = {};
+	Cartridge cartridge_ = {};
 };
 
 struct MakeMemory {

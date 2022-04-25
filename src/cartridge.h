@@ -21,8 +21,16 @@ auto convert(const TInput& source, TOutput& destination)
 	});
 }
 
+enum class MemoryBanking {
+	NO_BANKING,
+	MBC1,
+	MBC2,
+};
+
 class Cartridge {
 public:
+
+	Cartridge() = default;
 	Cartridge(const std::string& filename)
 	{
 		auto file = std::ifstream(filename, std::ios::binary);
@@ -30,6 +38,130 @@ public:
 			throw std::invalid_argument(std::string("Can't open file >") + filename + "<");
 		}
 		buffer_ = std::vector<uint8_t>(std::istreambuf_iterator<char>(file), {});
+
+		const auto mbc = read(0x147);
+		switch(mbc) {
+			case 0:
+				memory_banking_type_ = MemoryBanking::NO_BANKING;
+				std::cout << "INFO: MemoryBanking::NO_BANKING;\n";
+				break;
+			case 1:
+			case 2:
+			case 3:
+				memory_banking_type_ = MemoryBanking::MBC1;
+				std::cout << "INFO: MemoryBanking::MBC1;\n";
+				break;
+			case 5:
+			case 6:
+				memory_banking_type_ = MemoryBanking::MBC2;
+				std::cout << "INFO: MemoryBanking::MBC2;\n";
+				throw std::exception{};
+				break;
+		}
+
+		total_ram_banks_ = read(0x147);
+		std::cout << "INFO: total_ram_banks_ " << (int)total_ram_banks_ << '\n';
+		ram_banks_.resize(total_ram_banks_);
+
+		for (auto& ram_bank : ram_banks_) {
+			std::fill(begin(ram_bank), end(ram_bank), 0x00);
+		}
+	}
+
+	// Banking: http://www.codeslinger.co.uk/pages/projects/gameboy/banking.html
+	//          https://gbdev.io/pandocs/MBC1.html
+	auto write(const uint16_t& address, const uint8_t& val) -> void {
+
+		// Enable ram banking
+		if (address <= 0x1fff) {
+			if (memory_banking_type_ == MemoryBanking::NO_BANKING) {
+				return;
+			}
+
+			if (memory_banking_type_ == MemoryBanking::MBC2) {
+				if ((address & (1 << 4)) >> 4 == 1) return;
+			}
+
+			if ((val & 0xf) == 0xA) {
+				std::cout << "INFO: ram_banking enabled\n";
+				ram_banking_enabled_ = true;
+			}
+			else if ((val & 0xf) == 0x0) {
+				ram_banking_enabled_ = false;
+				std::cout << "INFO: ram_banking disabled\n";
+			}
+		}
+		else if (address >= 0x2000 && address <= 0x3fff) {
+			if (memory_banking_type_ == MemoryBanking::MBC1 || memory_banking_type_ == MemoryBanking::MBC2) {
+			// Change ROM bank
+				if (memory_banking_type_ == MemoryBanking::MBC2) {
+					current_rom_bank_ = val & 0xf;
+					if (current_rom_bank_ == 0) {
+						current_rom_bank_ = 1;
+					}
+					return;
+				}
+
+				const auto lower5 = val & 31;
+				current_rom_bank_ &= 224;
+				current_rom_bank_ = lower5;
+				if (current_rom_bank_ == 0) {
+					current_rom_bank_ = 1;
+				}
+
+
+			}
+		}
+		else if (address >= 0x4000 && address <= 0x5fff) {
+			if (memory_banking_type_ == MemoryBanking::MBC1) {
+				if (rom_banking_) {
+					// change hi ROM bank
+					current_rom_bank_ &= 31;
+					const auto val_crop = val & 224;
+					current_rom_bank_ |= val_crop;
+
+					if (current_rom_bank_ == 0) {
+						current_rom_bank_ = 1;
+					}
+
+				}
+				else {
+					current_ram_bank_ = val & 0x3;
+				}
+
+			}
+		}
+		else if (address >= 0x6000 && address <= 0x7fff) {
+			if (memory_banking_type_ == MemoryBanking::MBC1) {
+				// change ROM RAM mode
+				const auto val_crop = val & 0x1;
+				rom_banking_ = val_crop == 0;
+				if (rom_banking_) {
+					current_ram_bank_ = 0;
+				}
+			}
+		}
+
+		else if (address >= 0xa000 && address <= 0xbfff) {
+			if (ram_banking_enabled_) {
+				ram_banks_[current_ram_bank_][address - 0xa000] = val;
+			}
+		}
+
+	}
+
+	auto read(const uint16_t& address) const -> uint8_t {
+		if (address <= 0x3fff) {
+			return buffer_[address];
+		}
+		else if (address <= 0x7fff) {
+			return buffer_[address - 0x4000 + (current_rom_bank_ * 0x4000)];
+		}
+		else if (address >= 0xa000 && address <= 0xbfff) {
+			return ram_banks_[current_ram_bank_][address - 0xa000];
+		}
+		throw std::exception{};
+		return 0;
 	}
 
 	// TODO: Why can't it be const? At least make std::pair const?
@@ -82,11 +214,6 @@ public:
 		std::cout << std::dec;
 	}
 
-	auto dump() const
-	{
-		return buffer_;
-	}
-
 private:
 	void print_as_hex(const std::pair<uint16_t, uint16_t>& range)
 	{
@@ -119,5 +246,15 @@ private:
 		std::cout << std::dec;
 	}
 
-	std::vector<uint8_t> buffer_;
+	std::vector<uint8_t> buffer_ = {};
+	MemoryBanking memory_banking_type_ = {};
+
+	uint8_t current_rom_bank_ = 1;
+
+	bool rom_banking_ = true;
+
+	bool ram_banking_enabled_ = {};
+	uint8_t current_ram_bank_ = {};
+	uint8_t total_ram_banks_ = {};
+	std::vector<std::array<uint8_t, 0x2000>> ram_banks_ = {};
 };

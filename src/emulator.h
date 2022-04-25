@@ -75,22 +75,13 @@ class Emulator {
 public:
 	Emulator(const std::string& cartridge_path) {
 
-		const auto rom = Cartridge{cartridge_path}.dump();
-
-		auto array = Memory::ArrayType{};
-		std::fill(begin(array) + 0xa000, begin(array) + 0xe000, 0xff);
-
-		std::transform(begin(rom), end(rom), begin(array), [](const auto& el) { return static_cast<uint8_t>(el); });
-
-		// Timer setup
-		array[0xff04] = 0xac;
-		array[0xff07] = 0xf8;
+		auto memory = Memory{Cartridge{cartridge_path}};
 
 		// TODO: Init the RAM as well somehow? Check boot rom
 		const auto regs =
 			RegistersChanger{.AF = 0x01b0, .BC=0x0013, .DE = 0x00d8, .HL = 0x014d, .PC = 0x0100, .SP = 0xfffe}.get(Registers{});
 
-		cpu_ = Cpu{array, regs};
+		cpu_ = Cpu{memory, regs};
 		raw_dump(cpu_.memory_dump(), "init_memory_dump");
 	}
 

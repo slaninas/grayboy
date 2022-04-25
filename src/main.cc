@@ -31,12 +31,12 @@ auto main(int argc, const char** argv) -> int
 	const uint64_t CPU_FREQUENCY = 4'194'304 / 4;
 	const uint64_t CYCLES_PER_FRAME = CPU_FREQUENCY / 60;
 
-	if (argc < 2 || argc > 3) {
-		std::cout << "Usage: " << argv[0] << " <boot_rom> cartridge_filename\n";
+	if (argc != 2) {
+		std::cout << "Usage: " << argv[0] << " cartridge_filename\n";
 		return 1;
 	}
 
-	auto emu = argc == 2 ? Emulator{argv[1]} : Emulator{argv[1], argv[2]};
+	auto emu = Emulator{argv[1]};
 
 
 	auto counter = static_cast<uint64_t>(1);

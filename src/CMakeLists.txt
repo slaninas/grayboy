@@ -29,9 +29,9 @@ target_link_libraries(grayboy
 	${pkgcfg_lib_SDL2_SDL2}
 )
 
-add_executable(debugger debugger.cc)
-find_package(curses)
-target_link_libraries(debugger
-	ncurses
-	cpu
-)
+# add_executable(debugger debugger.cc)
+# find_package(curses)
+# target_link_libraries(debugger
+	# ncurses
+	# cpu
+# )

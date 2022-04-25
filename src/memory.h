@@ -54,6 +54,7 @@ public:
 		// Timer setup
 		array_[0xff04] = 0xac;
 		array_[0xff07] = 0xf8;
+		array_[0xff40] = 0x91;
 
 	}
 

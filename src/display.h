@@ -32,13 +32,19 @@ public:
 	}
 
 	auto update(Memory& mem, const uint16_t& cycles) {
-		// TODO: Don't do it every update
-		scanline_cycles_ += cycles;
+		if (mem.read(0xff40) & (1 << 7)) {
+			scanline_cycles_ += cycles;
+		} else {
+			return;
+		}
 
 		const auto SCY = mem.read(0xff42);
 		const auto SCX = mem.read(0xff43);
 
 		const auto scanline = mem.read(0xff44);
+		// Fake LCD state
+		update_lcd_status(mem);
+
 
 		if (scanline_cycles_ >= CYCLES_PER_SCANLINE) {
 			scanline_cycles_ -= CYCLES_PER_SCANLINE;
@@ -83,7 +89,59 @@ public:
 			}
 
 			mem.write(0xff44, scanline + 1);
+			lyc_interupt_already_requested_ = false;
+
 		}
+	}
+
+	auto update_lcd_status(Memory& mem) -> void {
+		const auto stat = mem.read(0xff41);
+
+		const auto scanline = mem.direct_read(0xff44);
+
+		auto request_interupt = false;
+		const auto orig_status = stat & 0x3;
+		auto new_status = orig_status;
+
+		if (scanline >= 0x90) {
+			new_status = 1;
+			request_interupt = static_cast<bool>(stat & (1 << 4));
+		}
+		else {
+
+			if (scanline_cycles_ < 80 / 4) {
+				new_status = 2;
+				request_interupt = static_cast<bool>(stat & (1 << 5));
+			}
+			else if (scanline_cycles_ < (80 + 172) / 4) {
+				new_status = 3;
+			}
+			else {
+				new_status = 0;
+				request_interupt = static_cast<bool>(stat & (1 << 3));
+			}
+
+			if (new_status != orig_status && request_interupt) {
+				// Request interupt
+				// std::cout << "INFO: Requesting interupt\n";
+				mem.write(0xff0f, mem.direct_read(0xff0f) | 0x2);
+			}
+
+			// LY == LYC
+			if (scanline == mem.direct_read(0xff45)) {
+				new_status |= 1 << 2;
+				if (stat & (1 << 6) && !lyc_interupt_already_requested_) {
+				// Request interupt
+					mem.write(0xff0f, mem.direct_read(0xff0f) | 0x2);
+					lyc_interupt_already_requested_ = true;
+				}
+			} else {
+				new_status &= ~(1 << 2);
+			}
+		}
+
+		mem.write(0xff41, (stat & ~0x3) | new_status);
+
 	}
 
 	auto render(Memory& mem) -> bool {
@@ -486,5 +544,6 @@ private:
 
 	uint64_t scanline_cycles_ = {};
 	Uint32 frame_start_ = {};
+	bool lyc_interupt_already_requested_ = {};
 };
 

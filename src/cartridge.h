@@ -21,8 +21,6 @@ auto convert(const TInput& source, TOutput& destination)
 	});
 }
 
-// TODO: Add unit tests
-// TODO: Add check for header checksum?
 class Cartridge {
 public:
 	Cartridge(const std::string& filename)
@@ -31,9 +29,7 @@ public:
 		if (file.fail()) {
 			throw std::invalid_argument(std::string("Can't open file >") + filename + "<");
 		}
-		auto buffer = std::vector<uint8_t>(std::istreambuf_iterator<char>(file), {});
-
-		convert(buffer, buffer_);
+		buffer_ = std::vector<uint8_t>(std::istreambuf_iterator<char>(file), {});
 	}
 
 	// TODO: Why can't it be const? At least make std::pair const?

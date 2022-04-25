@@ -14,8 +14,8 @@ add_subdirectory("src/")
 
 if (${BUILD_TESTS})
 	enable_testing()
-	# Disabled for now, I made a change that prevent writes to ROM but lot of tests use that (usually starts writing at 0x00) so they fail
-	# add_subdirectory("tests/")
+	# Some tests are failing because they are writing to memory locations 0-0x7fff but that is forbidden (it's ROM)
+	add_subdirectory("tests/")
 	add_subdirectory("tests-blargg/")
 endif()
 

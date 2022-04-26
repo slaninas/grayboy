@@ -9,23 +9,6 @@
 #include "display.h"
 
 
-// State (BLARGG comparison)
-// ************************
-// - BootRom has no diff compared to https://github.com/wheremyfoodat/Gameboy-logs except last 100 lines but it should be just checksum (and I'm running different cartridge
-//   than the author of those dumps
-// - Blargg 01 works fine
-// - Blargg 02 works fine
-// - Blargg 03 works fine
-// - Blargg 04 works fine
-// - Blargg 05 works fine
-// - Blargg 06 works fine
-// - Blargg 07 works fine
-// - Blargg 08 works fine
-// - Blargg 09 works fine
-// - Blargg 10 works fine
-// - Blargg 11 works fine
-
-
 auto main(int argc, const char** argv) -> int
 {
 	const uint64_t CPU_FREQUENCY = 4'194'304 / 4;
@@ -62,6 +45,6 @@ auto main(int argc, const char** argv) -> int
 
 		++counter;
 	}
-	//
-	// check_implemented();
+
+	return 0;
 }

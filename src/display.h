@@ -103,12 +103,7 @@ public:
 		const auto orig_status = stat & 0x3;
 		auto new_status = orig_status;
 
-		if (scanline >= 0x90) {
-			new_status = 1;
-			request_interupt = static_cast<bool>(stat & (1 << 4));
-		}
-		else {
-
+		if (scanline < 0x90) {
 			if (scanline_cycles_ < 80 / 4) {
 				new_status = 2;
 				request_interupt = static_cast<bool>(stat & (1 << 5));
@@ -138,9 +133,9 @@ public:
 			} else {
 				new_status &= ~(1 << 2);
 			}
+			mem.write(0xff41, (stat & ~0x3) | new_status);
 		}
 
-		mem.write(0xff41, (stat & ~0x3) | new_status);
 
 	}
 

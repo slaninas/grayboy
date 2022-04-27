@@ -510,34 +510,10 @@ private:
 		const auto first_byte = mem.read(addr + y * 2 + 1);
 		const auto second_byte = mem.read(addr + y * 2 + 0);
 
-		switch (x) {
-			case 0:
-				return ((first_byte & 0x80) >> 6) + ((second_byte & 0x80) >> 7);
-				break;
-			case 1:
-				return ((first_byte & 0x40) >> 5) + ((second_byte & 0x40) >> 6);
-				break;
-			case 2:
-				return ((first_byte & 0x20) >> 4) + ((second_byte & 0x20) >> 5);
-				break;
-			case 3:
-				return ((first_byte & 0x10) >> 3) + ((second_byte & 0x10) >> 4);
-				break;
-			case 4:
-				return ((first_byte & 0x08) >> 2) + ((second_byte & 0x08) >> 3);
-				break;
-			case 5:
-				return ((first_byte & 0x04) >> 1) + ((second_byte & 0x04) >> 2);
-				break;
-			case 6:
-				return ((first_byte & 0x02) >> 0) + ((second_byte & 0x02) >> 1);
-				break;
-			case 7:
-				return ((first_byte & 0x01) << 1) + ((second_byte & 0x01) >> 0);
-				break;
+		const auto first_bit = static_cast<bool>(first_byte & (1 << (7 - x)));
+		const auto second_bit = static_cast<bool>(second_byte & (1 << (7 - x)));
 
-
-		}
+		return static_cast<uint8_t>(first_bit) << 1 + second_bit;
 
 	}
 

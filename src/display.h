@@ -13,18 +13,6 @@ struct BackgroundPixel {
 	uint8_t raw_color = {};
 };
 
-struct Sprite {
-	uint8_t index = {};
-	uint8_t pos_x = {};
-	uint8_t pos_y = {};
-
-	bool render_priority = {};
-	bool x_flip = {};
-	bool y_flip = {};
-	uint8_t palette = {};
-
-};
-
 // Useful sources:
 // - https://stackoverflow.com/a/35989490/1112468
 // - http://emudev.de/gameboy-emulator/%e2%af%88-ppu-rgb-arrays-and-sdl/
@@ -62,7 +50,10 @@ public:
 			scanline_cycles_ -= CYCLES_PER_SCANLINE;
 
 			update_bg_scanline(mem);
-			update_sprites_scanline(mem);
+			if (scanline == 0) {
+				update_sprites(mem);
+			}
+
 
 			if (scanline >= 0x99) {
 				mem.write(0xff44, 0);
@@ -448,53 +439,11 @@ private:
 
 	}
 
-	auto update_sprites_scanline(const Memory& mem) -> void {
-
-		const auto large_sprites = mem.read(0xff40) & (1 << 2);
-		const auto SCY = mem.read(0xff42);
-		const auto SCX = mem.read(0xff43);
+	auto update_sprites(const Memory& mem) -> void {
 
 		// TODO: Large sprites
 		// const auto large_sprites = mem.read(0xff40) & 0x4;
 		raw_dump(mem.dump(), "update_sprites_mem");
-
-		auto all_sprites = std::vector<Sprite>{};
-
-		for (auto sprite = size_t{0}; sprite < 40; ++sprite) {
-			const auto index = sprite * 4;
-			const auto pos_x = mem.read(0xfe00 + index + 1) - 0x8;
-			const auto pos_y = mem.read(0xfe00 + index) - 0x10;
-			const auto tile_number = mem.read(0xfe00 + index + 2);
-
-			const auto attributes = mem.read(0xfe00 + index + 3);
-			const auto render_priority = static_cast<bool>(attributes & (1 << 7));
-			const auto y_flip = static_cast<bool>(attributes & (1 << 6));
-			const auto x_flip = static_cast<bool>(attributes & (1 << 5));
-
-			const auto palette_address = (attributes & (1 << 4)) ? 0xff49 : 0xff48;
-			const auto palette = mem.read(palette_address);
-
-			all_sprites.push_back({index, pos_x, pos_y, render_priority, x_flip, y_flip, palette});
-
-		}
-
-		auto sprites = std::vector<Sprite>{};
-		std::copy_if(
-			begin(all_sprites),
-			end(all_sprites),
-			std::back_inserter(sprites),
-			[SCX, SCY, large_sprites](const auto& s) {
-				if (s.pos_x + 8 >= SCX && s.pos_x < 160 + SCX) {
-					const auto size_y = large_sprites ? 16 : 8;
-					if (s.pos_y + size_y >= SCY && s.pos_y < 144 + SCY) {
-						return true;
-					}
-				}
-				return false;
-			});
-
-		std::stable_sort(begin(sprites), end(sprites), [](const auto& a, const auto& b) { return a.pos_x < b.pos_x; });
-
 
 
 		for (auto y = static_cast<uint64_t>(0); y < sprites_buffer_[0].size(); ++y) {
@@ -504,22 +453,37 @@ private:
 
 		}
 
-		for (const auto& sprite : sprites) {
-			const auto tile_number = mem.read(0xfe00 + sprite.index + 2);
+		for (auto sprite = 0; sprite < 40; ++sprite) {
+			const auto index = sprite * 4;
+			const auto x_pos = mem.read(0xfe00 + index + 1) - 0x8;
+			const auto y_pos = mem.read(0xfe00 + index) - 0x10;
+			const auto tile_number = mem.read(0xfe00 + index + 2);
+
+			// TODO: Proper selection
 			const auto tile_address = 0x8000 + tile_number * 0x10;
+
+			const auto attributes = mem.read(0xfe00 + index + 3);
+			const auto render_priority = static_cast<bool>(attributes & (1 << 7));
+			const auto y_flip = static_cast<bool>(attributes & (1 << 6));
+			const auto x_flip = static_cast<bool>(attributes & (1 << 5));
+			// const auto x_flip = false;
+			// const auto y_flip = false;
+			const auto palette_address = (attributes & (1 << 4)) ? 0xff49 : 0xff48;
+
+
+			const auto palette = mem.read(palette_address);
+			const auto colors = std::array{palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6};
+
 			auto tile = load_tile(mem, tile_address);
 
-			const auto size_y = large_sprites ? 16 : 8;
-
-			// TODO: Handle 8x16 sprites
-			if (sprite.y_flip) {
+			if (y_flip) {
 				for (auto y = 0; y < 4; ++y) {
 					for (auto x = 0; x < 8; ++x) {
 						std::swap(tile[y * 8 + x], tile[(7-y)*8 + x]);
 					}
 				}
 			}
-			if (sprite.x_flip) {
+			if (x_flip) {
 				for (auto y = 0; y < 8; ++y) {
 					for (auto x = 0; x < 4; ++x) {
 						std::swap(tile[y * 8 + x], tile[y * 8 + (7 - x)]);
@@ -527,16 +491,16 @@ private:
 				}
 			}
 
-			const auto colors = std::array{sprite.palette & 0x3, (sprite.palette & 0xc) >> 2, (sprite.palette & 0x30) >> 4, (sprite.palette & 0xc0) >> 6};
 
-			if (sprite.pos_x + 8 + SCX >= 0 && sprite.pos_x < 160 + SCX && sprite.pos_y + size_y >= SCY && sprite.pos_y < 144 + SCY) {
+			if (x_pos + 8 >= 0 && x_pos < 160 && y_pos + 8>= 0 && y_pos < 144) {
 
-				for (auto y = std::max(uint8_t{0}, sprite.pos_y); y < std::min(sprite.pos_y + size_y, 144); ++y) {
-					for (auto x = std::max(uint8_t{0}, sprite.pos_x); x < std::min(sprite.pos_x + 8, 160); ++x) {
-						const auto value = tile[(y - sprite.pos_y) * 8 + x - sprite.pos_x];
+				// TODO: FIx case when top left corner of the sprite is out of display but part is
+				for (auto y = std::max(0, y_pos); y < std::min(y_pos + 8, 144); ++y) {
+					for (auto x = std::max(0, x_pos); x < std::min(x_pos + 8, 160); ++x) {
+						const auto value = tile[(y - y_pos) * 8 + x - x_pos];
 						// Sprite data 00 is transparent (https://gbdev.gg8.se/wiki/articles/Video_Display#LCD_Monochrome_Palettes)
 						if (value != 0) {
-							sprites_buffer_[x][y] = {static_cast<uint8_t>(colors[value]), value, !sprite.render_priority};
+							sprites_buffer_[x][y] = {static_cast<uint8_t>(colors[value]), value, !render_priority};
 						}
 					}
 
@@ -545,6 +509,7 @@ private:
 			}
 
 		}
+
 	}
 
 	auto load_tile(const Memory& mem, const uint16_t& addr) -> std::array<uint8_t, 64> {

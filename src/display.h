@@ -432,7 +432,7 @@ private:
 			const auto first_bit = static_cast<bool>(first_byte & (1 << (7 - (x + SCX) % 8)));
 			const auto second_bit = static_cast<bool>(second_byte & (1 << (7 - (x + SCX) % 8)));
 
-			const auto pixel = static_cast<uint8_t>(first_bit) << 1 + second_bit;
+			const auto pixel = (static_cast<uint8_t>(first_bit) << 1) + second_bit;
 			bg_buffer_[x][scanline] = {static_cast<uint8_t>(colors[pixel]), pixel};
 
 		}

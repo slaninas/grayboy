@@ -426,7 +426,13 @@ private:
 			const auto tile_id = mem.read(tile_index);
 			const auto tile_address = tile_data == 0x8000 ? (0x8000 + tile_id * 0x10) : ((tile_id < 128 ? 0x9000 + tile_id * 0x10 : 0x8800 + (tile_id - 128) * 0x10));
 
-			const auto pixel = load_tile_pixel(mem, tile_address, (x + SCX) % 8, (scanline + SCY) % 8);
+			const auto first_byte = mem.read(tile_address + ((scanline + SCY) % 8) * 2 + 1);
+			const auto second_byte = mem.read(tile_address + ((scanline + SCY) % 8) * 2 + 0);
+
+			const auto first_bit = static_cast<bool>(first_byte & (1 << (7 - (x + SCX) % 8)));
+			const auto second_bit = static_cast<bool>(second_byte & (1 << (7 - (x + SCX) % 8)));
+
+			const auto pixel = static_cast<uint8_t>(first_bit) << 1 + second_bit;
 			bg_buffer_[x][scanline] = {static_cast<uint8_t>(colors[pixel]), pixel};
 
 		}
@@ -503,17 +509,6 @@ private:
 			}
 
 		}
-
-	}
-
-	auto load_tile_pixel(const Memory& mem, const uint16_t& addr, const uint8_t& x, const uint8_t& y) -> uint8_t {
-		const auto first_byte = mem.read(addr + y * 2 + 1);
-		const auto second_byte = mem.read(addr + y * 2 + 0);
-
-		const auto first_bit = static_cast<bool>(first_byte & (1 << (7 - x)));
-		const auto second_bit = static_cast<bool>(second_byte & (1 << (7 - x)));
-
-		return static_cast<uint8_t>(first_bit) << 1 + second_bit;
 
 	}
 

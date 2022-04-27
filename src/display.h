@@ -375,7 +375,7 @@ private:
 	auto update_sprites(const Memory& mem) -> void {
 
 		// TODO: Large sprites
-		// const auto large_sprites = mem.read(0xff40) & 0x4;
+		const auto large_sprites = mem.read(0xff40) & (1 << 2);
 
 
 		for (auto y = static_cast<uint64_t>(0); y < sprites_buffer_[0].size(); ++y) {
@@ -408,35 +408,43 @@ private:
 
 			auto tile = load_tile(mem, tile_address);
 
-			if (y_flip) {
-				for (auto y = 0; y < 4; ++y) {
-					for (auto x = 0; x < 8; ++x) {
-						std::swap(tile[y * 8 + x], tile[(7-y)*8 + x]);
-					}
-				}
-			}
-			if (x_flip) {
-				for (auto y = 0; y < 8; ++y) {
-					for (auto x = 0; x < 4; ++x) {
-						std::swap(tile[y * 8 + x], tile[y * 8 + (7 - x)]);
-					}
-				}
-			}
-
-
-			if (x_pos + 8 >= 0 && x_pos < 160 && y_pos + 8>= 0 && y_pos < 144) {
-
-				// TODO: FIx case when top left corner of the sprite is out of display but part is
-				for (auto y = std::max(0, y_pos); y < std::min(y_pos + 8, 144); ++y) {
-					for (auto x = std::max(0, x_pos); x < std::min(x_pos + 8, 160); ++x) {
-						const auto value = tile[(y - y_pos) * 8 + x - x_pos];
-						// Sprite data 00 is transparent (https://gbdev.gg8.se/wiki/articles/Video_Display#LCD_Monochrome_Palettes)
-						if (value != 0) {
-							sprites_buffer_[x][y] = {static_cast<uint8_t>(colors[value]), value, !render_priority};
+			const auto render_tile = [=](auto& tile, const auto& x_pos, const auto& y_pos) {
+				if (y_flip) {
+					for (auto y = 0; y < 4; ++y) {
+						for (auto x = 0; x < 8; ++x) {
+							std::swap(tile[y * 8 + x], tile[(7-y)*8 + x]);
 						}
 					}
+				}
+				if (x_flip) {
+					for (auto y = 0; y < 8; ++y) {
+						for (auto x = 0; x < 4; ++x) {
+							std::swap(tile[y * 8 + x], tile[y * 8 + (7 - x)]);
+						}
+					}
+				}
+
+
+				if (x_pos + 8 >= 0 && x_pos < 160 && y_pos + 8>= 0 && y_pos < 144) {
+
+					// TODO: FIx case when top left corner of the sprite is out of display but part is
+					for (auto y = std::max(0, y_pos); y < std::min(y_pos + 8, 144); ++y) {
+						for (auto x = std::max(0, x_pos); x < std::min(x_pos + 8, 160); ++x) {
+							const auto value = tile[(y - y_pos) * 8 + x - x_pos];
+							// Sprite data 00 is transparent (https://gbdev.gg8.se/wiki/articles/Video_Display#LCD_Monochrome_Palettes)
+							if (value != 0) {
+								sprites_buffer_[x][y] = {static_cast<uint8_t>(colors[value]), value, !render_priority};
+							}
+						}
+
+					}
 
 				}
+			};
+			render_tile(tile, x_pos, y_pos);
+			if (large_sprites) {
+				tile = load_tile(mem, 0x8000 + (tile_number + 1) * 0x10);
+				render_tile(tile, x_pos, y_pos + 8);
 
 			}
 

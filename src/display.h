@@ -443,7 +443,6 @@ private:
 
 		// TODO: Large sprites
 		// const auto large_sprites = mem.read(0xff40) & 0x4;
-		raw_dump(mem.dump(), "update_sprites_mem");
 
 
 		for (auto y = static_cast<uint64_t>(0); y < sprites_buffer_[0].size(); ++y) {

@@ -49,8 +49,8 @@ public:
 		if (scanline_cycles_ >= CYCLES_PER_SCANLINE) {
 			scanline_cycles_ -= CYCLES_PER_SCANLINE;
 
+			update_bg_scanline(mem);
 			if (scanline == 0) {
-				update_tile_map(mem);
 				update_sprites(mem);
 			}
 
@@ -67,7 +67,7 @@ public:
 				}
 
 				for (auto x = 0; x < 160; ++x) {
-					const auto background_pixel = bg_buffer_[(x + SCX) % 256][(scanline + SCY) % 256];
+					const auto background_pixel = bg_buffer_[x][scanline];
 					display_[x][scanline] = background_pixel.render_color;
 
 					const auto sprite_pixel = sprites_buffer_[x][scanline];
@@ -408,7 +408,7 @@ private:
 		mem.joypad_state_ = mem.joypad_state_ & ~(1 << key);
 	}
 
-	auto update_tile_map(const Memory& mem) -> void {
+	auto update_bg_scanline(const Memory& mem) -> void {
 
 		const auto palette = mem.read(0xff47);
 		const auto colors = std::array{palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6};
@@ -416,24 +416,19 @@ private:
 		const auto tile_map = (((mem.read(0xff40) >> 3) & 1) == 1) ? 0x9c00 : 0x9800;
 		const auto tile_data = ((mem.read(0xff40) >> 4) & 1) ? 0x8000 : 0x8800;
 
-		for (auto ty = 0; ty < 32; ++ty) {
-			for (auto tx = 0; tx < 32; ++tx) {
+		const auto SCY = mem.read(0xff42);
+		const auto SCX = mem.read(0xff43);
+		const auto scanline = mem.read(0xff44);
 
-				const auto index = tile_map + (ty) * 32 + tx;
-				const auto tile_id = mem.read(index);
-				const auto tile_address = tile_data == 0x8000 ? (0x8000 + tile_id * 0x10) : ((tile_id < 128 ? 0x9000 + tile_id * 0x10 : 0x8800 + (tile_id - 128) * 0x10));
 
-				const auto tile = load_tile(mem, tile_address);
+		for (auto x = size_t{0}; x < 160; ++x) {
+			const auto tile_index = tile_map + (scanline + SCY) / 8 * 32 + (x + SCX) / 8;
+			const auto tile_id = mem.read(tile_index);
+			const auto tile_address = tile_data == 0x8000 ? (0x8000 + tile_id * 0x10) : ((tile_id < 128 ? 0x9000 + tile_id * 0x10 : 0x8800 + (tile_id - 128) * 0x10));
 
-				for (auto x = 0; x < 8; ++x) {
-					for (auto y = 0; y < 8; ++y) {
-						const auto& pixel = tile[y * 8 + x];
-						// std::cout << "INFO: map, putting " << (int)colors[pixel] << " at the place of " << (int)pixel << '\n';
-						bg_buffer_[x + tx * 8][y + ty * 8] = {static_cast<uint8_t>(colors[pixel]), pixel};
-					}
-				}
+			const auto pixel = load_tile_pixel(mem, tile_address, (x + SCX) % 8, (scanline + SCY) % 8);
+			bg_buffer_[x][scanline] = {static_cast<uint8_t>(colors[pixel]), pixel};
 
-			}
 		}
 
 	}
@@ -506,6 +501,41 @@ private:
 				}
 
 			}
+
+		}
+
+	}
+
+	auto load_tile_pixel(const Memory& mem, const uint16_t& addr, const uint8_t& x, const uint8_t& y) -> uint8_t {
+		const auto first_byte = mem.read(addr + y * 2 + 1);
+		const auto second_byte = mem.read(addr + y * 2 + 0);
+
+		switch (x) {
+			case 0:
+				return ((first_byte & 0x80) >> 6) + ((second_byte & 0x80) >> 7);
+				break;
+			case 1:
+				return ((first_byte & 0x40) >> 5) + ((second_byte & 0x40) >> 6);
+				break;
+			case 2:
+				return ((first_byte & 0x20) >> 4) + ((second_byte & 0x20) >> 5);
+				break;
+			case 3:
+				return ((first_byte & 0x10) >> 3) + ((second_byte & 0x10) >> 4);
+				break;
+			case 4:
+				return ((first_byte & 0x08) >> 2) + ((second_byte & 0x08) >> 3);
+				break;
+			case 5:
+				return ((first_byte & 0x04) >> 1) + ((second_byte & 0x04) >> 2);
+				break;
+			case 6:
+				return ((first_byte & 0x02) >> 0) + ((second_byte & 0x02) >> 1);
+				break;
+			case 7:
+				return ((first_byte & 0x01) << 1) + ((second_byte & 0x01) >> 0);
+				break;
+
 
 		}
 

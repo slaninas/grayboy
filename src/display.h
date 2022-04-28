@@ -49,7 +49,9 @@ public:
 		if (scanline_cycles_ >= CYCLES_PER_SCANLINE) {
 			scanline_cycles_ -= CYCLES_PER_SCANLINE;
 
-			update_bg_scanline(mem);
+			const auto scanline = mem.read(0xff44);
+
+			update_tiles_scanline(mem);
 			if (scanline == 0) {
 				update_sprites(mem);
 			}
@@ -341,29 +343,43 @@ private:
 		mem.joypad_state_ = mem.joypad_state_ & ~(1 << key);
 	}
 
-	auto update_bg_scanline(const Memory& mem) -> void {
+	auto update_tiles_scanline(const Memory& mem) -> void {
 
 		const auto palette = mem.read(0xff47);
 		const auto colors = std::array{palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6};
 
-		const auto tile_map = (((mem.read(0xff40) >> 3) & 1) == 1) ? 0x9c00 : 0x9800;
-		const auto tile_data = ((mem.read(0xff40) >> 4) & 1) ? 0x8000 : 0x8800;
-
 		const auto SCY = mem.read(0xff42);
 		const auto SCX = mem.read(0xff43);
-		const auto scanline = mem.read(0xff44);
 
+		const auto window_y = mem.read(0xff4A);
+		const auto window_x = mem.read(0xff4B) - 0x7;
+
+		const auto scanline = mem.read(0xff44);
+		const auto using_window = (mem.read(0xff40) & (1 << 5)) && window_y <= scanline;
+
+		const auto tile_data = ((mem.read(0xff40) >> 4) & 1) ? 0x8000 : 0x8800;
+
+		auto tile_map = (((mem.read(0xff40) >> 3) & 1) == 1) ? 0x9c00 : 0x9800;
+
+		auto pos_y = scanline + SCY;
 
 		for (auto x = size_t{0}; x < 160; ++x) {
-			const auto tile_index = tile_map + (scanline + SCY) / 8 * 32 + (x + SCX) / 8;
+
+			auto pos_x = x + SCX;
+			if (using_window && x >= window_x) {
+				pos_y = scanline - window_y;
+				pos_x = x - window_x;
+				tile_map = ((mem.read(0xff40) >> 6 & 1) == 1) ? 0x9c00 : 9800;
+			}
+			const auto tile_index = tile_map + pos_y / 8 * 32 + pos_x / 8;
 			const auto tile_id = mem.read(tile_index);
 			const auto tile_address = tile_data == 0x8000 ? (0x8000 + tile_id * 0x10) : ((tile_id < 128 ? 0x9000 + tile_id * 0x10 : 0x8800 + (tile_id - 128) * 0x10));
 
-			const auto first_byte = mem.read(tile_address + ((scanline + SCY) % 8) * 2 + 1);
-			const auto second_byte = mem.read(tile_address + ((scanline + SCY) % 8) * 2 + 0);
+			const auto first_byte = mem.read(tile_address + (pos_y % 8) * 2 + 1);
+			const auto second_byte = mem.read(tile_address + (pos_y % 8) * 2 + 0);
 
-			const auto first_bit = static_cast<bool>(first_byte & (1 << (7 - (x + SCX) % 8)));
-			const auto second_bit = static_cast<bool>(second_byte & (1 << (7 - (x + SCX) % 8)));
+			const auto first_bit = static_cast<bool>(first_byte & (1 << (7 - pos_x % 8)));
+			const auto second_bit = static_cast<bool>(second_byte & (1 << (7 - pos_x % 8)));
 
 			const auto pixel = (static_cast<uint8_t>(first_bit) << 1) + second_bit;
 			bg_buffer_[x][scanline] = {static_cast<uint8_t>(colors[pixel]), pixel};

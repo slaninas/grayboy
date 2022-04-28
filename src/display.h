@@ -38,10 +38,6 @@ public:
 			return;
 		}
 
-		const auto SCY = mem.read(0xff42);
-		const auto SCX = mem.read(0xff43);
-
-		const auto scanline = mem.read(0xff44);
 		// Fake LCD state
 		update_lcd_status(mem);
 

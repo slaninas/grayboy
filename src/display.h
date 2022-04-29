@@ -13,6 +13,12 @@ struct BackgroundPixel {
 	uint8_t raw_color = {};
 };
 
+struct WindowPixel {
+	bool active = {};
+	uint8_t render_color = {};
+	uint8_t raw_color = {};
+};
+
 // Useful sources:
 // - https://stackoverflow.com/a/35989490/1112468
 // - http://emudev.de/gameboy-emulator/%e2%af%88-ppu-rgb-arrays-and-sdl/
@@ -486,6 +492,7 @@ private:
 
 	SDL_Renderer* renderer_ = {};
 	SDL_Window* window_ = {};
+	std::array<std::array<WindowPixel, 256>, 256> window_buffer_;
 	std::array<std::array<BackgroundPixel, 256>, 256> bg_buffer_;
 	std::array<std::array<SpritePixel, 144>, 160> sprites_buffer_;
 	std::array<std::array<uint8_t, 144>, 160> display_;

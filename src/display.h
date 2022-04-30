@@ -102,10 +102,27 @@ public:
 				mem.write(0xff0f, mem.read(0xff0f) | 0x1);
 			}
 
+			check_lyc(mem);
 			mem.write(0xff44, scanline + 1);
-			lyc_interupt_already_requested_ = false;
-
 		}
+	}
+
+	auto check_lyc(Memory& mem) -> void {
+		const auto stat = mem.read(0xff41);
+		auto new_status = stat & 0x3;
+
+		// LY == LYC
+		if (mem.direct_read(0xff44 == mem.direct_read(0xff45))) {
+			new_status |= 1 << 2;
+			if (stat & (1 << 6)) {
+			// Request interupt
+				mem.write(0xff0f, mem.direct_read(0xff0f) | 0x2);
+			}
+		} else {
+			new_status &= ~(1 << 2);
+		}
+
+		mem.write(0xff41, (stat & ~0x3) | new_status);
 	}
 
 	auto update_lcd_status(Memory& mem) -> void {
@@ -136,17 +153,6 @@ public:
 				mem.write(0xff0f, mem.direct_read(0xff0f) | 0x2);
 			}
 
-			// LY == LYC
-			if (scanline == mem.direct_read(0xff45)) {
-				new_status |= 1 << 2;
-				if (stat & (1 << 6) && !lyc_interupt_already_requested_) {
-				// Request interupt
-					mem.write(0xff0f, mem.direct_read(0xff0f) | 0x2);
-					lyc_interupt_already_requested_ = true;
-				}
-			} else {
-				new_status &= ~(1 << 2);
-			}
 			mem.write(0xff41, (stat & ~0x3) | new_status);
 		}
 

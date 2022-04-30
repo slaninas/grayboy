@@ -356,6 +356,15 @@ private:
 	}
 
 	auto update_tiles_scanline(const Memory& mem) -> void {
+		const auto scanline = mem.read(0xff44);
+
+		// TODO: Use BG/Window Display/Priority bit correctly
+		// if (!mem.read(0xff40) & 0x1) {
+			// for (auto x = size_t{0}; x < size_t{160}; ++x) {
+				// bg_buffer_[x][scanline] = {uint8_t{0}, uint8_t{0}};
+			// }
+			// return;
+		// }
 
 		const auto palette = mem.read(0xff47);
 		const auto colors = std::array{palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6};
@@ -366,7 +375,6 @@ private:
 		const auto window_y = mem.read(0xff4A);
 		const auto window_x = mem.read(0xff4B) - 0x7;
 
-		const auto scanline = mem.read(0xff44);
 		const auto using_window = (mem.read(0xff40) & (1 << 5)) && window_y <= scanline;
 
 		const auto tile_data = ((mem.read(0xff40) >> 4) & 1) ? 0x8000 : 0x8800;

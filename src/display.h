@@ -19,6 +19,16 @@ struct WindowPixel {
 	uint8_t raw_color = {};
 };
 
+struct SpriteAttributes {
+	bool render_priority = {};
+	bool y_flip = {};
+	bool x_flip = {};
+	std::array<uint8_t, 4> colors = {};
+
+	uint8_t pos_x = {};
+	uint8_t pos_y = {};
+};
+
 // Useful sources:
 // - https://stackoverflow.com/a/35989490/1112468
 // - http://emudev.de/gameboy-emulator/%e2%af%88-ppu-rgb-arrays-and-sdl/
@@ -365,7 +375,7 @@ private:
 
 		auto pos_y = scanline + SCY;
 
-		for (auto x = size_t{0}; x < 160; ++x) {
+		for (auto x = 0; x < 160; ++x) {
 
 			auto pos_x = x + SCX;
 			if (using_window && x >= window_x) {
@@ -384,7 +394,7 @@ private:
 			const auto second_bit = static_cast<bool>(second_byte & (1 << (7 - pos_x % 8)));
 
 			const auto pixel = (static_cast<uint8_t>(first_bit) << 1) + second_bit;
-			bg_buffer_[x][scanline] = {static_cast<uint8_t>(colors[pixel]), pixel};
+			bg_buffer_[x][scanline] = {static_cast<uint8_t>(colors[pixel]), static_cast<uint8_t>(pixel)};
 
 		}
 
@@ -412,29 +422,31 @@ private:
 			// TODO: Proper selection
 			const auto tile_address = 0x8000 + tile_number * 0x10;
 
-			const auto attributes = mem.read(0xfe00 + index + 3);
-			const auto render_priority = static_cast<bool>(attributes & (1 << 7));
-			const auto y_flip = static_cast<bool>(attributes & (1 << 6));
-			const auto x_flip = static_cast<bool>(attributes & (1 << 5));
-			// const auto x_flip = false;
-			// const auto y_flip = false;
-			const auto palette_address = (attributes & (1 << 4)) ? 0xff49 : 0xff48;
-
-
+			const auto attrs_raw = mem.read(0xfe00 + index + 3);
+			const auto palette_address = (attrs_raw & (1 << 4)) ? 0xff49 : 0xff48;
 			const auto palette = mem.read(palette_address);
-			const auto colors = std::array{palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6};
+
+			const auto attrs = SpriteAttributes {
+					.render_priority = static_cast<bool>(attrs_raw & (1 << 7)),
+					.y_flip = static_cast<bool>(attrs_raw & (1 << 6)),
+					.x_flip = static_cast<bool>(attrs_raw & (1 << 5)),
+					.colors = {palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6},
+					.pos_x = x_pos,
+					.pos_y = y_pos,
+			};
 
 			auto tile = load_tile(mem, tile_address);
 
-			const auto render_tile = [=](auto& tile, const auto& x_pos, const auto& y_pos) {
-				if (y_flip) {
+
+			const auto render_tile = [](auto& tile, auto& sprites_buffer, const SpriteAttributes& attrs) {
+				if (attrs.y_flip) {
 					for (auto y = 0; y < 4; ++y) {
 						for (auto x = 0; x < 8; ++x) {
 							std::swap(tile[y * 8 + x], tile[(7-y)*8 + x]);
 						}
 					}
 				}
-				if (x_flip) {
+				if (attrs.x_flip) {
 					for (auto y = 0; y < 8; ++y) {
 						for (auto x = 0; x < 4; ++x) {
 							std::swap(tile[y * 8 + x], tile[y * 8 + (7 - x)]);
@@ -443,15 +455,15 @@ private:
 				}
 
 
-				if (x_pos + 8 >= 0 && x_pos < 160 && y_pos + 8>= 0 && y_pos < 144) {
+				if (attrs.pos_x + 8 >= 0 && attrs.pos_x < 160 && attrs.pos_y + 8>= 0 && attrs.pos_y < 144) {
 
 					// TODO: FIx case when top left corner of the sprite is out of display but part is
-					for (auto y = std::max(0, y_pos); y < std::min(y_pos + 8, 144); ++y) {
-						for (auto x = std::max(0, x_pos); x < std::min(x_pos + 8, 160); ++x) {
-							const auto value = tile[(y - y_pos) * 8 + x - x_pos];
+					for (auto y = std::max(uint8_t{0}, attrs.pos_y); y < std::min(attrs.pos_y + 8, 144); ++y) {
+						for (auto x = std::max(uint8_t{0}, attrs.pos_x); x < std::min(attrs.pos_x + 8, 160); ++x) {
+							const auto value = tile[(y - attrs.pos_y) * 8 + x - attrs.pos_x];
 							// Sprite data 00 is transparent (https://gbdev.gg8.se/wiki/articles/Video_Display#LCD_Monochrome_Palettes)
 							if (value != 0) {
-								sprites_buffer_[x][y] = {static_cast<uint8_t>(colors[value]), value, !render_priority};
+								sprites_buffer[x][y] = {static_cast<uint8_t>(attrs.colors[value]), value, !attrs.render_priority};
 							}
 						}
 
@@ -459,10 +471,11 @@ private:
 
 				}
 			};
-			render_tile(tile, x_pos, y_pos);
+
+			render_tile(tile, sprites_buffer_, attrs);
 			if (large_sprites) {
 				tile = load_tile(mem, 0x8000 + (tile_number + 1) * 0x10);
-				render_tile(tile, x_pos, y_pos + 8);
+				render_tile(tile, sprites_buffer_, attrs);
 
 			}
 

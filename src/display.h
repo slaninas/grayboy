@@ -111,7 +111,7 @@ public:
 		auto new_status = stat & 0x3;
 
 		// LY == LYC
-		if (mem.direct_read(0xff44 == mem.direct_read(0xff45))) {
+		if (mem.direct_read(0xff44) == mem.direct_read(0xff45)) {
 			new_status |= 1 << 2;
 			if (stat & (1 << 6)) {
 			// Request interupt

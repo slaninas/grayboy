@@ -47,7 +47,8 @@ auto main(int argc, const char** argv) -> int
 			if (!continue_running) {
 				return 0;
 			}
-			emu.get_memory().direct_write(0xff44, 0);
+			// TODO: Sync rendering with scanlines
+			// emu.get_memory().direct_write(0xff44, 0);
 
 			const auto end = std::chrono::high_resolution_clock::now();
 			const auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();

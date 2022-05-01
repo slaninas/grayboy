@@ -27,6 +27,10 @@ auto main(int argc, const char** argv) -> int
 	auto total_cycles = static_cast<uint64_t>(0);
 
 	auto display = Display{};
+	auto start = std::chrono::high_resolution_clock::now();
+	auto start10s = std::chrono::high_resolution_clock::now();
+	auto frames = 0;
+	auto frames10s = 0;
 	while (1) {
 
 		const auto cycles = emu.execute_next();
@@ -36,10 +40,33 @@ auto main(int argc, const char** argv) -> int
 		// std::cout << "INFO: instructions executed: " << std::dec << counter << '\n';
 
 		if (frame_cycles > CYCLES_PER_FRAME) {
+			std::cout << "INFO: main: calling render, frame_cycles " << frame_cycles << ", CYCLES_PER_FRAME " << CYCLES_PER_FRAME << "\n";
 			frame_cycles -= CYCLES_PER_FRAME;
 
-			if (!display.render(emu.get_memory())) {
+			const auto continue_running = display.render(emu.get_memory());
+			if (!continue_running) {
 				return 0;
+			}
+			emu.get_memory().direct_write(0xff44, 0);
+
+			const auto end = std::chrono::high_resolution_clock::now();
+			const auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+			++frames;
+			++frames10s;
+
+			if (diff >= 1000) {
+				std::cout << "INFO: FPS: " << (frames / (1000.0 / diff)) << '\n';
+				start = std::chrono::high_resolution_clock::now();
+				frames = 0;
+			}
+
+			const auto end10s = std::chrono::high_resolution_clock::now();
+			const auto diff10s = std::chrono::duration_cast<std::chrono::milliseconds>(end10s - start10s).count();
+
+			if (diff10s >= 10'000) {
+				std::cout << "INFO: 10s average FPS: " << (frames10s / (10'000.0 / diff10s)) / 10 << '\n';
+				start10s = std::chrono::high_resolution_clock::now();
+				frames10s = 0;
 			}
 		}
 

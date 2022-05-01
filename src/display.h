@@ -19,7 +19,8 @@ struct WindowPixel {
 	uint8_t raw_color = {};
 };
 
-struct SpriteAttributes {
+struct Sprite {
+	uint8_t tile_number = {};
 	bool render_priority = {};
 	bool y_flip = {};
 	bool x_flip = {};
@@ -64,9 +65,7 @@ public:
 			const auto scanline = mem.read(0xff44);
 
 			update_tiles_scanline(mem);
-			if (scanline == 0) {
-				update_sprites(mem);
-			}
+			update_sprites(mem);
 
 
 			if (scanline >= 0x99) {
@@ -416,84 +415,91 @@ private:
 
 	auto update_sprites(const Memory& mem) -> void {
 
-		// TODO: Large sprites
+		const auto scanline = mem.read(0xff44);
+
 		const auto large_sprites = mem.read(0xff40) & (1 << 2);
 
 
 		for (auto y = static_cast<uint64_t>(0); y < sprites_buffer_[0].size(); ++y) {
 			for (auto x = static_cast<uint64_t>(0); x < sprites_buffer_.size(); ++x) {
-				sprites_buffer_[x][y] = {};
 			}
 
 		}
 
+		for (auto x = size_t{0}; x < 160; ++x) {
+				sprites_buffer_[x][scanline] = {};
+		}
+
+
+		auto all_sprites = std::vector<Sprite>{};
+
 		for (auto sprite = 0; sprite < 40; ++sprite) {
 			const auto index = sprite * 4;
-			const auto x_pos = mem.read(0xfe00 + index + 1) - 0x8;
-			const auto y_pos = mem.read(0xfe00 + index) - 0x10;
+			const auto x_pos = static_cast<uint8_t>(mem.read(0xfe00 + index + 1) - 0x8);
+			const auto y_pos = static_cast<uint8_t>(mem.read(0xfe00 + index) - 0x10);
 			const auto tile_number = mem.read(0xfe00 + index + 2);
 
-			// TODO: Proper selection
 			const auto tile_address = 0x8000 + tile_number * 0x10;
 
 			const auto attrs_raw = mem.read(0xfe00 + index + 3);
 			const auto palette_address = (attrs_raw & (1 << 4)) ? 0xff49 : 0xff48;
 			const auto palette = mem.read(palette_address);
 
-			const auto attrs = SpriteAttributes {
-					.render_priority = static_cast<bool>(attrs_raw & (1 << 7)),
-					.y_flip = static_cast<bool>(attrs_raw & (1 << 6)),
-					.x_flip = static_cast<bool>(attrs_raw & (1 << 5)),
-					.colors = {palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6},
-					.pos_x = x_pos,
-					.pos_y = y_pos,
+			const auto s = Sprite {
+				.tile_number = tile_number,
+				.render_priority = static_cast<bool>(attrs_raw & (1 << 7)),
+				.y_flip = static_cast<bool>(attrs_raw & (1 << 6)),
+				.x_flip = static_cast<bool>(attrs_raw & (1 << 5)),
+				.colors = {palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6},
+				.pos_x = x_pos,
+				.pos_y = y_pos,
+
 			};
-
-			auto tile = load_tile(mem, tile_address);
-
-
-			const auto render_tile = [](auto& tile, auto& sprites_buffer, const SpriteAttributes& attrs) {
-				if (attrs.y_flip) {
-					for (auto y = 0; y < 4; ++y) {
-						for (auto x = 0; x < 8; ++x) {
-							std::swap(tile[y * 8 + x], tile[(7-y)*8 + x]);
-						}
-					}
-				}
-				if (attrs.x_flip) {
-					for (auto y = 0; y < 8; ++y) {
-						for (auto x = 0; x < 4; ++x) {
-							std::swap(tile[y * 8 + x], tile[y * 8 + (7 - x)]);
-						}
-					}
-				}
-
-
-				if (attrs.pos_x + 8 >= 0 && attrs.pos_x < 160 && attrs.pos_y + 8>= 0 && attrs.pos_y < 144) {
-
-					// TODO: FIx case when top left corner of the sprite is out of display but part is
-					for (auto y = std::max(uint8_t{0}, attrs.pos_y); y < std::min(attrs.pos_y + 8, 144); ++y) {
-						for (auto x = std::max(uint8_t{0}, attrs.pos_x); x < std::min(attrs.pos_x + 8, 160); ++x) {
-							const auto value = tile[(y - attrs.pos_y) * 8 + x - attrs.pos_x];
-							// Sprite data 00 is transparent (https://gbdev.gg8.se/wiki/articles/Video_Display#LCD_Monochrome_Palettes)
-							if (value != 0) {
-								sprites_buffer[x][y] = {static_cast<uint8_t>(attrs.colors[value]), value, !attrs.render_priority};
-							}
-						}
-
-					}
-
-				}
-			};
-
-			render_tile(tile, sprites_buffer_, attrs);
+			all_sprites.push_back(s);
 			if (large_sprites) {
-				tile = load_tile(mem, 0x8000 + (tile_number + 1) * 0x10);
-				render_tile(tile, sprites_buffer_, attrs);
-
+				auto sprite2 = s;
+				++sprite2.tile_number;
+				sprite2.pos_y += 8;
+				all_sprites.push_back(sprite2);
 			}
 
 		}
+
+		auto sprites = std::vector<Sprite>{};
+		std::copy_if(begin(all_sprites), end(all_sprites), std::back_inserter(sprites), [scanline](const auto& s) {
+			return s.pos_x + 8 >= 0 && s.pos_x < 160 && s.pos_y + 8 >= scanline && s.pos_y <= scanline;
+		});
+
+		std::stable_sort(begin(sprites), end(sprites), [](const auto& a, const auto& b) { return a.pos_x < b.pos_x; });
+
+
+		std::for_each(cbegin(sprites), sprites.size() >= 10 ? cbegin(sprites) + 10 : cend(sprites) , [&mem, this, scanline](const auto& s) {
+				auto tile = load_tile(mem, 0x8000 + s.tile_number * 0x10);
+
+				if (s.x_flip) {
+					for (auto y = size_t{0}; y < 8; ++y) {
+						for (auto x = size_t{0}; x < 4; ++x) {
+							std::swap(tile[x + 8 * y], tile[7 - x + 8 * y]);
+						}
+					}
+				}
+
+				if (s.y_flip) {
+					for (auto y = size_t{0}; y < 4; ++y) {
+						for (auto x = size_t{0}; x < 8; ++x) {
+							std::swap(tile[x + 8 * y], tile[x + 8 * (7 - y)]);
+						}
+					}
+				}
+
+
+				for (auto x = std::max(uint8_t{0}, s.pos_x); x < std::min(s.pos_x + 8, 160); ++x) {
+					const auto pixel_index = (x - s.pos_x) + 8 * (scanline - s.pos_y);
+					const auto pixel_val = tile[pixel_index];
+					sprites_buffer_[x][scanline] = {s.colors[pixel_val], pixel_val, !s.render_priority};
+				}
+		});
+
 
 	}
 

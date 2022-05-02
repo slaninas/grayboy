@@ -146,6 +146,14 @@ public:
 		raw_dump(cpu_.memory_dump(), filename);
 	}
 
+	auto get_cpu() -> Cpu& {
+		return cpu_;
+	}
+
+	auto get_cpu() const -> const Cpu& {
+		return cpu_;
+	}
+
 
 private:
 

@@ -1,6 +1,6 @@
 // For debug
-#include "cartridge.h"
-#include "cpu.h"
+#include "display.h"
+#include "emulator.h"
 #include "curse.h"
 #include "registers.h"
 
@@ -129,47 +129,15 @@ auto get_from_to(
 
 auto main(int argc, const char** argv) -> int
 {
-	// const auto memory = MakeMemory{{{0x1234, 0x55}, {0x534, 0x21}, {0x0894, 0xab}}}.get();
-	// const auto memory2 = MemoryChanger{{{0x1234, 0x56}, {0x5432, 0xfe}}}.get(memory);
-	// print_memory(memory.dump());
-	// std::cout << "--------------\n";
-	// print_memory(memory2.dump());
-
-	// const auto diff = memory_diff(memory, memory2);
-	// std::cout << diff << '\n';
-
-	// return 1;
 	if (argc != 2) {
 		std::cout << "Usage: " << argv[0] << "cartridge_filename\n";
 		return 1;
 	}
 
-	const auto filename = std::string(argv[1]);
+	auto emu = Emulator{argv[1]};
+	// auto display = Display{};
 
-	auto cart = Cartridge{filename};
-
-	const auto rom = cart.dump();
-	auto array = Memory::ArrayType{};
-	// TODO: What to do with the memory at startup?
-	// std::iota(begin(array), end(array), 0);
-
-
-	// TODO: Remove hardcoded values, do this properly - extract Cpu construction a use it in the main executable as well
-	std::transform(
-		begin(rom) + 0x100,
-		begin(rom) + 0x100 + std::min(static_cast<decltype(rom.size())>(32768), rom.size()),
-		begin(array) + 0x100,
-		[]([[maybe_unused]] const auto& el) { return static_cast<uint8_t>(el); });
-
-	// Initializing values same way bgb emualtor does it
-		const auto regs =
-			RegistersChanger{.AF = 0x01b0, .BC=0x0013, .DE = 0x00d8, .HL = 0x014d, .PC = 0x0100, .SP = 0xfffe}.get(Registers{});
-
-	auto cpu = Cpu{array, regs};
-	raw_dump(cpu.memory_dump(), "init_memory_dump");
-	cpu.registers().print();
-
-	auto next_addr = cpu.registers().read("PC");
+	auto next_addr = emu.get_cpu().registers().read("PC");
 
 	auto cursed = MainCurse{};
 	auto instruction_window = CursedWindow{{0, 0}, {40, 50}};
@@ -177,7 +145,7 @@ auto main(int argc, const char** argv) -> int
 	auto changes_window = CursedWindow{{40, 26}, {24, 13}};
 	auto reg_changes_window = CursedWindow{{40, 13}, {24, 13}};
 
-	auto cpu_copy = cpu;
+	auto cpu_copy = emu.get_cpu();
 	auto disassembled_instructions = disassemble(cpu_copy);
 
 	auto should_break = [](const auto& break_points, const auto& next_addr) {
@@ -186,37 +154,48 @@ auto main(int argc, const char** argv) -> int
 	};
 
 	const auto break_points = std::vector<uint16_t>{
-		0xc0a3};
+		0x0048};
 
 	auto running = false;
 	// auto instruction_count = static_cast<uint64_t>(0);
-	auto memory_snapshots = MemorySnapshots{cpu.get_memory()};
-	auto registers_snapshot = RegistersSnaphost{cpu.registers()};
-	registers_snapshot.add(cpu.registers());
+	auto memory_snapshots = MemorySnapshots{emu.get_cpu().get_memory()};
+	auto registers_snapshot = RegistersSnaphost{emu.get_cpu().registers()};
+	registers_snapshot.add(emu.get_cpu().registers());
+
+	auto f = std::ofstream("f");
 
 	while (true) {
-		auto registers_stream = std::ostringstream{};
-		auto instructions_stream = std::ostringstream{};
-		auto memory_changes_stream = std::ostringstream{};
-		auto reg_changes_stream = std::ostringstream{};
+		// const auto cycles = emu.execute_next();
+		// if (!display.update(emu.get_memory(), cycles)) {
+			// return 0;
+		// }
 
-		const auto disassembled = cpu.disassemble_next(next_addr);
-		next_addr = disassembled.next_address;
-
-		cpu.registers().print(registers_stream);
-
-		memory_changes_stream << "Last memory update:\n";
-		const auto mem_diffs = memory_snapshots.getLastNonEmptyDiffs(10);
-		memory_changes_stream << mem_diffs << '\n';
-
-		reg_changes_stream << "Last register changes:\n";
-		reg_changes_stream << registers_diff(registers_snapshot.get(1), cpu.registers());
-
-		const auto PC = cpu.registers().read("PC");
-		get_from_to(disassembled_instructions, 10, PC, instructions_stream);
+	// }
+	// while (false){
 		if (!running) {
+
+			auto registers_stream = std::ostringstream{};
+			auto instructions_stream = std::ostringstream{};
+			auto memory_changes_stream = std::ostringstream{};
+			auto reg_changes_stream = std::ostringstream{};
+
+			const auto disassembled = emu.get_cpu().disassemble_next(next_addr);
+			next_addr = disassembled.next_address;
+
+			emu.get_cpu().registers().print(registers_stream);
+
+			memory_changes_stream << "Last memory update:\n";
+			const auto mem_diffs = memory_snapshots.getLastNonEmptyDiffs(10);
+			memory_changes_stream << mem_diffs << '\n';
+
+			reg_changes_stream << "Last register changes:\n";
+			// reg_changes_stream << registers_diff(registers_snapshot.get(1), emu.get_cpu().registers());
+
+			const auto PC = emu.get_cpu().registers().read("PC");
+			get_from_to(disassembled_instructions, 10, PC, instructions_stream);
+
 			instruction_window.update(instructions_stream.str());
-			registers_stream << "IME: " << cpu.registers().read_IME() << '\n';
+			registers_stream << "IME: " << emu.get_cpu().registers().read_IME() << '\n';
 			reg_window.update(registers_stream.str());
 			changes_window.update(memory_changes_stream.str());
 			reg_changes_window.update(reg_changes_stream.str());
@@ -228,7 +207,7 @@ auto main(int argc, const char** argv) -> int
 					running = true;
 					break;
 				case 'm':
-					raw_dump(cpu.memory_dump(), "memory_dump");
+					raw_dump(emu.get_cpu().memory_dump(), "memory_dump");
 					continue;
 				default: break;
 			}
@@ -237,12 +216,15 @@ auto main(int argc, const char** argv) -> int
 			if (should_break(break_points, next_addr)) { running = false; }
 		}
 
-		[[maybe_unused]] const auto cycles = cpu.execute_next();
-		cpu_copy = cpu;
+		[[maybe_unused]] const auto cycles = emu.execute_next();
+		// if (!display.update(emu.get_memory(), cycles)) {
+			// return 0;
+		// }
+		cpu_copy = emu.get_cpu();
 		auto disassembled_new = disassemble(cpu_copy);
 		update_instructions(disassembled_new, disassembled_instructions);
 		// TODO: Speed up? memory_snapshots.add() is causing massive slowdown when running to the breakpoint (debug build only)
-		memory_snapshots.add(cpu.get_memory());
-		registers_snapshot.add(cpu.registers());
+		// memory_snapshots.add(emu.get_cpu().get_memory());
+		// registers_snapshot.add(emu.get_cpu().registers());
 	}
 }

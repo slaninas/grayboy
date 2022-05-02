@@ -515,7 +515,7 @@ private:
 
 		auto sprites = std::vector<Sprite>{};
 		std::copy_if(begin(all_sprites), end(all_sprites), std::back_inserter(sprites), [scanline](const auto& s) {
-			return s.pos_x + 8 >= 0 && s.pos_x < 160 && s.pos_y + 8 >= scanline && s.pos_y <= scanline;
+			return s.pos_x + 7 >= 0 && s.pos_x < 160 && s.pos_y + 7 >= scanline && s.pos_y <= scanline;
 		});
 
 		std::stable_sort(begin(sprites), end(sprites), [](const auto& a, const auto& b) { return a.pos_x < b.pos_x; });
@@ -540,11 +540,13 @@ private:
 					}
 				}
 
-
+				const auto pixel_y = scanline - s.pos_y;
 				for (auto x = std::max(uint8_t{0}, s.pos_x); x < std::min(s.pos_x + 8, 160); ++x) {
-					const auto pixel_index = (x - s.pos_x) % 8 + 8 * ((scanline - s.pos_y) % 8);
-					const auto pixel_val = tile[pixel_index];
-					sprites_buffer_[x][scanline] = {s.colors[pixel_val], pixel_val, !s.render_priority};
+					const auto pixel_x = x - s.pos_x;
+					const auto pixel_val = tile[pixel_x + 8 * pixel_y];
+					if (pixel_val != 0) {
+						sprites_buffer_[x][scanline] = {s.colors[pixel_val], pixel_val, !s.render_priority};
+					}
 				}
 		});
 

@@ -74,8 +74,8 @@ public:
 		}
 
 		if (scanline_cycles_ > 80 / 4 && !background_updated_) {
-			std::cout << "INFO: updating tiles\n";
 			update_tiles_scanline(mem);
+			update_window(mem);
 			background_updated_ = true;
 		}
 
@@ -103,6 +103,9 @@ public:
 						} else if (background_pixel.raw_color == 0) {
 							display_[x][scanline] = sprite_pixel.render_color;
 						}
+					}
+					if (window_buffer_[x][scanline].active) {
+						display_[x][scanline] = window_buffer_[x][scanline].render_color;
 					}
 				}
 			}
@@ -462,7 +465,7 @@ private:
 			const auto second_bit = static_cast<bool>(second_byte & (1 << (7 - pos_x % 8)));
 
 			const auto pixel = (static_cast<uint8_t>(first_bit) << 1) + second_bit;
-			window_buffer_[x][scanline] = {static_cast<uint8_t>(colors[pixel]), static_cast<uint8_t>(pixel)};
+			window_buffer_[x][scanline] = {true, static_cast<uint8_t>(colors[pixel]), static_cast<uint8_t>(pixel)};
 
 		}
 

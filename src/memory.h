@@ -89,12 +89,6 @@ public:
 
 	void write(const uint16_t address, const uint8_t value)
 	{
-		if (address == 0xff40) {
-			// LCD is turned off - reset the LY
-			if (!(value & 0x1)) {
-				direct_write(0xff44, 0x0);
-			}
-		}
 		// ROM
 		if (address <= 0x7fff || (address >= 0xa000 && address <= 0xbfff)) {
 		// std::cout << "INFO: attempt to write to 0x" << std::hex << (int)address << " value 0x" << (int)value << std::dec << '\n';

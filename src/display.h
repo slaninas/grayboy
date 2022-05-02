@@ -94,16 +94,16 @@ public:
 					const auto background_pixel = bg_buffer_[x][scanline];
 					display_[x][scanline] = background_pixel.render_color;
 
-					// const auto sprite_pixel = sprites_buffer_[x][scanline];
+					const auto sprite_pixel = sprites_buffer_[x][scanline];
 
-					// if (sprite_pixel.raw_color != 0) {
+					if (sprite_pixel.raw_color != 0) {
 						// Sprite is under background
-						// if (sprite_pixel.render_over_bg) {
-							// display_[x][scanline] = sprite_pixel.render_color;
-						// } else if (background_pixel.raw_color == 0) {
-							// display_[x][scanline] = sprite_pixel.render_color;
-						// }
-					// }
+						if (sprite_pixel.render_over_bg) {
+							display_[x][scanline] = sprite_pixel.render_color;
+						} else if (background_pixel.raw_color == 0) {
+							display_[x][scanline] = sprite_pixel.render_color;
+						}
+					}
 				}
 			}
 
@@ -470,17 +470,9 @@ private:
 	}
 
 	auto update_sprites(const Memory& mem) -> void {
-
 		const auto scanline = mem.read(0xff44);
-
 		const auto large_sprites = mem.read(0xff40) & (1 << 2);
 
-
-		for (auto y = static_cast<uint64_t>(0); y < sprites_buffer_[0].size(); ++y) {
-			for (auto x = static_cast<uint64_t>(0); x < sprites_buffer_.size(); ++x) {
-			}
-
-		}
 
 		for (auto x = size_t{0}; x < 160; ++x) {
 				sprites_buffer_[x][scanline] = {};
@@ -550,7 +542,7 @@ private:
 
 
 				for (auto x = std::max(uint8_t{0}, s.pos_x); x < std::min(s.pos_x + 8, 160); ++x) {
-					const auto pixel_index = (x - s.pos_x) + 8 * (scanline - s.pos_y);
+					const auto pixel_index = (x - s.pos_x) % 8 + 8 * ((scanline - s.pos_y) % 8);
 					const auto pixel_val = tile[pixel_index];
 					sprites_buffer_[x][scanline] = {s.colors[pixel_val], pixel_val, !s.render_priority};
 				}

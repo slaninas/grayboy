@@ -53,7 +53,7 @@ public:
 				lcd_enabled_ = true;
 		} else {
 			lcd_enabled_ = false;
-			scanline_cycles_ = frame_cycles_ = 0;
+			scanline_cycles_ = 0;
 			mem.write(0xff44, 0);
 			// render(mem);
 			return true;

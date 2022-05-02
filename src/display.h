@@ -50,8 +50,14 @@ public:
 
 	auto update(Memory& mem, const uint16_t& cycles) {
 		if (mem.read(0xff40) & (1 << 7)) {
+			if (!lcd_enabled_) {
+				lcd_enabled_ = true;
+				scanline_cycles_ = 0;
+				mem.write(0xff44, 0);
+			}
 			scanline_cycles_ += cycles;
 		} else {
+			lcd_enabled_ = false;
 			return;
 		}
 
@@ -83,16 +89,16 @@ public:
 					const auto background_pixel = bg_buffer_[x][scanline];
 					display_[x][scanline] = background_pixel.render_color;
 
-					const auto sprite_pixel = sprites_buffer_[x][scanline];
+					// const auto sprite_pixel = sprites_buffer_[x][scanline];
 
-					if (sprite_pixel.raw_color != 0) {
+					// if (sprite_pixel.raw_color != 0) {
 						// Sprite is under background
-						if (sprite_pixel.render_over_bg) {
-							display_[x][scanline] = sprite_pixel.render_color;
-						} else if (background_pixel.raw_color == 0) {
-							display_[x][scanline] = sprite_pixel.render_color;
-						}
-					}
+						// if (sprite_pixel.render_over_bg) {
+							// display_[x][scanline] = sprite_pixel.render_color;
+						// } else if (background_pixel.raw_color == 0) {
+							// display_[x][scanline] = sprite_pixel.render_color;
+						// }
+					// }
 				}
 			}
 
@@ -325,6 +331,7 @@ public:
 
 		frame_start_ = SDL_GetTicks();
 
+		frame_++;
 		return true;
 	}
 
@@ -380,22 +387,18 @@ private:
 		const auto window_y = mem.read(0xff4A);
 		const auto window_x = mem.read(0xff4B) - 0x7;
 
-		const auto using_window = (mem.read(0xff40) & (1 << 5)) && window_y <= scanline;
+		// const auto using_window = (mem.read(0xff40) & (1 << 5)) && window_y <= scanline;
+		const auto using_window = false;
 
 		const auto tile_data = ((mem.read(0xff40) >> 4) & 1) ? 0x8000 : 0x8800;
 
-		auto tile_map = (((mem.read(0xff40) >> 3) & 1) == 1) ? 0x9c00 : 0x9800;
+		const auto tile_map = (((mem.read(0xff40) >> 3) & 1) == 1) ? 0x9c00 : 0x9800;
 
-		auto pos_y = scanline + SCY;
+		const auto pos_y = scanline + SCY;
 
 		for (auto x = 0; x < 160; ++x) {
 
-			auto pos_x = x + SCX;
-			if (using_window && x >= window_x) {
-				pos_y = scanline - window_y;
-				pos_x = x - window_x;
-				tile_map = ((mem.read(0xff40) >> 6 & 1) == 1) ? 0x9c00 : 9800;
-			}
+			const auto pos_x = x + SCX;
 			const auto tile_index = tile_map + pos_y / 8 * 32 + pos_x / 8;
 			const auto tile_id = mem.read(tile_index);
 			const auto tile_address = tile_data == 0x8000 ? (0x8000 + tile_id * 0x10) : ((tile_id < 128 ? 0x9000 + tile_id * 0x10 : 0x8800 + (tile_id - 128) * 0x10));
@@ -410,6 +413,48 @@ private:
 			bg_buffer_[x][scanline] = {static_cast<uint8_t>(colors[pixel]), static_cast<uint8_t>(pixel)};
 
 		}
+	}
+
+	auto update_window(const Memory& mem) -> void {
+		const auto scanline = mem.read(0xff44);
+
+		const auto palette = mem.read(0xff47);
+		const auto colors = std::array{palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6};
+
+		const auto window_y = mem.read(0xff4A);
+		const auto window_x = mem.read(0xff4B) - 0x7;
+
+		const auto using_window = (mem.read(0xff40) & (1 << 5)) && window_y <= scanline;
+		if (!using_window) {
+			for (auto x = size_t{0}; x < 160; ++x) {
+				window_buffer_[x][scanline] = {};
+			}
+			return;
+		}
+
+		const auto tile_data = ((mem.read(0xff40) >> 4) & 1) ? 0x8000 : 0x8800;
+		const auto tile_map = ((mem.read(0xff40) >> 6 & 1) == 1) ? 0x9c00 : 9800;
+
+		const auto pos_y = scanline - window_y;
+
+		for (auto x = window_x; x < 160; ++x) {
+
+			const auto pos_x = x - window_x;
+			const auto tile_index = tile_map + pos_y / 8 * 32 + pos_x / 8;
+			const auto tile_id = mem.read(tile_index);
+			const auto tile_address = tile_data == 0x8000 ? (0x8000 + tile_id * 0x10) : ((tile_id < 128 ? 0x9000 + tile_id * 0x10 : 0x8800 + (tile_id - 128) * 0x10));
+
+			const auto first_byte = mem.read(tile_address + (pos_y % 8) * 2 + 1);
+			const auto second_byte = mem.read(tile_address + (pos_y % 8) * 2 + 0);
+
+			const auto first_bit = static_cast<bool>(first_byte & (1 << (7 - pos_x % 8)));
+			const auto second_bit = static_cast<bool>(second_byte & (1 << (7 - pos_x % 8)));
+
+			const auto pixel = (static_cast<uint8_t>(first_bit) << 1) + second_bit;
+			window_buffer_[x][scanline] = {static_cast<uint8_t>(colors[pixel]), static_cast<uint8_t>(pixel)};
+
+		}
+
 
 	}
 
@@ -533,5 +578,7 @@ private:
 	uint64_t scanline_cycles_ = {};
 	Uint32 frame_start_ = {};
 	bool lyc_interupt_already_requested_ = {};
+	uint64_t frame_ = {};
+	bool lcd_enabled_ = true;
 };
 

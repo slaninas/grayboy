@@ -196,7 +196,7 @@ void instruction_sub(const char (&dest_name)[kDestSize], const ValueType& value,
 	static_assert(std::is_same_v<ValueType, uint8_t>, "Only 8bit sub is supported.");
 
 	const auto dest_old = regs.read(dest_name);
-	const auto dest_new = dest_old - value;
+	const auto dest_new = static_cast<uint8_t>(dest_old - value);
 
 	regs.write(dest_name, dest_new);
 	regs.set_flag("Z", dest_new == 0);

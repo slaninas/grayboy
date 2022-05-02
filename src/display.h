@@ -66,8 +66,6 @@ public:
 
 		const auto scanline = mem.read(0xff44);
 
-		std::cout << "INFO: scanline " << (int)scanline << ", scanline_cycles_ " << scanline_cycles_ << ", bg enabled " << (mem.read(0xff40) & 1) << "\n";
-
 		if (!sprites_updated_) {
 			update_sprites(mem);
 			sprites_updated_ = true;

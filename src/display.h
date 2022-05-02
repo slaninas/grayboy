@@ -396,14 +396,7 @@ private:
 		const auto SCY = mem.read(0xff42);
 		const auto SCX = mem.read(0xff43);
 
-		const auto window_y = mem.read(0xff4A);
-		const auto window_x = mem.read(0xff4B) - 0x7;
-
-		// const auto using_window = (mem.read(0xff40) & (1 << 5)) && window_y <= scanline;
-		const auto using_window = false;
-
 		const auto tile_data = ((mem.read(0xff40) >> 4) & 1) ? 0x8000 : 0x8800;
-
 		const auto tile_map = (((mem.read(0xff40) >> 3) & 1) == 1) ? 0x9c00 : 0x9800;
 
 		const auto pos_y = scanline + SCY;

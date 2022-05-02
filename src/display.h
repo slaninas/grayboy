@@ -371,13 +371,12 @@ private:
 	auto update_tiles_scanline(const Memory& mem) -> void {
 		const auto scanline = mem.read(0xff44);
 
-		// TODO: Use BG/Window Display/Priority bit correctly
-		// if (!mem.read(0xff40) & 0x1) {
-			// for (auto x = size_t{0}; x < size_t{160}; ++x) {
-				// bg_buffer_[x][scanline] = {uint8_t{0}, uint8_t{0}};
-			// }
-			// return;
-		// }
+		if (!(mem.read(0xff40) & 0x1)) {
+			for (auto x = size_t{0}; x < size_t{160}; ++x) {
+				bg_buffer_[x][scanline] = {uint8_t{0}, uint8_t{0}};
+			}
+			return;
+		}
 
 		const auto palette = mem.read(0xff47);
 		const auto colors = std::array{palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6};

@@ -48,19 +48,19 @@ public:
 		 frame_start_ = SDL_GetTicks();
 	}
 
-	auto update(Memory& mem, const uint16_t& cycles) {
+	auto update(Memory& mem, const uint16_t& cycles) -> bool {
 		if (mem.read(0xff40) & (1 << 7)) {
-			if (!lcd_enabled_) {
 				lcd_enabled_ = true;
-				scanline_cycles_ = 0;
-				mem.write(0xff44, 0);
-			}
-			scanline_cycles_ += cycles;
 		} else {
 			lcd_enabled_ = false;
-			return;
+			scanline_cycles_ = frame_cycles_ = 0;
+			mem.write(0xff44, 0);
+			// render(mem);
+			return true;
 		}
 
+
+		scanline_cycles_ += cycles;
 		// Fake LCD state
 		update_lcd_status(mem);
 
@@ -76,7 +76,7 @@ public:
 
 			if (scanline >= 0x99) {
 				mem.write(0xff44, 0);
-				return;
+				return render(mem);
 			}
 
 			if (scanline < 0x90) {
@@ -110,6 +110,7 @@ public:
 			check_lyc(mem);
 			mem.write(0xff44, scanline + 1);
 		}
+		return true;
 	}
 
 	auto check_lyc(Memory& mem) -> void {

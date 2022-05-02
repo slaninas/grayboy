@@ -483,8 +483,6 @@ private:
 			const auto y_pos = static_cast<uint8_t>(mem.read(0xfe00 + index) - 0x10);
 			const auto tile_number = mem.read(0xfe00 + index + 2);
 
-			const auto tile_address = 0x8000 + tile_number * 0x10;
-
 			const auto attrs_raw = mem.read(0xfe00 + index + 3);
 			const auto palette_address = (attrs_raw & (1 << 4)) ? 0xff49 : 0xff48;
 			const auto palette = mem.read(palette_address);
@@ -494,7 +492,11 @@ private:
 				.render_priority = static_cast<bool>(attrs_raw & (1 << 7)),
 				.y_flip = static_cast<bool>(attrs_raw & (1 << 6)),
 				.x_flip = static_cast<bool>(attrs_raw & (1 << 5)),
-				.colors = {palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6},
+				.colors = {
+					static_cast<uint8_t>(palette & 0x3),
+					static_cast<uint8_t>((palette & 0xc) >> 2),
+					static_cast<uint8_t>((palette & 0x30) >> 4),
+					static_cast<uint8_t>((palette & 0xc0) >> 6),},
 				.pos_x = x_pos,
 				.pos_y = y_pos,
 

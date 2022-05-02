@@ -66,15 +66,17 @@ public:
 
 		const auto scanline = mem.read(0xff44);
 
-		if (!sprites_updated_) {
-			update_sprites(mem);
-			sprites_updated_ = true;
-		}
+		if (scanline < 0x90) {
+			if (scanline_cycles_ >= 80 / 4 && !sprites_updated_) {
+				update_sprites(mem);
+				sprites_updated_ = true;
+			}
 
-		if (scanline_cycles_ > 80 / 4 && !background_updated_) {
-			update_tiles_scanline(mem);
-			update_window(mem);
-			background_updated_ = true;
+			if (scanline_cycles_ >= (80 + 168) / 4 && !background_updated_) {
+				update_tiles_scanline(mem);
+				update_window(mem);
+				background_updated_ = true;
+			}
 		}
 
 		if (scanline_cycles_ >= CYCLES_PER_SCANLINE) {
@@ -569,8 +571,8 @@ private:
 
 	SDL_Renderer* renderer_ = {};
 	SDL_Window* window_ = {};
-	std::array<std::array<WindowPixel, 256>, 256> window_buffer_;
-	std::array<std::array<BackgroundPixel, 256>, 256> bg_buffer_;
+	std::array<std::array<WindowPixel, 144>, 160> window_buffer_;
+	std::array<std::array<BackgroundPixel, 144>, 160> bg_buffer_;
 	std::array<std::array<SpritePixel, 144>, 160> sprites_buffer_;
 	std::array<std::array<uint8_t, 144>, 160> display_;
 

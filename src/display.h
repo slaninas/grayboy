@@ -64,20 +64,25 @@ public:
 		// Fake LCD state
 		update_lcd_status(mem);
 
+		const auto scanline = mem.read(0xff44);
+
+		std::cout << "INFO: scanline " << (int)scanline << ", scanline_cycles_ " << scanline_cycles_ << ", bg enabled " << (mem.read(0xff40) & 1) << "\n";
+
+		if (!sprites_updated_) {
+			update_sprites(mem);
+			sprites_updated_ = true;
+		}
+
+		if (scanline_cycles_ > 80 / 4 && !background_updated_) {
+			std::cout << "INFO: updating tiles\n";
+			update_tiles_scanline(mem);
+			background_updated_ = true;
+		}
 
 		if (scanline_cycles_ >= CYCLES_PER_SCANLINE) {
 			scanline_cycles_ -= CYCLES_PER_SCANLINE;
+			background_updated_ = sprites_updated_ = false;
 
-			const auto scanline = mem.read(0xff44);
-
-			update_tiles_scanline(mem);
-			update_sprites(mem);
-
-
-			if (scanline >= 0x99) {
-				mem.write(0xff44, 0);
-				return render(mem);
-			}
 
 			if (scanline < 0x90) {
 
@@ -109,6 +114,12 @@ public:
 
 			check_lyc(mem);
 			mem.write(0xff44, scanline + 1);
+
+			if (scanline >= 0x99) {
+				mem.write(0xff44, 0);
+				return render(mem);
+			}
+
 		}
 		return true;
 	}
@@ -580,5 +591,7 @@ private:
 	bool lyc_interupt_already_requested_ = {};
 	uint64_t frame_ = {};
 	bool lcd_enabled_ = true;
+	bool sprites_updated_ = {};
+	bool background_updated_ = {};
 };
 

@@ -411,7 +411,7 @@ private:
 
 		for (auto x = 0; x < 160; ++x) {
 
-			const auto pos_x = x + SCX;
+			const auto pos_x = (x + SCX) % 256;
 			const auto tile_index = tile_map + pos_y / 8 * 32 + pos_x / 8;
 			const auto tile_id = mem.read(tile_index);
 			const auto tile_address = tile_data == 0x8000 ? (0x8000 + tile_id * 0x10) : ((tile_id < 128 ? 0x9000 + tile_id * 0x10 : 0x8800 + (tile_id - 128) * 0x10));

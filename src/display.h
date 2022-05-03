@@ -91,6 +91,7 @@ public:
 			new_status = 3;
 			if (!tiles_updated_) {
 				update_tiles_scanline(mem);
+				update_window(mem);
 				tiles_updated_ = true;
 			}
 

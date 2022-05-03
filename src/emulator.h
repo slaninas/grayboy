@@ -247,14 +247,14 @@ private:
 		debug_log << "PC:" << format(PC, 4) << ' ';
 		debug_log << "(cy: " << std::dec << total_cycles_ * 4 << ") " << std::hex;
 		debug_log << "ppu:+" << (cpu_.get_memory().read(0xff41) & 0x3);
-		// debug_log << "|[00]0x" << format(PC, 4) << ": ";
-		// const auto info = cpu_.disassemble_next(PC);
+		debug_log << "|[00]0x" << format(PC, 4) << ": ";
+		const auto info = cpu_.disassemble_next(PC);
 
-		// for (auto i = size_t{0}; i < info.memory_representation.size(); ++i) {
-			// debug_log << format(info.memory_representation[i], 2) << ' ';
-		// }
+		for (auto i = size_t{0}; i < info.memory_representation.size(); ++i) {
+			debug_log << format(info.memory_representation[i], 2) << ' ';
+		}
 
-		// debug_log << ' ' << info.instruction.mnemonic << ' ';
+		debug_log << "\t\t" << info.instruction.mnemonic << ' ';
 
 		// const auto mem = cpu_.get_memory();
 

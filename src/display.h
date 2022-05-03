@@ -49,8 +49,7 @@ public:
 		 frame_start_ = SDL_GetTicks();
 	}
 
-	auto update(Memory& mem, const uint16_t& cycles) -> bool {
-		auto result = true;
+	auto update(Memory& mem, const uint16_t& cycles) -> void {
 
 		lcd_enabled_ = static_cast<bool>(mem.read(0xff40) &( 1 << 7));
 
@@ -58,7 +57,6 @@ public:
 		if (lcd_enabled_) {
 			if (frame_cycles_ >= CYCLES_PER_FRAME) {
 				frame_cycles_ -= CYCLES_PER_FRAME;
-				result = render(mem);
 			}
 		}
 
@@ -68,7 +66,7 @@ public:
 			const auto stat = mem.direct_read(0xff41);
 			mem.direct_write(0xff41, stat & (~0x3));
 
-			return result;
+			return;
 		}
 
 		scanline_cycles_ += cycles;
@@ -81,7 +79,7 @@ public:
 		const auto orig_status = stat & 0x3;
 		auto new_status = orig_status;
 
-		if (scanline_cycles_ < 80 / 4 && !sprites_updated_) {
+		if (scanline_cycles_ < 80 / 4) {
 			new_status = 2;
 			request_interupt = static_cast<bool>(stat & (1 << 5));
 			if (!sprites_updated_) {
@@ -126,7 +124,6 @@ public:
 				vblank_issued_ = true;
 			}
 
-			check_lyc(mem);
 
 			if (scanline + 1 >= 0x99) {
 				mem.direct_write(0xff44, 0);
@@ -134,10 +131,9 @@ public:
 			else {
 				mem.direct_write(0xff44, scanline + 1);
 			}
+			check_lyc(mem);
 
 		}
-
-		return result;
 	}
 
 	auto mix_buffers(const uint8_t& scanline) -> void  {

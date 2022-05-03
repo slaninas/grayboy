@@ -55,6 +55,10 @@ public:
 			lcd_enabled_ = false;
 			scanline_cycles_ = 0;
 			mem.write(0xff44, 0);
+
+			// Switch to mode 0
+			const auto stat = mem.direct_read(0xff41);
+			mem.direct_write(0xff41, stat & (~0x3));
 			// render(mem);
 			return true;
 		}

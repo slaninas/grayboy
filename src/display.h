@@ -479,13 +479,17 @@ private:
 		if (scanline >= 0x90) {
 			return;
 		}
-		const auto large_sprites = mem.read(0xff40) & (1 << 2);
-
 
 		for (auto x = size_t{0}; x < 160; ++x) {
 				sprites_buffer_[x][scanline] = {};
 		}
 
+		// Objects disabled
+		if (!(mem.read(0xff40) & (1 << 1))) {
+			return;
+		}
+
+		const auto large_sprites = mem.read(0xff40) & (1 << 2);
 
 		auto all_sprites = std::vector<Sprite>{};
 

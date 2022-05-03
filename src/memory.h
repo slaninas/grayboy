@@ -65,7 +65,7 @@ public:
 		return array_[address];
 	}
 
-	[[nodiscard]] auto read(const uint16_t address) const
+	[[nodiscard]] auto read(const uint16_t address) const -> uint8_t
 	{
 
 		if (address <= 0x7fff) {

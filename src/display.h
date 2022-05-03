@@ -38,6 +38,7 @@ class Display {
 public:
 
 	const uint64_t CYCLES_PER_SCANLINE = 456 / 4;
+	const uint64_t CYCLES_PER_FRAME = 70'224;
 
 	Display() {
 		 SDL_Init(SDL_INIT_VIDEO);
@@ -49,87 +50,122 @@ public:
 	}
 
 	auto update(Memory& mem, const uint16_t& cycles) -> bool {
-		if (mem.read(0xff40) & (1 << 7)) {
-				lcd_enabled_ = true;
-		} else {
-			lcd_enabled_ = false;
-			scanline_cycles_ = 0;
-			mem.write(0xff44, 0);
+		auto result = true;
 
-			// Switch to mode 0
-			const auto stat = mem.direct_read(0xff41);
-			mem.direct_write(0xff41, stat & (~0x3));
-			// render(mem);
-			return true;
+		lcd_enabled_ = static_cast<bool>(mem.read(0xff40) &( 1 << 7));
+
+		frame_cycles_ += cycles;
+		if (lcd_enabled_) {
+			if (frame_cycles_ >= CYCLES_PER_FRAME) {
+				frame_cycles_ -= CYCLES_PER_FRAME;
+				result = render(mem);
+			}
 		}
 
+		else {
+			scanline_cycles_ = 0;
+			mem.direct_write(0xff44, 0);
+			const auto stat = mem.direct_read(0xff41);
+			mem.direct_write(0xff41, stat & (~0x3));
+
+			return result;
+		}
 
 		scanline_cycles_ += cycles;
-		// Fake LCD state
-		update_lcd_status(mem);
 
-		const auto scanline = mem.read(0xff44);
+		const auto stat = mem.read(0xff41);
 
-		if (scanline < 0x90) {
-			if (scanline_cycles_ >= 80 / 4 && !sprites_updated_) {
+		const auto scanline = mem.direct_read(0xff44);
+
+		auto request_interupt = false;
+		const auto orig_status = stat & 0x3;
+		auto new_status = orig_status;
+
+		if (scanline_cycles_ < 80 / 4 && !sprites_updated_) {
+			new_status = 2;
+			request_interupt = static_cast<bool>(stat & (1 << 5));
+			if (!sprites_updated_) {
 				update_sprites(mem);
 				sprites_updated_ = true;
 			}
-
-			if (scanline_cycles_ >= (80 + 168) / 4 && !background_updated_) {
+		}
+		else if (scanline_cycles_ <= (80 + 172) / 4) {
+			new_status = 3;
+			if (!tiles_updated_) {
 				update_tiles_scanline(mem);
-				update_window(mem);
-				background_updated_ = true;
+				tiles_updated_ = true;
+			}
+
+		}
+
+		else {
+			new_status = 0;
+			if (!hblank_issued_) {
+				request_interupt = static_cast<bool>(stat & (1 << 3));
+				hblank_issued_ = true;
 			}
 		}
+
+		if (new_status != orig_status && request_interupt) {
+				// Request interupt
+				mem.direct_write(0xff0f, mem.direct_read(0xff0f) | 0x2);
+		}
+
+		mem.direct_write(0xff41, (stat & ~0x3) | new_status);
 
 		if (scanline_cycles_ >= CYCLES_PER_SCANLINE) {
 			scanline_cycles_ -= CYCLES_PER_SCANLINE;
-			background_updated_ = sprites_updated_ = false;
-
+			tiles_updated_ = sprites_updated_ = hblank_issued_ = vblank_issued_ = false;
 
 			if (scanline < 0x90) {
-
-				for (auto x = 0; x < 160; ++x) {
-					display_[x][scanline] = 0;
-				}
-
-				for (auto x = 0; x < 160; ++x) {
-					const auto background_pixel = bg_buffer_[x][scanline];
-					display_[x][scanline] = background_pixel.render_color;
-
-					const auto sprite_pixel = sprites_buffer_[x][scanline];
-
-					if (sprite_pixel.raw_color != 0) {
-						// Sprite is under background
-						if (sprite_pixel.render_over_bg) {
-							display_[x][scanline] = sprite_pixel.render_color;
-						} else if (background_pixel.raw_color == 0) {
-							display_[x][scanline] = sprite_pixel.render_color;
-						}
-					}
-					if (window_buffer_[x][scanline].active) {
-						display_[x][scanline] = window_buffer_[x][scanline].render_color;
-					}
-				}
+				mix_buffers(scanline);
 			}
 
-			// V-BLANK interupt
-			if (scanline == 0x90) {
-				mem.write(0xff0f, mem.read(0xff0f) | 0x1);
+			if (scanline == 0x90 && !vblank_issued_) {
+				mem.direct_write(0xff0f, mem.read(0xff0f) | 0x1);
+				vblank_issued_ = true;
 			}
 
 			check_lyc(mem);
-			mem.write(0xff44, scanline + 1);
 
-			if (scanline >= 0x99) {
-				mem.write(0xff44, 0);
-				return render(mem);
+			if (scanline + 1 >= 0x99) {
+				mem.direct_write(0xff44, 0);
+			}
+			else {
+				mem.direct_write(0xff44, scanline + 1);
 			}
 
 		}
-		return true;
+
+		return result;
 	}
+
+	auto mix_buffers(const uint8_t& scanline) -> void  {
+		for (auto x = 0; x < 160; ++x) {
+			display_[x][scanline] = 0;
+		}
+
+		for (auto x = 0; x < 160; ++x) {
+			const auto background_pixel = bg_buffer_[x][scanline];
+			display_[x][scanline] = background_pixel.render_color;
+
+			const auto sprite_pixel = sprites_buffer_[x][scanline];
+
+			if (sprite_pixel.raw_color != 0) {
+				// Sprite is under background
+				if (sprite_pixel.render_over_bg) {
+					display_[x][scanline] = sprite_pixel.render_color;
+				} else if (background_pixel.raw_color == 0) {
+					display_[x][scanline] = sprite_pixel.render_color;
+				}
+			}
+			if (window_buffer_[x][scanline].active) {
+				display_[x][scanline] = window_buffer_[x][scanline].render_color;
+			}
+		}
+
+	}
+
 
 	auto check_lyc(Memory& mem) -> void {
 		const auto stat = mem.read(0xff41);
@@ -140,47 +176,13 @@ public:
 			new_status |= 1 << 2;
 			if (stat & (1 << 6)) {
 			// Request interupt
-				mem.write(0xff0f, mem.direct_read(0xff0f) | 0x2);
+				mem.direct_write(0xff0f, mem.direct_read(0xff0f) | 0x2);
 			}
 		} else {
 			new_status &= ~(1 << 2);
 		}
 
-		mem.write(0xff41, (stat & ~0x3) | new_status);
-	}
-
-	auto update_lcd_status(Memory& mem) -> void {
-		const auto stat = mem.read(0xff41);
-
-		const auto scanline = mem.direct_read(0xff44);
-
-		auto request_interupt = false;
-		const auto orig_status = stat & 0x3;
-		auto new_status = orig_status;
-
-		if (scanline < 0x90) {
-			if (scanline_cycles_ < 80 / 4) {
-				new_status = 2;
-				request_interupt = static_cast<bool>(stat & (1 << 5));
-			}
-			else if (scanline_cycles_ < (80 + 172) / 4) {
-				new_status = 3;
-			}
-			else {
-				new_status = 0;
-				request_interupt = static_cast<bool>(stat & (1 << 3));
-			}
-
-			if (new_status != orig_status && request_interupt) {
-				// Request interupt
-				// std::cout << "INFO: Requesting interupt\n";
-				mem.write(0xff0f, mem.direct_read(0xff0f) | 0x2);
-			}
-
-			mem.write(0xff41, (stat & ~0x3) | new_status);
-		}
-
-
+		mem.direct_write(0xff41, (stat & ~0x3) | new_status);
 	}
 
 	auto render(Memory& mem) -> bool {
@@ -388,6 +390,9 @@ private:
 
 	auto update_tiles_scanline(const Memory& mem) -> void {
 		const auto scanline = mem.read(0xff44);
+		if (scanline >= 0x90) {
+			return;
+		}
 
 		if (!(mem.read(0xff40) & 0x1)) {
 			for (auto x = size_t{0}; x < size_t{160}; ++x) {
@@ -428,6 +433,9 @@ private:
 
 	auto update_window(const Memory& mem) -> void {
 		const auto scanline = mem.read(0xff44);
+		if (scanline >= 0x90) {
+			return;
+		}
 
 		const auto palette = mem.read(0xff47);
 		const auto colors = std::array{palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6};
@@ -471,6 +479,9 @@ private:
 
 	auto update_sprites(const Memory& mem) -> void {
 		const auto scanline = mem.read(0xff44);
+		if (scanline >= 0x90) {
+			return;
+		}
 		const auto large_sprites = mem.read(0xff40) & (1 << 2);
 
 
@@ -583,11 +594,14 @@ private:
 	std::array<std::array<uint8_t, 144>, 160> display_;
 
 	uint64_t scanline_cycles_ = {};
+	uint64_t frame_cycles_ = {};
 	Uint32 frame_start_ = {};
 	bool lyc_interupt_already_requested_ = {};
 	uint64_t frame_ = {};
 	bool lcd_enabled_ = true;
 	bool sprites_updated_ = {};
-	bool background_updated_ = {};
+	bool tiles_updated_ = {};
+	bool vblank_issued_ = {};
+	bool hblank_issued_ = {};
 };
 

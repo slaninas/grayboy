@@ -528,10 +528,15 @@ private:
 			return s.pos_x + 7 >= 0 && s.pos_x < 160 && s.pos_y + 7 >= scanline && s.pos_y <= scanline;
 		});
 
+		// Get first 10 based on lowest x, then sort them in reverse
 		std::stable_sort(begin(sprites), end(sprites), [](const auto& a, const auto& b) { return a.pos_x < b.pos_x; });
 
+		const auto last = sprites.size() >= 10 ? cbegin(sprites) + 10 : cend(sprites);
+		sprites.erase(last, cend(sprites));
+		std::stable_sort(begin(sprites), end(sprites), [](const auto& a, const auto& b) { return a.pos_x > b.pos_x; });
 
-		std::for_each(cbegin(sprites), sprites.size() >= 10 ? cbegin(sprites) + 10 : cend(sprites) , [&mem, this, scanline](const auto& s) {
+
+		std::for_each(cbegin(sprites), cend(sprites), [&mem, this, scanline](const auto& s) {
 				auto tile = load_tile(mem, 0x8000 + s.tile_number * 0x10);
 
 				if (s.x_flip) {

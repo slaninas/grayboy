@@ -533,7 +533,7 @@ private:
 
 		const auto last = sprites.size() >= 10 ? cbegin(sprites) + 10 : cend(sprites);
 		sprites.erase(last, cend(sprites));
-		std::stable_sort(begin(sprites), end(sprites), [](const auto& a, const auto& b) { return a.pos_x > b.pos_x; });
+		std::stable_sort(begin(sprites), end(sprites), [](const auto& a, const auto& b) { return a.pos_x >= b.pos_x; });
 
 
 		std::for_each(cbegin(sprites), cend(sprites), [&mem, this, scanline](const auto& s) {

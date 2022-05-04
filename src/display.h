@@ -453,7 +453,7 @@ private:
 
 		const auto pos_y = scanline - window_y;
 
-		for (auto x = window_x; x < 160; ++x) {
+		for (auto x = std::max(0, window_x); x < 160; ++x) {
 
 			const auto pos_x = x - window_x;
 			const auto tile_index = tile_map + pos_y / 8 * 32 + pos_x / 8;

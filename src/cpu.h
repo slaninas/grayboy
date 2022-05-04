@@ -58,7 +58,17 @@ public:
 		const auto opcode = get_opcode(PC);
 
 		const auto instruction = find_by_opcode(opcode);
-		const auto cycles = instruction(regs_, memory_, PC);
+
+		// const auto cycles = instruction(regs_, memory_, PC);
+		auto cycles = 0;
+
+		if (instruction.opcode > 0xff) {
+			cycles = execute_opcode16bit(instruction.opcode, PC, regs_, memory_);
+		} else {
+			cycles = execute_opcode(instruction.opcode, PC, regs_, memory_);
+		}
+		regs_.write("PC", regs_.read("PC") + instruction.size);
+
 		// std::cout << "executing 0x" << instruction.mnemonic << '\n';
 		// TODO: Unit test are not prepared for this, if getRandomMemory() set 0xff02 to 0x81, it may fail. Make getRandomMemory() to set 0xff02 not to 0x81?
 		// if (memory_.read(0xff02) == 0x81) {
@@ -68,6 +78,9 @@ public:
 		// }
 		return cycles;
 	}
+
+	[[nodiscard]] auto execute_opcode(const uint8_t& opcode, const uint16_t& PC, Registers& regs, Memory& memory) -> uint8_t;
+	[[nodiscard]] auto execute_opcode16bit(const uint16_t& opcode, const uint16_t& PC, Registers& regs, Memory& memory) -> uint8_t;
 
 	[[nodiscard]] auto disassemble_next(const uint16_t& starting_address) const
 	{

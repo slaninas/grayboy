@@ -407,7 +407,7 @@ private:
 		const auto tile_data = ((mem.read(0xff40) >> 4) & 1) ? 0x8000 : 0x8800;
 		const auto tile_map = (((mem.read(0xff40) >> 3) & 1) == 1) ? 0x9c00 : 0x9800;
 
-		const auto pos_y = scanline + SCY;
+		const auto pos_y = (scanline + SCY) % 256;
 
 		for (auto x = 0; x < 160; ++x) {
 

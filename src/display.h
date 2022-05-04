@@ -126,7 +126,7 @@ public:
 			}
 
 
-			if (scanline + 1 >= 0x99) {
+			if (scanline + 1 >= 0x9a) {
 				mem.direct_write(0xff44, 0);
 			}
 			else {

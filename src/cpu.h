@@ -59,7 +59,6 @@ public:
 
 		const auto instruction = find_by_opcode(opcode);
 
-		// const auto cycles = instruction(regs_, memory_, PC);
 		auto cycles = 0;
 
 		if (instruction.opcode > 0xff) {
@@ -69,13 +68,6 @@ public:
 		}
 		regs_.write("PC", regs_.read("PC") + instruction.size);
 
-		// std::cout << "executing 0x" << instruction.mnemonic << '\n';
-		// TODO: Unit test are not prepared for this, if getRandomMemory() set 0xff02 to 0x81, it may fail. Make getRandomMemory() to set 0xff02 not to 0x81?
-		// if (memory_.read(0xff02) == 0x81) {
-		// auto c = static_cast<char>(memory_.read(0xff01));
-		// std::cout << c;
-		// memory_.write(0xff02, 0x00);
-		// }
 		return cycles;
 	}
 

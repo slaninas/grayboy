@@ -232,9 +232,9 @@ private:
 
 	// binjbg format
 	auto save_debug() -> void {
+		debug_log << std::hex;
 		// TODO: Add PPU
 		const auto PC = cpu_.registers().read("PC");
-		debug_log << std::hex;
 		debug_log << "A:" << format(cpu_.registers().read("A"), 2) << ' ';
 		debug_log << "F:";
 		debug_log << (cpu_.registers().read_flag("Z") ? 'Z' : '-');
@@ -265,7 +265,6 @@ private:
 		// debug_log << " 0xff06 [TMA]: " << format(mem.read(0xff06), 2);
 		// debug_log << " 0xff07 [TAC]: " << format(mem.read(0xff07), 2);
 		debug_log << '\n';
-		debug_log << std::dec;
 	}
 
 	Cpu cpu_ = Cpu{};

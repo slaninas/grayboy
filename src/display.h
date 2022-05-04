@@ -26,8 +26,8 @@ struct Sprite {
 	bool x_flip = {};
 	std::array<uint8_t, 4> colors = {};
 
-	uint8_t pos_x = {};
-	uint8_t pos_y = {};
+	int16_t pos_x = {};
+	int16_t pos_y = {};
 };
 
 // Useful sources:
@@ -560,7 +560,7 @@ private:
 				}
 
 				const auto pixel_y = scanline - s.pos_y;
-				for (auto x = std::max(uint8_t{0}, s.pos_x); x < std::min(s.pos_x + 8, 160); ++x) {
+				for (auto x = std::max(int16_t{0}, s.pos_x); x < std::min(s.pos_x + 8, 160); ++x) {
 					const auto pixel_x = x - s.pos_x;
 					const auto pixel_val = tile[pixel_x + 8 * pixel_y];
 					if (pixel_val != 0) {

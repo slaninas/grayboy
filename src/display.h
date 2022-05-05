@@ -51,7 +51,7 @@ public:
 
 	auto update(Memory& mem, const uint16_t& cycles) -> void {
 
-		lcd_enabled_ = static_cast<bool>(mem.read(0xff40) &( 1 << 7));
+		lcd_enabled_ = static_cast<bool>(mem.direct_read(0xff40) &( 1 << 7));
 
 		frame_cycles_ += cycles;
 		if (lcd_enabled_) {
@@ -71,7 +71,7 @@ public:
 
 		scanline_cycles_ += cycles;
 
-		const auto stat = mem.read(0xff41);
+		const auto stat = mem.direct_read(0xff41);
 
 		const auto scanline = mem.direct_read(0xff44);
 
@@ -121,7 +121,7 @@ public:
 			}
 
 			if (scanline == 0x90 && !vblank_issued_) {
-				mem.direct_write(0xff0f, mem.read(0xff0f) | 0x1);
+				mem.direct_write(0xff0f, mem.direct_read(0xff0f) | 0x1);
 				vblank_issued_ = true;
 			}
 
@@ -165,7 +165,7 @@ public:
 
 
 	auto check_lyc(Memory& mem) -> void {
-		const auto stat = mem.read(0xff41);
+		const auto stat = mem.direct_read(0xff41);
 		auto new_status = stat & 0x3;
 
 		// LY == LYC
@@ -376,7 +376,7 @@ private:
 		}
 
 		if (was_unsed && request_interupt) {
-			mem.write(0xff0f, mem.read(0xff0f) | 0x16);
+			mem.direct_write(0xff0f, mem.direct_read(0xff0f) | 0x16);
 		}
 
 	}
@@ -386,26 +386,26 @@ private:
 	}
 
 	auto update_tiles_scanline(const Memory& mem) -> void {
-		const auto scanline = mem.read(0xff44);
+		const auto scanline = mem.direct_read(0xff44);
 		if (scanline >= 0x90) {
 			return;
 		}
 
-		if (!(mem.read(0xff40) & 0x1)) {
+		if (!(mem.direct_read(0xff40) & 0x1)) {
 			for (auto x = size_t{0}; x < size_t{160}; ++x) {
 				bg_buffer_[x][scanline] = {uint8_t{0}, uint8_t{0}};
 			}
 			return;
 		}
 
-		const auto palette = mem.read(0xff47);
+		const auto palette = mem.direct_read(0xff47);
 		const auto colors = std::array{palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6};
 
-		const auto SCY = mem.read(0xff42);
-		const auto SCX = mem.read(0xff43);
+		const auto SCY = mem.direct_read(0xff42);
+		const auto SCX = mem.direct_read(0xff43);
 
-		const auto tile_data = ((mem.read(0xff40) >> 4) & 1) ? 0x8000 : 0x8800;
-		const auto tile_map = (((mem.read(0xff40) >> 3) & 1) == 1) ? 0x9c00 : 0x9800;
+		const auto tile_data = ((mem.direct_read(0xff40) >> 4) & 1) ? 0x8000 : 0x8800;
+		const auto tile_map = (((mem.direct_read(0xff40) >> 3) & 1) == 1) ? 0x9c00 : 0x9800;
 
 		const auto pos_y = (scanline + SCY) % 256;
 
@@ -413,11 +413,11 @@ private:
 
 			const auto pos_x = (x + SCX) % 256;
 			const auto tile_index = tile_map + pos_y / 8 * 32 + pos_x / 8;
-			const auto tile_id = mem.read(tile_index);
+			const auto tile_id = mem.direct_read(tile_index);
 			const auto tile_address = tile_data == 0x8000 ? (0x8000 + tile_id * 0x10) : ((tile_id < 128 ? 0x9000 + tile_id * 0x10 : 0x8800 + (tile_id - 128) * 0x10));
 
-			const auto first_byte = mem.read(tile_address + (pos_y % 8) * 2 + 1);
-			const auto second_byte = mem.read(tile_address + (pos_y % 8) * 2 + 0);
+			const auto first_byte = mem.direct_read(tile_address + (pos_y % 8) * 2 + 1);
+			const auto second_byte = mem.direct_read(tile_address + (pos_y % 8) * 2 + 0);
 
 			const auto first_bit = static_cast<bool>(first_byte & (1 << (7 - pos_x % 8)));
 			const auto second_bit = static_cast<bool>(second_byte & (1 << (7 - pos_x % 8)));
@@ -429,18 +429,18 @@ private:
 	}
 
 	auto update_window(const Memory& mem) -> void {
-		const auto scanline = mem.read(0xff44);
+		const auto scanline = mem.direct_read(0xff44);
 		if (scanline >= 0x90) {
 			return;
 		}
 
-		const auto palette = mem.read(0xff47);
+		const auto palette = mem.direct_read(0xff47);
 		const auto colors = std::array{palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6};
 
-		const auto window_y = mem.read(0xff4A);
-		const auto window_x = mem.read(0xff4B) - 0x7;
+		const auto window_y = mem.direct_read(0xff4A);
+		const auto window_x = mem.direct_read(0xff4B) - 0x7;
 
-		const auto using_window = (mem.read(0xff40) & (1 << 5)) && window_y <= scanline;
+		const auto using_window = (mem.direct_read(0xff40) & (1 << 5)) && window_y <= scanline;
 		if (!using_window) {
 			for (auto x = size_t{0}; x < 160; ++x) {
 				window_buffer_[x][scanline] = {};
@@ -448,8 +448,8 @@ private:
 			return;
 		}
 
-		const auto tile_data = ((mem.read(0xff40) >> 4) & 1) ? 0x8000 : 0x8800;
-		const auto tile_map = ((mem.read(0xff40) >> 6 & 1) == 1) ? 0x9c00 : 9800;
+		const auto tile_data = ((mem.direct_read(0xff40) >> 4) & 1) ? 0x8000 : 0x8800;
+		const auto tile_map = ((mem.direct_read(0xff40) >> 6 & 1) == 1) ? 0x9c00 : 9800;
 
 		const auto pos_y = scanline - window_y;
 
@@ -457,11 +457,11 @@ private:
 
 			const auto pos_x = x - window_x;
 			const auto tile_index = tile_map + pos_y / 8 * 32 + pos_x / 8;
-			const auto tile_id = mem.read(tile_index);
+			const auto tile_id = mem.direct_read(tile_index);
 			const auto tile_address = tile_data == 0x8000 ? (0x8000 + tile_id * 0x10) : ((tile_id < 128 ? 0x9000 + tile_id * 0x10 : 0x8800 + (tile_id - 128) * 0x10));
 
-			const auto first_byte = mem.read(tile_address + (pos_y % 8) * 2 + 1);
-			const auto second_byte = mem.read(tile_address + (pos_y % 8) * 2 + 0);
+			const auto first_byte = mem.direct_read(tile_address + (pos_y % 8) * 2 + 1);
+			const auto second_byte = mem.direct_read(tile_address + (pos_y % 8) * 2 + 0);
 
 			const auto first_bit = static_cast<bool>(first_byte & (1 << (7 - pos_x % 8)));
 			const auto second_bit = static_cast<bool>(second_byte & (1 << (7 - pos_x % 8)));
@@ -475,7 +475,7 @@ private:
 	}
 
 	auto update_sprites(const Memory& mem) -> void {
-		const auto scanline = mem.read(0xff44);
+		const auto scanline = mem.direct_read(0xff44);
 		if (scanline >= 0x90) {
 			return;
 		}
@@ -485,23 +485,23 @@ private:
 		}
 
 		// Objects disabled
-		if (!(mem.read(0xff40) & (1 << 1))) {
+		if (!(mem.direct_read(0xff40) & (1 << 1))) {
 			return;
 		}
 
-		const auto large_sprites = mem.read(0xff40) & (1 << 2);
+		const auto large_sprites = mem.direct_read(0xff40) & (1 << 2);
 
 		auto all_sprites = std::vector<Sprite>{};
 
 		for (auto sprite = 0; sprite < 40; ++sprite) {
 			const auto index = sprite * 4;
-			const auto x_pos = static_cast<uint8_t>(mem.read(0xfe00 + index + 1) - 0x8);
-			const auto y_pos = static_cast<uint8_t>(mem.read(0xfe00 + index) - 0x10);
-			const auto tile_number = mem.read(0xfe00 + index + 2);
+			const auto x_pos = static_cast<uint8_t>(mem.direct_read(0xfe00 + index + 1) - 0x8);
+			const auto y_pos = static_cast<uint8_t>(mem.direct_read(0xfe00 + index) - 0x10);
+			const auto tile_number = mem.direct_read(0xfe00 + index + 2);
 
-			const auto attrs_raw = mem.read(0xfe00 + index + 3);
+			const auto attrs_raw = mem.direct_read(0xfe00 + index + 3);
 			const auto palette_address = (attrs_raw & (1 << 4)) ? 0xff49 : 0xff48;
-			const auto palette = mem.read(palette_address);
+			const auto palette = mem.direct_read(palette_address);
 
 			const auto s = Sprite {
 				.tile_number = tile_number,
@@ -576,8 +576,8 @@ private:
 		auto result = std::array<uint8_t, 64>{};
 
 		for (auto row = 0; row < 8; ++row) {
-			const auto first_byte = mem.read(addr + row * 2 + 1);
-			const auto second_byte = mem.read(addr + row * 2 + 0);
+			const auto first_byte = mem.direct_read(addr + row * 2 + 1);
+			const auto second_byte = mem.direct_read(addr + row * 2 + 0);
 			result[8 * row + 0] = ((first_byte & 0x80) >> 6) + ((second_byte & 0x80) >> 7);
 			result[8 * row + 1] = ((first_byte & 0x40) >> 5) + ((second_byte & 0x40) >> 6);
 			result[8 * row + 2] = ((first_byte & 0x20) >> 4) + ((second_byte & 0x20) >> 5);

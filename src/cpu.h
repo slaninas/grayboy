@@ -66,7 +66,25 @@ public:
 		return cycles;
 	}
 
-	[[nodiscard]] auto execute_opcode(const uint16_t& opcode, const uint16_t& PC, Registers& regs, Memory& memory) -> uint8_t;
+	[[nodiscard]] auto execute_opcode(const uint16_t& opcode, const uint16_t& PC, Registers& regs, Memory& memory) const -> uint8_t;
+
+	[[nodiscard]] auto disassemble_next(const uint16_t& starting_address) const {
+		auto regs = regs_;
+		auto memory = memory_;
+		regs.write("PC", starting_address);
+		const auto opcode = get_opcode(starting_address);
+
+		const auto instruction = find_by_opcode(opcode);
+		const auto PC = regs.read("PC");
+
+		[[maybe_unused]] const auto cycles = execute_opcode(instruction.opcode, PC, regs, memory);
+		auto memory_representation = std::vector<uint8_t>{};
+		for (auto address = starting_address; address < starting_address + instruction.size; ++address) {
+			memory_representation.push_back(memory.read(address));
+		}
+
+		return DisassemblyInfo{starting_address, regs.read("PC"), instruction, memory_representation};
+	}
 
 	[[nodiscard]] auto memory_dump() const
 	{

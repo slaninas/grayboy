@@ -495,8 +495,8 @@ private:
 
 		for (auto sprite = 0; sprite < 40; ++sprite) {
 			const auto index = sprite * 4;
-			const auto x_pos = static_cast<uint8_t>(mem.direct_read(0xfe00 + index + 1) - 0x8);
-			const auto y_pos = static_cast<uint8_t>(mem.direct_read(0xfe00 + index) - 0x10);
+			const auto x_pos = static_cast<int16_t>(mem.direct_read(0xfe00 + index + 1) - 0x8);
+			const auto y_pos = static_cast<int16_t>(mem.direct_read(0xfe00 + index) - 0x10);
 			const auto tile_number = mem.direct_read(0xfe00 + index + 2);
 
 			const auto attrs_raw = mem.direct_read(0xfe00 + index + 3);
@@ -538,7 +538,6 @@ private:
 		const auto last = sprites.size() >= 10 ? cbegin(sprites) + 10 : cend(sprites);
 		sprites.erase(last, cend(sprites));
 		std::stable_sort(begin(sprites), end(sprites), [](const auto& a, const auto& b) { return a.pos_x >= b.pos_x; });
-
 
 		std::for_each(cbegin(sprites), cend(sprites), [&mem, this, scanline](const auto& s) {
 				auto tile = load_tile(mem, 0x8000 + s.tile_number * 0x10);

@@ -9,15 +9,6 @@ struct Instruction {
 	std::string mnemonic;
 	uint16_t opcode;
 	uint8_t size;
-	std::function<uint8_t(Registers&, Memory&, const uint16_t&)> execute;
-
-	[[nodiscard]] auto operator()(Registers& regs, Memory& mem, const uint16_t& PC) const
-	{
-		const auto cycles = execute(regs, mem, PC);
-		const auto PC_new = regs.read("PC");
-		regs.write("PC", PC_new + size);
-		return cycles;
-	}
 };
 
 // TODO: Merge (half) carries somehow?

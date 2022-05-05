@@ -17,7 +17,6 @@ auto get_all_instructions() -> std::vector<Instruction>
 		instr.mnemonic = orig_instr.mnemonic;
 		instr.opcode = orig_instr.opcode;
 		instr.size = orig_instr.size;
-		instr.execute = orig_instr.execute;
 	}
 
 	return sorted;

@@ -59,38 +59,14 @@ public:
 
 		const auto instruction = find_by_opcode(opcode);
 
-		auto cycles = 0;
+		const auto cycles = execute_opcode(instruction.opcode, PC, regs_, memory_);
 
-		if (instruction.opcode > 0xff) {
-			cycles = execute_opcode16bit(instruction.opcode, PC, regs_, memory_);
-		} else {
-			cycles = execute_opcode(instruction.opcode, PC, regs_, memory_);
-		}
 		regs_.write("PC", regs_.read("PC") + instruction.size);
 
 		return cycles;
 	}
 
-	[[nodiscard]] auto execute_opcode(const uint8_t& opcode, const uint16_t& PC, Registers& regs, Memory& memory) -> uint8_t;
-	[[nodiscard]] auto execute_opcode16bit(const uint16_t& opcode, const uint16_t& PC, Registers& regs, Memory& memory) -> uint8_t;
-
-	[[nodiscard]] auto disassemble_next(const uint16_t& starting_address) const
-	{
-		auto regs = regs_;
-		auto memory = memory_;
-		regs.write("PC", starting_address);
-		const auto opcode = get_opcode(starting_address);
-
-		const auto instruction = find_by_opcode(opcode);
-
-		[[maybe_unused]] const auto cycles = instruction(regs, memory, starting_address);
-		auto memory_representation = std::vector<uint8_t>{};
-		for (auto address = starting_address; address < starting_address + instruction.size; ++address) {
-			memory_representation.push_back(memory.read(address));
-		}
-
-		return DisassemblyInfo{starting_address, regs.read("PC"), instruction, memory_representation};
-	}
+	[[nodiscard]] auto execute_opcode(const uint16_t& opcode, const uint16_t& PC, Registers& regs, Memory& memory) -> uint8_t;
 
 	[[nodiscard]] auto memory_dump() const
 	{

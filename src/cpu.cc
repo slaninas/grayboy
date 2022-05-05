@@ -8,7 +8,7 @@
 	return instructions[index];
 }
 
-[[nodiscard]] auto Cpu::execute_opcode(const uint8_t& opcode, const uint16_t& PC, Registers& regs, Memory& memory) -> uint8_t {
+[[nodiscard]] auto Cpu::execute_opcode(const uint16_t& opcode, const uint16_t& PC, Registers& regs, Memory& memory) -> uint8_t {
 	switch (opcode) {
 	case 0x00: {
 		return 1;
@@ -1606,14 +1606,8 @@
 		}
 		return 2;
 		}
-	}
-
-	return 0;
-}
 
 
-[[nodiscard]] auto Cpu::execute_opcode16bit(const uint16_t& opcode, const uint16_t& PC, Registers& regs, Memory& memory) -> uint8_t {
-	switch (opcode) {
 	case 0xcb00: {
 		instruction_rlc("B", regs);
 		return 2;
@@ -2977,5 +2971,5 @@
 		return 2;
 		}
 	}
-}
 
+}

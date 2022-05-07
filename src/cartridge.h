@@ -175,7 +175,7 @@ public:
 
 	auto get_header_checksum()
 	{
-		unsigned char sum = 0;
+		auto sum = uint8_t{0};
 		for (auto i = 0x134; i < 0x14C + 1; ++i) { sum -= buffer_[i] + 1; }
 		return static_cast<int>(sum);
 	}
@@ -247,12 +247,12 @@ private:
 	std::vector<uint8_t> buffer_ = {};
 	MemoryBanking memory_banking_type_ = {};
 
-	uint8_t current_rom_bank_ = 1;
-
 	bool rom_banking_ = true;
+	uint8_t current_rom_bank_ = 1;
 
 	bool ram_banking_enabled_ = {};
 	uint8_t current_ram_bank_ = {};
 	uint8_t total_ram_banks_ = {};
+
 	std::vector<std::array<uint8_t, 0x2000>> ram_banks_ = {};
 };

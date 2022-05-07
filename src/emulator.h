@@ -25,10 +25,7 @@ public:
 	Emulator(const std::string& cartridge_path) {
 
 		memory_ = Memory{Cartridge{cartridge_path}};
-		memory_.direct_write(0xff40, 0x91);
-		memory_.direct_write(0xff41, 0x80);
 
-		// TODO: Init the RAM as well somehow? Check boot rom
 		const auto regs =
 			RegistersChanger{.AF = 0x01b0, .BC=0x0013, .DE = 0x00d8, .HL = 0x014d, .PC = 0x0100, .SP = 0xfffe}.get(Registers{});
 

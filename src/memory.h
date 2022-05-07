@@ -1,10 +1,6 @@
 #pragma once
 
-#include <cstdint>
 #include <array>
-#include <cassert>
-#include <vector>
-#include <fstream>
 
 #include "cartridge.h"
 
@@ -31,9 +27,16 @@ public:
 		array_[0xff07] = 0xf8;
 		array_[0xff40] = 0x91;
 
+		// LCD setup
+		array_[0xff40] = 0x91;
+		array_[0xff41] = 0x80;
+
 	}
 
-	Memory(const ArrayType& array) : array_{array} {}
+	void direct_write(const uint16_t address, const uint8_t value)
+	{
+		array_[address] = value;
+	}
 
 	[[nodiscard]] auto direct_read(const uint16_t address) const
 	{
@@ -57,10 +60,6 @@ public:
 		return array_[address];
 	}
 
-	void direct_write(const uint16_t address, const uint8_t value)
-	{
-		array_[address] = value;
-	}
 
 	void write(const uint16_t address, const uint8_t value)
 	{
@@ -96,6 +95,8 @@ public:
 		return array_;
 	}
 
+
+	// TOOD: Move to separate class
 	uint8_t joypad_state_ = {};
 private:
 	ArrayType array_ = {};

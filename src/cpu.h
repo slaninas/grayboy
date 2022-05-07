@@ -5,10 +5,6 @@
 #include "memory.h"
 #include "registers.h"
 
-#include <cassert>
-#include <iostream>
-#include <sstream>
-#include <type_traits>
 #include <vector>
 
 struct DisassemblyInfo {
@@ -28,7 +24,6 @@ public:
 	using MemoryType = Memory;
 
 	Cpu() = default;
-
 	Cpu(const Registers& regs) : regs_{regs} {}
 
 
@@ -36,11 +31,9 @@ public:
 	{
 		const auto PC = regs_.read("PC");
 		const auto opcode = get_opcode(PC, memory);
-
 		const auto instruction = find_by_opcode(opcode);
 
 		const auto cycles = execute_opcode(instruction.opcode, PC, regs_, memory);
-
 		regs_.write("PC", regs_.read("PC") + instruction.size);
 
 		return cycles;
@@ -48,15 +41,6 @@ public:
 
 	[[nodiscard]] auto execute_opcode(const uint16_t& opcode, const uint16_t& PC, Registers& regs, Memory& memory) const -> uint8_t;
 
-	[[nodiscard]] auto get_opcode(const uint16_t& starting_address, const Memory& memory) const -> uint16_t
-	{
-		const auto first_byte = static_cast<uint16_t>(memory.read(starting_address));
-		if (first_byte == 0xcb) {
-			const auto second_byte = memory.read(starting_address + 1);
-			return static_cast<uint16_t>((first_byte << 8) + second_byte);
-		}
-		return first_byte;
-	}
 
 	[[nodiscard]] auto disassemble_next(const uint16_t& starting_address, const Memory& memory) const -> DisassemblyInfo {
 		auto regs = regs_;
@@ -87,15 +71,25 @@ public:
 	}
 
 private:
-	Registers regs_ = {};
-
-	// See https://meganesulli.com/generate-gb-opcodes/
-	std::vector<Instruction> instructions_ = get_all_instructions();
 
 	[[nodiscard]] auto find_by_opcode(const uint16_t opcode) const -> Instruction
 	{
 		const auto index = opcode <= 0xff ? opcode : (opcode & 0xff) + 0x100;
 		return instructions_[index];
 	}
+
+	[[nodiscard]] auto get_opcode(const uint16_t& starting_address, const Memory& memory) const -> uint16_t
+	{
+		const auto first_byte = static_cast<uint16_t>(memory.read(starting_address));
+		if (first_byte == 0xcb) {
+			const auto second_byte = memory.read(starting_address + 1);
+			return static_cast<uint16_t>((first_byte << 8) + second_byte);
+		}
+		return first_byte;
+	}
+
+	// See https://meganesulli.com/generate-gb-opcodes/
+	std::vector<Instruction> instructions_ = get_all_instructions();
+	Registers regs_ = {};
 
 };

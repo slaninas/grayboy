@@ -83,12 +83,10 @@ public:
 			}
 
 			if ((val & 0xf) == 0xA) {
-				std::cout << "INFO: ram_banking enabled\n";
 				ram_banking_enabled_ = true;
 			}
 			else if ((val & 0xf) == 0x0) {
 				ram_banking_enabled_ = false;
-				std::cout << "INFO: ram_banking disabled\n";
 			}
 		}
 		else if (address >= 0x2000 && address <= 0x3fff) {

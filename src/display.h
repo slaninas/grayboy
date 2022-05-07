@@ -98,11 +98,22 @@ uint8_t palettes[][4][4] = {
 	{0x00, 0x00, 0x00, 0x00}},
 };
 
+// Dummy Deiplay for headless run (tests)
+template<bool headless>
+class Display {
+public:
+	Display() = default;
+
+	auto update(Memory& mem, const uint16_t& cycles) -> void {}
+	auto render(Memory& mem) -> bool { return true; }
+};
+
 // Useful sources:
 // - https://stackoverflow.com/a/35989490/1112468
 // - http://emudev.de/gameboy-emulator/%e2%af%88-ppu-rgb-arrays-and-sdl/
 // - http://www.codeslinger.co.uk/pages/projects/gameboy.html
-class Display {
+template<>
+class Display<false> {
 public:
 
 	const uint64_t CYCLES_PER_FRAME = 70'224;

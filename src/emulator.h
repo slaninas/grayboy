@@ -12,6 +12,7 @@ inline auto format(const int& value, const uint32_t& width) -> std::string {
 	return result;
 }
 
+template<bool headless>
 class Emulator {
 public:
 	Emulator(const std::string& cartridge_path) {

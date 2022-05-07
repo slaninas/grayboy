@@ -19,8 +19,8 @@ auto main(int argc, const char** argv) -> int
 		return 1;
 	}
 
-	auto emu = Emulator{argv[1]};
-	auto display = Display{};
+	auto emu = Emulator<false>{argv[1]};
+	auto display = Display<false>{};
 	auto frame_cycles = uint64_t{0};
 
 	auto frames = uint64_t{0};

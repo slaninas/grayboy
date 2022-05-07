@@ -1,8 +1,11 @@
 #pragma once
 
+#include <chrono>
+
 #include "cartridge.h"
 #include "cpu.h"
 #include "timer.h"
+#include "display.h"
 
 inline auto format(const int& value, const uint32_t& width) -> std::string {
 	auto s = std::stringstream{};
@@ -15,18 +18,65 @@ inline auto format(const int& value, const uint32_t& width) -> std::string {
 template<bool headless>
 class Emulator {
 public:
+
+	const uint64_t CPU_FREQUENCY = 4'194'304 / 4;
+	const uint64_t CYCLES_PER_FRAME = CPU_FREQUENCY / 60;
+
 	Emulator(const std::string& cartridge_path) {
 
-		auto memory = Memory{Cartridge{cartridge_path}};
-		memory.direct_write(0xff40, 0x91);
-		memory.direct_write(0xff41, 0x80);
+		memory_ = Memory{Cartridge{cartridge_path}};
+		memory_.direct_write(0xff40, 0x91);
+		memory_.direct_write(0xff41, 0x80);
 
 		// TODO: Init the RAM as well somehow? Check boot rom
 		const auto regs =
 			RegistersChanger{.AF = 0x01b0, .BC=0x0013, .DE = 0x00d8, .HL = 0x014d, .PC = 0x0100, .SP = 0xfffe}.get(Registers{});
 
-		cpu_ = Cpu{memory, regs};
-		raw_dump(cpu_.memory_dump(), "init_memory_dump");
+		cpu_ = Cpu{regs};
+	}
+
+	auto run() -> void {
+		auto frame_cycles = uint64_t{0};
+		auto frames = uint64_t{0};
+		auto frames10s = uint64_t{0};
+
+		auto start = std::chrono::high_resolution_clock::now();
+		auto start10s = std::chrono::high_resolution_clock::now();
+
+		while (true) {
+			const auto cycles = execute_next();
+			display.update(memory_, cycles);
+
+			frame_cycles += cycles;
+
+			if (frame_cycles >= CYCLES_PER_FRAME) {
+				frame_cycles -= CYCLES_PER_FRAME;
+				if (!display.render(memory_)) {
+					return;
+				}
+				++frames;
+				++frames10s;
+
+				const auto end = std::chrono::high_resolution_clock::now();
+				const auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+				if (diff >= 1000) {
+						  std::cout << "INFO: FPS: " << (frames / (1000.0 / diff)) << '\n';
+						  start = std::chrono::high_resolution_clock::now();
+						  frames = 0;
+				}
+
+				const auto end10s = std::chrono::high_resolution_clock::now();
+				const auto diff10s = std::chrono::duration_cast<std::chrono::milliseconds>(end10s - start10s).count();
+
+				if (diff10s >= 10'000) {
+						  std::cout << "INFO: 10s average FPS: " << (frames10s / (10'000.0 / diff10s)) / 10 << '\n';
+						  start10s = std::chrono::high_resolution_clock::now();
+						  frames10s = 0;
+				}
+			}
+
+		}
 	}
 
 	auto execute_next() -> uint64_t {
@@ -54,20 +104,20 @@ public:
 				check_handle_interupts();
 			}
 
-			cycles = cpu_.execute_next();
+			cycles = cpu_.execute_next(memory_);
 
-			const auto ff02 = cpu_.get_memory().read(0xff02);
+			const auto ff02 = memory_.read(0xff02);
 
 			if (ff02 == 0x81) {
-				const auto c = static_cast<char>(cpu_.get_memory().read(0xff01));
+				const auto c = static_cast<char>(memory_.read(0xff01));
 				std::cout << c;
 				serial_link_ += c;
-				cpu_.get_memory().write(0xff02, 0x80);
+				memory_.write(0xff02, 0x80);
 			}
 
 		}
 
-		timer_.update(cpu_.get_memory(), cycles);
+		timer_.update(memory_, cycles);
 		total_cycles_ += cycles;
 		return cycles;
 	}
@@ -82,21 +132,17 @@ public:
 		return serial_link_;
 	}
 
-	auto get_memory() -> Memory& {
-		return cpu_.get_memory();
-	}
+	// auto dump_memory(const std::string& filename) -> void {
+		// raw_dump(memory_, filename);
+	// }
 
-	auto dump_memory(const std::string& filename) -> void {
-		raw_dump(cpu_.memory_dump(), filename);
-	}
+	// auto get_cpu() -> Cpu& {
+		// return cpu_;
+	// }
 
-	auto get_cpu() -> Cpu& {
-		return cpu_;
-	}
-
-	auto get_cpu() const -> const Cpu& {
-		return cpu_;
-	}
+	// auto get_cpu() const -> const Cpu& {
+		// return cpu_;
+	// }
 
 
 private:
@@ -110,24 +156,27 @@ private:
 	}
 
 	auto check_interupts() -> uint8_t {
-		auto& mem = cpu_.get_memory();
-		if (mem.read(0xffff) & 0x1 && mem.read(0xff0f) & 0x1) {
+		// Interupt Enable and Interupt Requested
+		const auto IE = memory_.read(0xffff);
+		const auto IR = memory_.read(0xff0f);
+
+		if (IE & 0x1 && IR & 0x1) {
 			// V-Blank
 			return 0x1;
 
-		} else if (mem.read(0xffff) & 0x2 && mem.read(0xff0f) & 0x2) {
+		} else if (IE & 0x2 && IR & 0x2) {
 			// LCD Stat
 			return 0x2;
 
-		} else if (mem.read(0xffff) & 0x4 && mem.read(0xff0f) & 0x4) {
+		} else if (IE & 0x4 && IR & 0x4) {
 			// Timer
 			return 0x4;
 
-		} else if (mem.read(0xffff) & 0x8 && mem.read(0xff0f) & 0x8) {
+		} else if (IE & 0x8 && IR & 0x8) {
 			// Serial
 			return 0x8;
 
-		} else if (mem.read(0xffff) & 0x16 && mem.read(0xff0f) & 0x16) {
+		} else if (IE & 0x16 && IR & 0x16) {
 			// Joypad
 			return 0x16;
 		}
@@ -135,8 +184,7 @@ private:
 	}
 
 	auto handle_interupt(const uint8_t& bit) -> uint64_t {
-		auto& mem = cpu_.get_memory();
-		mem.write(0xff0f, mem.read(0xff0f) ^ bit);
+		memory_.write(0xff0f, memory_.read(0xff0f) ^ bit);
 
 		auto& regs = cpu_.registers();
 
@@ -146,8 +194,8 @@ private:
 		const auto return_address_high = static_cast<uint8_t>((PC & 0xff00) >> 8);
 		const auto return_address_low = static_cast<uint8_t>(PC & 0x00ff);
 
-		mem.write(SP - 1, return_address_high);
-		mem.write(SP - 2, return_address_low);
+		memory_.write(SP - 1, return_address_high);
+		memory_.write(SP - 2, return_address_low);
 		regs.write("SP", SP -2);
 
 		switch (bit) {
@@ -189,10 +237,10 @@ private:
 		debug_log << "SP:" << format(cpu_.registers().read("SP"), 4) << ' ';
 		debug_log << "PC:" << format(PC, 4) << ' ';
 		debug_log << "(cy: " << std::dec << total_cycles_ * 4 << ") " << std::hex;
-		debug_log << "ppu:+" << (cpu_.get_memory().read(0xff41) & 0x3);
+		debug_log << "ppu:+" << (memory_.read(0xff41) & 0x3);
 		debug_log << "|[00]0x" << format(PC, 4) << ": ";
 
-		const auto info = cpu_.disassemble_next(PC);
+		const auto info = cpu_.disassemble_next(PC, memory_);
 
 		for (auto i = size_t{0}; i < info.memory_representation.size(); ++i) {
 			debug_log << format(info.memory_representation[i], 2) << ' ';
@@ -210,10 +258,12 @@ private:
 		debug_log << '\n';
 	}
 
-	Cpu cpu_ = Cpu{};
+	Cpu cpu_ = {};
+	Memory memory_ = {};
+	Display<headless> display = {};
 	std::string serial_link_ = {};
 	Timer timer_ = {};
 
 	uint64_t total_cycles_ = {};
-	std::ofstream debug_file = std::ofstream("debug_log");
+	std::ofstream debug_log = std::ofstream("debug_log");
 };

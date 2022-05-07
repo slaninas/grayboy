@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
 	std::cout << "xTest " << test_name << ' ';
 	std::cout << std::setw(30) << std::setfill('.') << " ";
 
-	auto emu = Emulator{test_rom};
+	auto emu = Emulator<true>{test_rom};
 	emu.execute_instructions(instructions_count);
 	const auto serial_link_output = emu.get_serial_link();
 

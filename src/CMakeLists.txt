@@ -17,7 +17,7 @@ target_link_libraries(cpu
 find_package(PkgConfig)
 
 PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
-add_library(emulator emulator.cc)
+add_library(emulator emulator.h)
 target_link_libraries(emulator
 	cpu
 	${pkgcfg_lib_SDL2_SDL2}

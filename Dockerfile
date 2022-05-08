@@ -1,9 +1,7 @@
 FROM ubuntu:20.04
 
 RUN apt update
-RUN apt install -y cmake libncurses5-dev clang time libsdl2-dev
-RUN update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 100
-RUN update-alternatives --auto c++
+RUN apt install -y cmake libncurses5-dev g++ time libsdl2-dev
 
 Copy . /app
 CMD cd /app && mkdir build-docker && cd build-docker && cmake .. && time make -j7 && ctest

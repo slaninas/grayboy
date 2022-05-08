@@ -116,16 +116,28 @@ template<>
 class Display<false> {
 public:
 
+	const int32_t WIDTH = 160;
+	const int32_t HEIGHT = 144;
+	const int32_t PIXEL_SCALE = 4;
+
 	const uint64_t CYCLES_PER_FRAME = 70'224;
 	const uint64_t CYCLES_PER_SCANLINE = 456 / 4;
 
 	Display() {
-		 SDL_Init(SDL_INIT_VIDEO);
-		 // SDL_CreateWindowAndRenderer((160 + 256) * 4, 144 * 4, 0, &window_, &renderer_);
-		 SDL_CreateWindowAndRenderer(160 * 4, 144 * 4, 0, &window_, &renderer_);
-		 SDL_RenderSetScale(renderer_, 4.0, 4.0);
+		if (!SDL_WasInit(SDL_INIT_VIDEO)) {
+			SDL_InitSubSystem(SDL_INIT_VIDEO);
+		}
 
-		 frame_start_ = SDL_GetTicks();
+		SDL_Renderer * renderer;
+		SDL_Window * window;
+		SDL_CreateWindowAndRenderer(WIDTH * PIXEL_SCALE, HEIGHT * PIXEL_SCALE, 0, &window, &renderer);
+
+		renderer_.reset(renderer);
+		window_.reset(window);
+
+		SDL_RenderSetScale(renderer_.get(), PIXEL_SCALE, PIXEL_SCALE);
+
+		frame_start_ = SDL_GetTicks();
 	}
 
 	auto update(Memory& mem, const uint16_t& cycles) -> void {
@@ -264,19 +276,19 @@ public:
 
 		const auto colors = palettes[6];
 
-		SDL_SetRenderDrawColor(renderer_, 255, 255, 255, 255);
-		SDL_RenderClear(renderer_);
-		SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);
+		SDL_SetRenderDrawColor(renderer_.get(), 255, 255, 255, 255);
+		SDL_RenderClear(renderer_.get());
+		SDL_SetRenderDrawColor(renderer_.get(), 0, 0, 0, 255);
 
 		for (auto y = 0; y < 144; ++y) {
 			for (auto x = 0; x < 160; ++x) {
 				const auto pixel = display_[x][y];
-				SDL_SetRenderDrawColor(renderer_, colors[pixel][0], colors[pixel][1], colors[pixel][2], colors[pixel][3]);
-				SDL_RenderDrawPoint(renderer_, x, y);
+				SDL_SetRenderDrawColor(renderer_.get(), colors[pixel][0], colors[pixel][1], colors[pixel][2], colors[pixel][3]);
+				SDL_RenderDrawPoint(renderer_.get(), x, y);
 			}
 		}
 
-		SDL_RenderPresent(renderer_);
+		SDL_RenderPresent(renderer_.get());
 		SDL_Event event;
 
 		while(SDL_PollEvent(&event) != 0 ) {
@@ -585,8 +597,8 @@ private:
 	}
 
 
-	SDL_Renderer* renderer_ = {};
-	SDL_Window* window_ = {};
+	std::unique_ptr<SDL_Renderer, decltype(&SDL_DestroyRenderer)> renderer_ = {nullptr, SDL_DestroyRenderer};
+	std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> window_ = {nullptr, SDL_DestroyWindow};
 	std::array<std::array<WindowPixel, 144>, 160> window_buffer_;
 	std::array<std::array<BackgroundPixel, 144>, 160> bg_buffer_;
 	std::array<std::array<SpritePixel, 144>, 160> sprites_buffer_;

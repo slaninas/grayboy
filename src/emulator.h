@@ -32,6 +32,12 @@ public:
 		cpu_ = Cpu{regs};
 	}
 
+	~Emulator() {
+		if constexpr (!headless) {
+			SDL_Quit();
+		}
+	}
+
 	auto run() -> void {
 		auto frame_cycles = uint64_t{0};
 		auto frames = uint64_t{0};

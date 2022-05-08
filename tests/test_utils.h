@@ -50,11 +50,6 @@ auto getRandomArray()
 	return array;
 }
 
-auto getRandomMemory()
-{
-	return Memory{getRandomArray<Memory::ArrayElements>()};
-}
-
 auto getRandomRegisters()
 {
 	return Registers{getRandomArray<Registers::ArrayElementCount>()};

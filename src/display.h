@@ -272,7 +272,7 @@ public:
 		mem.direct_write(0xff41, (stat & ~0x3) | new_status);
 	}
 
-	auto render(Memory& mem) -> void {
+	auto render() -> void {
 
 		const auto colors = palettes[6];
 
@@ -303,8 +303,6 @@ public:
 	}
 
 private:
-
-
 	auto update_tiles_scanline(const Memory& mem) -> void {
 		const auto scanline = mem.direct_read(0xff44);
 		if (scanline >= 0x90) {

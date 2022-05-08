@@ -54,7 +54,7 @@ public:
 
 			if (frame_cycles >= CYCLES_PER_FRAME) {
 				frame_cycles -= CYCLES_PER_FRAME;
-				display.render(memory_);
+				display.render();
 
 				const auto joypad_update = memory_.update_joypad();
 				if (joypad_update.quit) {

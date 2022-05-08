@@ -1,4 +1,8 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
+
+# Prevent being stuck at timezone selection
+ENV TZ=Europe/Kiev
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN apt update
 RUN apt install -y cmake libncurses5-dev g++ time libsdl2-dev

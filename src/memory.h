@@ -3,6 +3,7 @@
 #include <array>
 
 #include "cartridge.h"
+#include "joypad.h"
 
 template<typename T>
 auto raw_dump(const T& container, const std::string& filename) {
@@ -52,9 +53,9 @@ public:
 
 		if (address == 0xff00) {
 			if (~direct_read(0xff00) & (1 << 4)) {
-				return static_cast<uint8_t>(~(joypad_state_ & 0x0f));
+				return static_cast<uint8_t>(joypad_.get_direction_keys());
 			} else if (~direct_read(0xff00) & (1 << 5)) {
-				return static_cast<uint8_t>(~((joypad_state_ >> 4) & 0x0f));
+				return static_cast<uint8_t>(joypad_.get_button_keys());
 			}
 		}
 		return array_[address];
@@ -90,16 +91,19 @@ public:
 		}
 	}
 
+	auto update_joypad() -> JoypadUpdate {
+		return joypad_.update(direct_read(0xff00));
+	}
+
 	[[nodiscard]] auto dump() const
 	{
 		return array_;
 	}
 
 
-	// TOOD: Move to separate class
-	uint8_t joypad_state_ = {};
 private:
 	ArrayType array_ = {};
 	Cartridge cartridge_ = {};
+	Joypad joypad_ = {};
 };
 

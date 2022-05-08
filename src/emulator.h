@@ -48,9 +48,17 @@ public:
 
 			if (frame_cycles >= CYCLES_PER_FRAME) {
 				frame_cycles -= CYCLES_PER_FRAME;
-				if (!display.render(memory_)) {
-					return;
+				display.render(memory_);
+
+				const auto joypad_update = memory_.update_joypad();
+				if (joypad_update.quit) {
+					break;
 				}
+
+				if (joypad_update.request_interupt) {
+					memory_.direct_write(0xff0f, memory_.direct_read(0xff0f) | 0x16);
+				}
+
 				++frames;
 				++frames10s;
 

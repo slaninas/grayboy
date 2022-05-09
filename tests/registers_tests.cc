@@ -2,9 +2,6 @@
 #include "registers.h"
 #include "test_utils.h"
 
-// TODO: Add more (copy/move ctor/assignment) for Registers class
-// TODO: Add test for MakeRegisters, test even the incorrect use (e.g. MakeRegisters{.AF=0x0000, .A=0x11}
-
 TEST_CASE("MakeRegisters", "[registers]")
 {
 	SECTION("One register set only")

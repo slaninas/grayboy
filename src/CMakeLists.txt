@@ -21,11 +21,3 @@ add_executable(grayboy main.cc)
 target_link_libraries(grayboy
 	emulator
 )
-
-# add_executable(debugger debugger.cc)
-# find_package(curses)
-# target_link_libraries(debugger
-	# ncurses
-	# emulator
-	# ${pkgcfg_lib_SDL2_SDL2}
-# )

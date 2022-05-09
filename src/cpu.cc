@@ -75,37 +75,37 @@
 		}
 
 	case 0x04: {
-		instruction_inc_fn("B", regs);
+		instruction_inc("B", regs);
 		return 1;
 		}
 
 	case 0x0c: {
-		instruction_inc_fn("C", regs);
+		instruction_inc("C", regs);
 		return 1;
 		}
 
 	case 0x1c: {
-		instruction_inc_fn("E", regs);
+		instruction_inc("E", regs);
 		return 1;
 		}
 
 	case 0x2c: {
-		instruction_inc_fn("L", regs);
+		instruction_inc("L", regs);
 		return 1;
 		}
 
 	case 0x3c: {
-		instruction_inc_fn("A", regs);
+		instruction_inc("A", regs);
 		return 1;
 		}
 
 	case 0x14: {
-		instruction_inc_fn("D", regs);
+		instruction_inc("D", regs);
 		return 1;
 		}
 
 	case 0x24: {
-		instruction_inc_fn("H", regs);
+		instruction_inc("H", regs);
 		return 1;
 		}
 
@@ -115,7 +115,7 @@
 		const auto old_value = memory.read(address);
 		const auto new_value = static_cast<uint8_t>(old_value + 1);
 		memory.write(address, new_value);
-		
+
 		regs.set_flag("Z", new_value == 0x00);
 		regs.set_flag("N", false);
 		regs.set_flag("H", half_carry_add_8bit(old_value, 1));
@@ -123,37 +123,37 @@
 		}
 
 	case 0x05: {
-		instruction_dec_fn("B", regs);
+		instruction_dec("B", regs);
 		return 1;
 		}
 
 	case 0x0d: {
-		instruction_dec_fn("C", regs);
+		instruction_dec("C", regs);
 		return 1;
 		}
 
 	case 0x1d: {
-		instruction_dec_fn("E", regs);
+		instruction_dec("E", regs);
 		return 1;
 		}
 
 	case 0x2d: {
-		instruction_dec_fn("L", regs);
+		instruction_dec("L", regs);
 		return 1;
 		}
 
 	case 0x3d: {
-		instruction_dec_fn("A", regs);
+		instruction_dec("A", regs);
 		return 1;
 		}
 
 	case 0x15: {
-		instruction_dec_fn("D", regs);
+		instruction_dec("D", regs);
 		return 1;
 		}
 
 	case 0x25: {
-		instruction_dec_fn("H", regs);
+		instruction_dec("H", regs);
 		return 1;
 		}
 
@@ -163,7 +163,7 @@
 		const auto old_value = memory.read(address);
 		const auto new_value = static_cast<uint8_t>(old_value - 1);
 		memory.write(address, new_value);
-		
+
 		regs.set_flag("Z", new_value == 0x00);
 		regs.set_flag("N", true);
 		regs.set_flag("H", half_carry_sub_8bit(old_value, 1));

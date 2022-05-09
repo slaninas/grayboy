@@ -11,8 +11,6 @@ struct Instruction {
 	uint8_t size;
 };
 
-// TODO: Merge (half) carries somehow?
-// TODO: Are (half) carries correct?
 // Detect half-carry for addition, see https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/
 [[nodiscard]] inline auto half_carry_add_8bit(const uint16_t a, const uint16_t b)
 {
@@ -47,12 +45,11 @@ struct Instruction {
 {
 	return ((a & 0xff) - (b & 0xff)) < 0;
 }
+
 [[nodiscard]] inline auto carry_sub_16bit(const uint16_t a, const uint16_t b)
 {
 	return ((a & 0xffff) - (b & 0xffff)) < 0;
 }
-
-// TOOD: Cleanup these instruction_* functions
 
 inline void instruction_rst(const uint8_t& value, Registers& regs, Memory& memory, const uint16_t& PC)
 {
@@ -68,44 +65,33 @@ inline void instruction_rst(const uint8_t& value, Registers& regs, Memory& memor
 }
 
 template<size_t kSize>
-// TODO: remove _fn from name
-void instruction_inc_fn(const char (&reg_name)[kSize], Registers& regs)
+void instruction_inc(const char (&reg_name)[kSize], Registers& regs)
 {
 	constexpr auto reg_name_size = kSize - 1; // Subtract \0 at the end
-	// 8bit
-	if constexpr (reg_name_size == 1) {
-		const auto old_value = regs.read(reg_name);
-		const auto new_value = static_cast<uint8_t>(old_value + 1);
-		regs.write(reg_name, new_value);
+	static_assert(reg_name_size == 1);
 
-		regs.set_flag("Z", new_value == 0x00);
-		regs.set_flag("N", false);
-		regs.set_flag("H", half_carry_add_8bit(old_value, 1));
-	}
-	// 16bit
-	else {
-		assert(false && "Not implemented yet");
-	}
+	const auto old_value = regs.read(reg_name);
+	const auto new_value = static_cast<uint8_t>(old_value + 1);
+	regs.write(reg_name, new_value);
+
+	regs.set_flag("Z", new_value == 0x00);
+	regs.set_flag("N", false);
+	regs.set_flag("H", half_carry_add_8bit(old_value, 1));
 }
 
 template<size_t kSize>
-void instruction_dec_fn(const char (&reg_name)[kSize], Registers& regs)
+void instruction_dec(const char (&reg_name)[kSize], Registers& regs)
 {
 	constexpr auto reg_name_size = kSize - 1; // Subtract \0 at the end
-	// 8bit
-	if constexpr (reg_name_size == 1) {
-		const auto old_value = regs.read(reg_name);
-		const auto new_value = static_cast<uint8_t>(old_value - 1);
-		regs.write(reg_name, new_value);
+	static_assert(reg_name_size == 1);
 
-		regs.set_flag("Z", new_value == 0x00);
-		regs.set_flag("N", true);
-		regs.set_flag("H", half_carry_sub_8bit(old_value, 1));
-	}
-	// 16bit
-	else {
-		assert(false && "Not implemented yet");
-	}
+	const auto old_value = regs.read(reg_name);
+	const auto new_value = static_cast<uint8_t>(old_value - 1);
+	regs.write(reg_name, new_value);
+
+	regs.set_flag("Z", new_value == 0x00);
+	regs.set_flag("N", true);
+	regs.set_flag("H", half_carry_sub_8bit(old_value, 1));
 }
 
 template<size_t kDestSize, size_t kSecondRegNameSize>
@@ -144,7 +130,6 @@ void instruction_add(
 	}
 }
 
-// TODO: Add unit test for this
 template<size_t kDestSize, typename ValueType>
 void instruction_addc(const char (&dest_name)[kDestSize], const ValueType& value, Registers& regs)
 {
@@ -196,7 +181,6 @@ void instruction_sub(const char (&dest_name)[kDestSize], const ValueType& value,
 	regs.set_flag("C", carry_sub_8bit(dest_old, value));
 }
 
-// TODO: Add unit test for this
 template<size_t kDestSize, size_t kSecondRegNameSize>
 void instruction_sub(
   const char (&dest_name)[kDestSize],
@@ -206,7 +190,6 @@ void instruction_sub(
 	instruction_sub(dest_name, regs.read(second_reg_name), regs);
 }
 
-// TODO: Add unit test for this
 template<size_t kDestSize, typename ValueType>
 void instruction_subc(const char (&dest_name)[kDestSize], const ValueType& value, Registers& regs)
 {
@@ -232,7 +215,6 @@ void instruction_subc(const char (&dest_name)[kDestSize], const ValueType& value
 	regs.set_flag("C", carry);
 }
 
-// TODO: Add unit test for this
 template<size_t kDestSize, size_t kSecondRegNameSize>
 void instruction_subc(
   const char (&dest_name)[kDestSize],
@@ -258,6 +240,7 @@ void instruction_and(const char (&dest_name)[kDestSize], const ValueType& value,
 	regs.set_flag("H", true);
 	regs.set_flag("C", false);
 }
+
 template<size_t kDestSize, size_t kSecondRegNameSize>
 void instruction_and(
   const char (&dest_name)[kDestSize],
@@ -310,6 +293,7 @@ void instruction_or(const char (&dest_name)[kDestSize], const ValueType& value, 
 	regs.set_flag("H", false);
 	regs.set_flag("C", false);
 }
+
 template<size_t kDestSize, size_t kSecondRegNameSize>
 void instruction_or(
   const char (&dest_name)[kDestSize],
@@ -330,12 +314,12 @@ void instruction_cp(const char (&dest_name)[kDestSize], const ValueType& value, 
 	const auto dest_old = regs.read(dest_name);
 	const auto dest_new = static_cast<uint8_t>(dest_old - value);
 
-	// regs.write(dest_name, dest_new);
 	regs.set_flag("Z", dest_new == 0);
 	regs.set_flag("N", true);
 	regs.set_flag("H", half_carry_sub_8bit(dest_old, value));
 	regs.set_flag("C", carry_sub_8bit(dest_old, value));
 }
+
 template<size_t kDestSize, size_t kSecondRegNameSize>
 void instruction_cp(
   const char (&dest_name)[kDestSize],
@@ -511,7 +495,7 @@ inline auto set_bit(const uint8_t orig_value, const uint8_t position)
 
 inline void instruction_set_bit(const char (&reg_name)[2], const uint8_t position, Registers& regs)
 {
-	auto new_value = set_bit(regs.read(reg_name), position);
+	const auto new_value = set_bit(regs.read(reg_name), position);
 	regs.write(reg_name, new_value);
 }
 
@@ -519,7 +503,7 @@ inline auto instruction_set_bit_hl(Memory& memory, const Registers& regs, const 
 	const auto HL = regs.read("HL");
 	const auto old_value = memory.read(HL);
 
-	auto new_value = set_bit(old_value, bit);
+	const auto new_value = set_bit(old_value, bit);
 	memory.write(HL, new_value);
 	return 4;
 }
@@ -533,6 +517,6 @@ inline auto reset_bit(const uint8_t orig_value, const uint8_t position)
 
 inline void instruction_reset_bit(const char (&reg_name)[2], const uint8_t position, Registers& regs)
 {
-	auto new_value = reset_bit(regs.read(reg_name), position);
+	const auto new_value = reset_bit(regs.read(reg_name), position);
 	regs.write(reg_name, new_value);
 }

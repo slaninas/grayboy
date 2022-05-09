@@ -154,7 +154,6 @@ void instruction_addc(
 	instruction_addc(dest_name, regs.read(second_reg_name), regs);
 }
 
-// TODO: Add unit test for this
 template<size_t kDestSize, typename ValueType>
 void instruction_sub(const char (&dest_name)[kDestSize], const ValueType& value, Registers& regs)
 {

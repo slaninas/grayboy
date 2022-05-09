@@ -9,15 +9,12 @@
 #include <string>
 #include <vector>
 
-// TODO: Zero registers or do not initialize at all or like original ROM?
-// TODO: Add unit tests for registers
 class Registers {
 public:
 	static const size_t ArrayElementCount = 12;
 	using ArrayType = std::array<uint8_t, ArrayElementCount>;
 
 	Registers() = default;
-	// TODO: Remove this constructor, use MakeRegisters only
 	Registers(const ArrayType& regs_array) : register_array_{regs_array} {}
 
 	void clear()
@@ -39,7 +36,6 @@ public:
 		}
 	}
 
-	// TODO: Hide this and set_flag methos, use one method instead of write + set_flag
 	template<size_t kSize>
 	void write(const char (&reg_name)[kSize], const uint16_t& value)
 	{
@@ -67,8 +63,7 @@ public:
 	template<size_t kSize>
 	[[nodiscard]] auto read_flag(const char (&flag_name)[kSize]) const
 	{
-		// TODO: Use static_assert
-		assert((kSize == 2) && "Flags are only one letter (+ \n), you cannot address them by more letters.");
+		static_assert(kSize == 2 && "Flags are only one letter (+ \n), you cannot address them by more letters.");
 		const auto flag = std::string_view{flag_name};
 		if (flag == "Z") { return static_cast<bool>(read("F") & (1 << 7)); }
 		if (flag == "N") { return static_cast<bool>(read("F") & (1 << 6)); }
@@ -79,12 +74,10 @@ public:
 		return false;
 	}
 
-	// TODO: Use set + reset flag methods instead?
 	template<size_t kSize>
 	void set_flag(const char (&flag_name)[kSize], const bool value)
 	{
-		// TODO: Use static_assert
-		assert((kSize == 2) && "Flags are only one letter (+ \n), you cannot address them by more letters.");
+		static_assert(kSize == 2 && "Flags are only one letter (+ \n), you cannot address them by more letters.");
 		const char flag = flag_name[0];
 		const auto F_value = read("F");
 
@@ -177,8 +170,6 @@ public:
 		return halt_;
 	}
 
-	//
-	// TODO: Make it standalone function
 	static auto register_index(const std::string_view& reg_name) -> int
 	{
 		if (reg_name == "AF") { return 0; }
@@ -351,7 +342,6 @@ struct MakeRegisters {
 	}
 };
 
-// TODO: Merge from MakeRegisters or inherit?
 struct RegistersChanger {
 	std::optional<uint16_t> AF = {};
 	std::optional<uint8_t> A = {};

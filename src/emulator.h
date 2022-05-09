@@ -233,7 +233,6 @@ private:
 	// binjbg format
 	auto save_debug() -> void {
 		debug_log << std::hex;
-		// TODO: Add PPU
 		const auto PC = cpu_.registers().read("PC");
 		debug_log << "A:" << format(cpu_.registers().read("A"), 2) << ' ';
 		debug_log << "F:";

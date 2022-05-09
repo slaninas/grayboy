@@ -103,28 +103,19 @@ void instruction_add(
 	static_assert(kDestSize == kSecondRegNameSize, "Add for 8bit + 16bit or vice versa not implemented.");
 	constexpr auto real_size = kDestSize - 1;
 
-	// 8bit
-	if constexpr (real_size == 1) {
-		const auto second_reg = regs.read(second_reg_name);
-		const auto dest_old = regs.read(dest_name);
-		const auto dest_new = static_cast<decltype(second_reg)>(dest_old + second_reg);
+	const auto second_reg = regs.read(second_reg_name);
+	const auto dest_old = regs.read(dest_name);
+	const auto dest_new = static_cast<decltype(second_reg)>(dest_old + second_reg);
 
-		regs.write(dest_name, dest_new);
+	regs.write(dest_name, dest_new);
+	regs.set_flag("N", false);
 
-		regs.set_flag("Z", dest_new == 0); // TODO: This is the only difference between 8 and 16bit, merge rest?
-		regs.set_flag("N", false);
+	if constexpr (real_size == 1 ) {
+		regs.set_flag("Z", dest_new == 0);
 		regs.set_flag("H", half_carry_add_8bit(dest_old, second_reg));
 		regs.set_flag("C", carry_add_8bit(dest_old, second_reg));
 	}
-	// 16bit
 	else {
-		const auto second_reg = regs.read(second_reg_name);
-		const auto dest_old = regs.read(dest_name);
-		const auto dest_new = static_cast<decltype(second_reg)>(dest_old + second_reg);
-
-		regs.write(dest_name, dest_new);
-
-		regs.set_flag("N", false);
 		regs.set_flag("H", half_carry_add_16bit(dest_old, second_reg));
 		regs.set_flag("C", carry_add_16bit(dest_old, second_reg));
 	}

@@ -159,7 +159,6 @@ public:
 		return 0;
 	}
 
-	// TODO: Why can't it be const? At least make std::pair const?
 	static inline std::map<const char*, std::pair<std::uint16_t, std::uint16_t>> addreses = {
 	  {"nintendo_logo", {0x104, 0x134}},
 	  {"title", {0x134, 0x13f}},

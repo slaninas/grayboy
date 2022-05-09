@@ -53,9 +53,9 @@ public:
 
 		if (address == 0xff00) {
 			if (~direct_read(0xff00) & (1 << 4)) {
-				return static_cast<uint8_t>(joypad_.get_direction_keys());
+				return static_cast<uint8_t>(get_direction_keys());
 			} else if (~direct_read(0xff00) & (1 << 5)) {
-				return static_cast<uint8_t>(joypad_.get_button_keys());
+				return static_cast<uint8_t>(get_button_keys());
 			}
 		}
 		return array_[address];
@@ -91,19 +91,26 @@ public:
 		}
 	}
 
-	auto update_joypad() -> JoypadUpdate {
-		return joypad_.update(direct_read(0xff00));
-	}
-
 	[[nodiscard]] auto dump() const
 	{
 		return array_;
 	}
 
+	auto update_joypad(const uint8_t& new_state) -> void {
+		joypad_state_ = new_state;
+	}
 
 private:
+
+	auto get_direction_keys() const -> uint8_t {
+		return ~(joypad_state_ & 0x0f);
+	}
+	auto get_button_keys() const -> uint8_t {
+		return ~((joypad_state_ >> 4) & 0x0f);
+	}
+
 	ArrayType array_ = {};
 	Cartridge cartridge_ = {};
-	Joypad joypad_ = {};
+	uint8_t joypad_state_ = {};
 };
 

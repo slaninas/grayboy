@@ -6,6 +6,7 @@
 #include "cpu.h"
 #include "timer.h"
 #include "display.h"
+#include "joypad.h"
 
 inline auto format(const int& value, const uint32_t& width) -> std::string {
 	auto s = std::stringstream{};
@@ -56,7 +57,7 @@ public:
 				frame_cycles -= CYCLES_PER_FRAME;
 				display.render();
 
-				const auto joypad_update = memory_.update_joypad();
+				const auto joypad_update = joypad_.update(memory_.read(0xff00));
 				if (joypad_update.quit) {
 					break;
 				}
@@ -64,6 +65,8 @@ public:
 				if (joypad_update.request_interupt) {
 					memory_.direct_write(0xff0f, memory_.direct_read(0xff0f) | 0x16);
 				}
+
+				memory_.update_joypad(joypad_update.state);
 
 				++frames;
 				++frames10s;
@@ -270,6 +273,7 @@ private:
 
 	Cpu cpu_ = {};
 	Memory memory_ = {};
+	Joypad joypad_ = {};
 	Display<headless> display = {};
 	std::string serial_link_ = {};
 	Timer timer_ = {};

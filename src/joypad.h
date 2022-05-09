@@ -2,10 +2,10 @@
 
 #include <SDL2/SDL.h>
 
-
 struct JoypadUpdate {
 	bool quit = {};
 	bool request_interupt = {};
+	uint8_t state = {};
 };
 
 class Joypad {
@@ -72,14 +72,7 @@ public:
 			released_key(7);
 		}
 
-		return {.quit = false, .request_interupt = request_interupt};
-	}
-
-	auto get_direction_keys() const -> uint8_t {
-		return ~(joypad_state_ & 0x0f);
-	}
-	auto get_button_keys() const -> uint8_t {
-		return ~((joypad_state_ >> 4) & 0x0f);
+		return {.quit = false, .request_interupt = request_interupt, .state = joypad_state_};
 	}
 
 private:

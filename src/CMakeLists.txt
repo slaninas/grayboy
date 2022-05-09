@@ -7,15 +7,15 @@ target_link_libraries(cpu
 	instructions
 )
 
-find_package(PkgConfig)
+find_package(SDL2 REQUIRED)
+include_directories(${SDL2_INCLUDE_DIRS})
 
-PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
 add_library(emulator emulator.h)
+
 target_link_libraries(emulator
 	cpu
-	${pkgcfg_lib_SDL2_SDL2}
+	${SDL2_LIBRARIES}
 )
-
 
 add_executable(grayboy main.cc)
 target_link_libraries(grayboy

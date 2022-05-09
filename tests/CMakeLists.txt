@@ -9,6 +9,9 @@ target_link_libraries(registers_tests test_main)
 add_executable(registers_snapshot_tests  registers_snapshot_tests.cc)
 target_link_libraries(registers_snapshot_tests test_main)
 
+find_package(SDL2 REQUIRED)
+include_directories(${SDL2_INCLUDE_DIRS})
+
 add_executable(cpu_utils_tests  cpu_utils_tests.cc)
 target_link_libraries(cpu_utils_tests test_main)
 

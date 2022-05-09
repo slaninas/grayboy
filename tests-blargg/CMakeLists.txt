@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.16)
 
 include_directories("../src/")
 
+find_package(SDL2 REQUIRED)
+include_directories(${SDL2_INCLUDE_DIRS})
+
 add_executable(tests-blargg tests-blargg.cc)
 target_link_libraries(tests-blargg emulator)
 

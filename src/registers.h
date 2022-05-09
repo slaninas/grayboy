@@ -7,6 +7,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 // TODO: Zero registers or do not initialize at all or like original ROM?
 // TODO: Add unit tests for registers

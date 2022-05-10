@@ -98,6 +98,13 @@ uint8_t palettes[][4][4] = {
 	{0x00, 0x00, 0x00, 0x00}},
 };
 
+struct ScanlineInfo {
+	uint64_t cycles = {};
+	bool sprites_updated = {};
+	bool tiles_updated = {};
+	bool hblank_issued = {};
+};
+
 // Dummy Deiplay for headless run (tests)
 template<bool headless>
 class Display {
@@ -152,7 +159,7 @@ public:
 		}
 
 		else {
-			scanline_cycles_ = 0;
+			scanline_info_ = {};
 			mem.direct_write(0xff44, 0);
 			const auto stat = mem.direct_read(0xff41);
 			mem.direct_write(0xff41, stat & (~0x3));
@@ -160,7 +167,7 @@ public:
 			return;
 		}
 
-		scanline_cycles_ += cycles;
+		scanline_info_.cycles += cycles;
 
 		const auto stat = mem.direct_read(0xff41);
 		const auto scanline = mem.direct_read(0xff44);
@@ -169,29 +176,29 @@ public:
 		const auto orig_status = stat & 0x3;
 		auto new_status = orig_status;
 
-		if (scanline_cycles_ < 80 / 4) {
+		if (scanline_info_.cycles < 80 / 4) {
 			new_status = 2;
 			request_interupt = static_cast<bool>(stat & (1 << 5));
-			if (!sprites_updated_) {
+			if (!scanline_info_.sprites_updated) {
 				update_sprites(mem);
-				sprites_updated_ = true;
+				scanline_info_.sprites_updated = true;
 			}
 		}
-		else if (scanline_cycles_ <= (80 + 172) / 4) {
+		else if (scanline_info_.cycles <= (80 + 172) / 4) {
 			new_status = 3;
-			if (!tiles_updated_) {
+			if (!scanline_info_.tiles_updated) {
 				update_tiles_scanline(mem);
 				update_window(mem);
-				tiles_updated_ = true;
+				scanline_info_.tiles_updated = true;
 			}
 
 		}
 
 		else {
 			new_status = 0;
-			if (!hblank_issued_) {
+			if (!scanline_info_.hblank_issued) {
 				request_interupt = static_cast<bool>(stat & (1 << 3));
-				hblank_issued_ = true;
+				scanline_info_.hblank_issued = true;
 			}
 		}
 
@@ -202,9 +209,9 @@ public:
 
 		mem.direct_write(0xff41, (stat & ~0x3) | new_status);
 
-		if (scanline_cycles_ >= CYCLES_PER_SCANLINE) {
-			scanline_cycles_ -= CYCLES_PER_SCANLINE;
-			tiles_updated_ = sprites_updated_ = hblank_issued_ = vblank_issued_ = false;
+		if (scanline_info_.cycles >= CYCLES_PER_SCANLINE) {
+			scanline_info_.cycles -= CYCLES_PER_SCANLINE;
+			scanline_info_.tiles_updated = scanline_info_.sprites_updated = scanline_info_.hblank_issued = vblank_issued_ = false;
 
 			if (scanline < 0x90) {
 				mix_buffers(scanline);
@@ -509,18 +516,17 @@ private:
 
 	std::unique_ptr<SDL_Renderer, decltype(&SDL_DestroyRenderer)> renderer_ = {nullptr, SDL_DestroyRenderer};
 	std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> window_ = {nullptr, SDL_DestroyWindow};
+	
 	std::array<std::array<WindowPixel, 144>, 160> window_buffer_;
 	std::array<std::array<BackgroundPixel, 144>, 160> bg_buffer_;
 	std::array<std::array<SpritePixel, 144>, 160> sprites_buffer_;
 	std::array<std::array<uint8_t, 144>, 160> display_;
 
-	uint64_t scanline_cycles_ = {};
 	uint64_t frame_cycles_ = {};
 	Uint32 frame_start_ = {};
 	bool lcd_enabled_ = true;
-	bool sprites_updated_ = {};
-	bool tiles_updated_ = {};
 	bool vblank_issued_ = {};
-	bool hblank_issued_ = {};
+
+	ScanlineInfo scanline_info_ = {};
 };
 

@@ -57,6 +57,11 @@ public:
 				return static_cast<uint8_t>(get_button_keys());
 			}
 		}
+
+		// This part of memory is not usable and always returns 0xff
+		if (address >= 0xfea0 && address <= 0xfeff) {
+			return 0xff;
+		}
 		return array_[address];
 	}
 
@@ -85,6 +90,10 @@ public:
 			array_[address] = 0x00;
 		}
 
+		// This part of memory is not usable
+		else if (address >= 0xfea0 && address <= 0xfeff) {
+			return;
+		}
 		else {
 			array_[address] = value;
 		}

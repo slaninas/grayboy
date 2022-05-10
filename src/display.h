@@ -516,7 +516,7 @@ private:
 
 	std::unique_ptr<SDL_Renderer, decltype(&SDL_DestroyRenderer)> renderer_ = {nullptr, SDL_DestroyRenderer};
 	std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> window_ = {nullptr, SDL_DestroyWindow};
-	
+
 	std::array<std::array<WindowPixel, 144>, 160> window_buffer_;
 	std::array<std::array<BackgroundPixel, 144>, 160> bg_buffer_;
 	std::array<std::array<SpritePixel, 144>, 160> sprites_buffer_;

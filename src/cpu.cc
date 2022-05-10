@@ -109,7 +109,6 @@
 		}
 
 	case 0x34: {
-		// TODO: Use instruction_inc method?
 		const auto address = regs.read("HL");
 		const auto old_value = memory.read(address);
 		const auto new_value = static_cast<uint8_t>(old_value + 1);
@@ -157,7 +156,6 @@
 		}
 
 	case 0x35: {
-		// TODO: Use instruction_dec function?
 		const auto address = regs.read("HL");
 		const auto old_value = memory.read(address);
 		const auto new_value = static_cast<uint8_t>(old_value - 1);
@@ -1445,100 +1443,40 @@
 
 	case 0xc4: {
 		if (!regs.read_flag("Z")) {
-		// TODO: Put into method
-		const auto return_address = PC + 3;
-		const auto return_address_high = static_cast<uint8_t>((return_address & 0xff00) >> 8);
-		const auto return_address_low = static_cast<uint8_t>(return_address & 0x00ff);
-		
-		const auto SP = regs.read("SP");
-		memory.write(SP - 1, return_address_high);
-		memory.write(SP - 2, return_address_low);
-		regs.write("SP", SP - 2);
-		
-		const auto call_address = static_cast<uint16_t>((memory.read(PC + 2) << 8) + memory.read(PC + 1));
-		
-		regs.write("PC", call_address - 3);
-		return 6;
+			instruction_call(regs, memory);
+			return 6;
 		}
-		return 3;
-		}
+	return 3;
+	}
 
 	case 0xcc: {
 		if (regs.read_flag("Z")) {
-		// TODO: Put into method
-		const auto return_address = PC + 3;
-		const auto return_address_high = static_cast<uint8_t>((return_address & 0xff00) >> 8);
-		const auto return_address_low = static_cast<uint8_t>(return_address & 0x00ff);
-		
-		const auto SP = regs.read("SP");
-		memory.write(SP - 1, return_address_high);
-		memory.write(SP - 2, return_address_low);
-		regs.write("SP", SP - 2);
-		
-		const auto call_address = static_cast<uint16_t>((memory.read(PC + 2) << 8) + memory.read(PC + 1));
-		
-		regs.write("PC", call_address - 3);
-		return 6;
+			instruction_call(regs, memory);
+			return 6;
 		}
-		return 3;
-		}
+	return 3;
+	}
 
 	case 0xd4: {
 		if (!regs.read_flag("C")) {
-		// TODO: Put into method
-		const auto return_address = PC + 3;
-		const auto return_address_high = static_cast<uint8_t>((return_address & 0xff00) >> 8);
-		const auto return_address_low = static_cast<uint8_t>(return_address & 0x00ff);
-		
-		const auto SP = regs.read("SP");
-		memory.write(SP - 1, return_address_high);
-		memory.write(SP - 2, return_address_low);
-		regs.write("SP", SP - 2);
-		
-		const auto call_address = static_cast<uint16_t>((memory.read(PC + 2) << 8) + memory.read(PC + 1));
-		
-		regs.write("PC", call_address - 3);
-		return 6;
+			instruction_call(regs, memory);
+			return 6;
 		}
-		return 3;
-		}
+	return 3;
+	}
 
 	case 0xdc: {
 		if (regs.read_flag("C")) {
-		// TODO: Put into method
-		const auto return_address = PC + 3;
-		const auto return_address_high = static_cast<uint8_t>((return_address & 0xff00) >> 8);
-		const auto return_address_low = static_cast<uint8_t>(return_address & 0x00ff);
-		
-		const auto SP = regs.read("SP");
-		memory.write(SP - 1, return_address_high);
-		memory.write(SP - 2, return_address_low);
-		regs.write("SP", SP - 2);
-		
-		const auto call_address = static_cast<uint16_t>((memory.read(PC + 2) << 8) + memory.read(PC + 1));
-		
-		regs.write("PC", call_address - 3);
-		return 6;
+			instruction_call(regs, memory);
+			return 6;
 		}
 		return 3;
-		}
+	}
 
 	case 0xcd: {
-		// TODO: Put into method
-		const auto return_address = PC + 3;
-		const auto return_address_high = static_cast<uint8_t>((return_address & 0xff00) >> 8);
-		const auto return_address_low = static_cast<uint8_t>(return_address & 0x00ff);
-		
-		const auto SP = regs.read("SP");
-		memory.write(SP - 1, return_address_high);
-		memory.write(SP - 2, return_address_low);
-		regs.write("SP", SP - 2);
-		
-		const auto call_address = static_cast<uint16_t>((memory.read(PC + 2) << 8) + memory.read(PC + 1));
-		
-		regs.write("PC", call_address - 3);
+		instruction_call(regs, memory);
 		return 6;
-		}
+	}
 
 	case 0xc7: {
 		instruction_rst(0x00, regs, memory, PC);

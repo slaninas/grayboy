@@ -510,3 +510,20 @@ inline void instruction_reset_bit(const char (&reg_name)[2], const uint8_t posit
 	const auto new_value = reset_bit(regs.read(reg_name), position);
 	regs.write(reg_name, new_value);
 }
+
+inline void instruction_call(Registers& regs, Memory& memory) {
+	const auto PC = regs.read("PC");
+	const auto SP = regs.read("SP");
+
+	const auto return_address = PC + 3;
+	const auto return_address_high = static_cast<uint8_t>((return_address & 0xff00) >> 8);
+	const auto return_address_low = static_cast<uint8_t>(return_address & 0x00ff);
+
+	memory.write(SP - 1, return_address_high);
+	memory.write(SP - 2, return_address_low);
+	regs.write("SP", SP - 2);
+
+	const auto call_address = static_cast<uint16_t>((memory.read(PC + 2) << 8) + memory.read(PC + 1));
+
+	regs.write("PC", call_address - 3);
+}

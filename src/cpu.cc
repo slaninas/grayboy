@@ -700,7 +700,6 @@
 		}
 
 	case 0x07: {
-		// TODO: Put into method
 		const auto A = regs.read("A");
 		const auto msb = (A & (1 << 7)) >> 7;
 		const auto A_new = static_cast<uint8_t>((A << 1) + msb);
@@ -714,12 +713,11 @@
 		}
 
 	case 0x17: {
-		// TODO: Put into method
 		const auto A = regs.read("A");
 		const auto msb = (A & (1 << 7)) >> 7;
 		const auto A_new = static_cast<uint8_t>((A << 1) + regs.read_flag("C")); // Setting C here as bit 0, it's only difference from RLCA which uses msb
 		regs.write("A", A_new);
-		
+
 		regs.set_flag("Z", false);
 		regs.set_flag("N", false);
 		regs.set_flag("H", false);
@@ -728,12 +726,11 @@
 		}
 
 	case 0x0f: {
-		// TODO: Put into method
 		const auto A = regs.read("A");
 		const auto lsb = (A & (1 << 0)) >> 0;
 		const auto A_new = static_cast<uint8_t>((A >> 1) + (lsb << 7));
 		regs.write("A", A_new);
-		
+
 		regs.set_flag("Z", false);
 		regs.set_flag("N", false);
 		regs.set_flag("H", false);
@@ -742,12 +739,11 @@
 		}
 
 	case 0x1f: {
-		// TODO: Put into method
 		const auto A = regs.read("A");
 		const auto lsb = (A & (1 << 0)) >> 0;
 		const auto A_new = static_cast<uint8_t>((A >> 1) + (regs.read_flag("C") << 7)); // Setting C here as bit 0, it's only difference from RLCA which uses msb
 		regs.write("A", A_new);
-		
+
 		regs.set_flag("Z", false);
 		regs.set_flag("N", false);
 		regs.set_flag("H", false);
@@ -756,7 +752,6 @@
 		}
 
 	case 0x08: {
-		// TODO: Put into method
 		const auto address = static_cast<uint16_t>((memory.read(PC + 2) << 8) + memory.read(PC + 1));
 		const auto SP = regs.read("SP");
 		memory.write(address, static_cast<uint8_t>(SP & 0x00ff));
@@ -765,7 +760,6 @@
 		}
 
 	case 0xea: {
-		// TODO: Check byte order
 		const auto address = static_cast<uint16_t>((memory.read(PC + 2) << 8) + memory.read(PC + 1));
 		const auto value = regs.read("A");
 		memory.write(address, value);
@@ -782,15 +776,15 @@
 	case 0x27: {
 		// https://forums.nesdev.org/viewtopic.php?p=196282&sid=3441048d6a2d28d493f69044754e4e42#p196282
 		const auto A = regs.read("A");
-		
+
 		const auto N = regs.read_flag("N");
 		const auto H = regs.read_flag("H");
 		const auto C = regs.read_flag("C");
-		
-		
+
+
 		auto A_new = A;
 		auto C_new = C;
-		
+
 		if (!N) {
 		if (C_new || A_new > 0x99) {
 		A_new += 0x60;
@@ -906,12 +900,11 @@
 		}
 
 	case 0x86: {
-		// TODO: Put into function
 		const auto address = regs.read("HL");
 		const auto value = memory.read(address);
 		const auto A_old = regs.read("A");
 		const auto A_new = static_cast<uint8_t>(A_old + value);
-		
+
 		regs.write("A", A_new);
 		regs.set_flag("Z", A_new == 0);
 		regs.set_flag("N", false);
@@ -1428,14 +1421,12 @@
 		}
 
 	case 0xc3: {
-		// TODO: Put into method
 		const auto PC_new = static_cast<uint16_t>((memory.read(PC + 2) << 8) + memory.read(PC + 1));
 		regs.write("PC", PC_new - 3);
 		return 4;
 		}
 
 	case 0xe9: {
-		// TODO: Put into method
 		const auto PC_new = regs.read("HL");
 		regs.write("PC", PC_new - 1);
 		return 1;

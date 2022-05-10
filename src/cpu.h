@@ -17,8 +17,6 @@ struct DisassemblyInfo {
 class Cpu;
 inline void log(const Cpu& cpu);
 
-// Make exceptions asserts and run in debug
-// TODO: Add unit tests
 class Cpu {
 public:
 	using MemoryType = Memory;

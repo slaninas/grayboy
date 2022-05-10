@@ -104,8 +104,8 @@ class Display {
 public:
 	Display() = default;
 
-	auto update(Memory& mem, const uint16_t& cycles) -> void {}
-	auto render(Memory& mem) -> bool { return true; }
+	auto update([[maybe_unused]] Memory& mem, [[maybe_unused]] const uint16_t& cycles) -> void {}
+	auto render([[maybe_unused]] Memory& mem) -> bool { return true; }
 };
 
 // Useful sources:
@@ -298,8 +298,6 @@ public:
 		}
 
 		frame_start_ = SDL_GetTicks();
-
-		frame_++;
 	}
 
 private:
@@ -519,8 +517,6 @@ private:
 	uint64_t scanline_cycles_ = {};
 	uint64_t frame_cycles_ = {};
 	Uint32 frame_start_ = {};
-	bool lyc_interupt_already_requested_ = {};
-	uint64_t frame_ = {};
 	bool lcd_enabled_ = true;
 	bool sprites_updated_ = {};
 	bool tiles_updated_ = {};

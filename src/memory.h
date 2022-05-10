@@ -3,7 +3,6 @@
 #include <array>
 
 #include "cartridge.h"
-#include "joypad.h"
 
 template<typename T>
 auto raw_dump(const T& container, const std::string& filename) {

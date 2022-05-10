@@ -5,6 +5,8 @@ include_directories("../src/")
 add_executable(tests-blargg tests-blargg.cc)
 target_link_libraries(tests-blargg emulator)
 
+include_directories(${SDL2_INCLUDE_DIRS})
+
 add_test("01-special.gb" tests-blargg "${CMAKE_SOURCE_DIR}/gb-test-roms/cpu_instrs/individual/01-special.gb" "1500000" "01-special
 
 

@@ -1,4 +1,6 @@
 #include "cpu.h"
+#include <stdexcept>
+
 
 
 [[nodiscard]] auto Cpu::execute_opcode(const uint16_t& opcode, const uint16_t& PC, Registers& regs, Memory& memory) const -> uint8_t {
@@ -2894,4 +2896,6 @@
 		}
 	}
 
+	throw std::runtime_error{"Opcode " + std::to_string(opcode) + "(dec) is not valid."};
+	return 0;
 }

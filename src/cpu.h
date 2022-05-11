@@ -24,7 +24,6 @@ public:
 	Cpu() = default;
 	Cpu(const Registers& regs) : regs_{regs} {}
 
-
 	[[nodiscard]] auto execute_next(Memory& memory) -> uint64_t
 	{
 		const auto PC = regs_.read("PC");
@@ -37,10 +36,11 @@ public:
 		return cycles;
 	}
 
-	[[nodiscard]] auto execute_opcode(const uint16_t& opcode, const uint16_t& PC, Registers& regs, Memory& memory) const -> uint8_t;
+	[[nodiscard]] auto execute_opcode(const uint16_t& opcode, const uint16_t& PC, Registers& regs, Memory& memory) const
+	  -> uint8_t;
 
-
-	[[nodiscard]] auto disassemble_next(const uint16_t& starting_address, const Memory& memory) const -> DisassemblyInfo {
+	[[nodiscard]] auto disassemble_next(const uint16_t& starting_address, const Memory& memory) const -> DisassemblyInfo
+	{
 		auto regs = regs_;
 		auto memory2 = memory;
 		regs.write("PC", starting_address);
@@ -63,13 +63,12 @@ public:
 		return regs_;
 	}
 
-	[[nodiscard]] auto registers() const  -> const auto&
+	[[nodiscard]] auto registers() const -> const auto&
 	{
 		return regs_;
 	}
 
 private:
-
 	[[nodiscard]] auto find_by_opcode(const uint16_t opcode) const -> Instruction
 	{
 		const auto index = opcode <= 0xff ? opcode : (opcode & 0xff) + 0x100;
@@ -89,5 +88,4 @@ private:
 	// See https://meganesulli.com/generate-gb-opcodes/
 	std::vector<Instruction> instructions_ = get_all_instructions();
 	Registers regs_ = {};
-
 };

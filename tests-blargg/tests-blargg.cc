@@ -1,9 +1,9 @@
-#include <iostream>
-
 #include "emulator.h"
 
-int main(int argc, char *argv[]) {
+#include <iostream>
 
+int main(int argc, char *argv[])
+{
 	if (argc != 4) {
 		std::cout << "Usage " << argv[0] << " test_rom instructions_count expected_output\n";
 		return 1;
@@ -25,7 +25,8 @@ int main(int argc, char *argv[]) {
 	if (serial_link_output == expected_output) {
 		std::cout << "Passed\n";
 		return 0;
-	} else {
+	}
+	else {
 		std::cout << "Failed\n";
 		std::cout << "output:\n";
 		std::cout << serial_link_output;
@@ -33,5 +34,4 @@ int main(int argc, char *argv[]) {
 		std::cout << expected_output;
 		return 1;
 	}
-
 }

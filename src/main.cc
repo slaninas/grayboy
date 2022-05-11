@@ -1,12 +1,10 @@
+#include "display.h"
 #include "emulator.h"
 
 #include <array>
 #include <iostream>
-#include <vector>
 #include <thread>
-
-#include "display.h"
-
+#include <vector>
 
 auto main(int argc, const char** argv) -> int
 {

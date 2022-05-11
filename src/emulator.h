@@ -1,14 +1,15 @@
 #pragma once
 
-#include <chrono>
-
 #include "cartridge.h"
 #include "cpu.h"
-#include "timer.h"
 #include "display.h"
 #include "joypad.h"
+#include "timer.h"
 
-inline auto format(const int& value, const uint32_t& width) -> std::string {
+#include <chrono>
+
+inline auto format(const int& value, const uint32_t& width) -> std::string
+{
 	auto s = std::stringstream{};
 	s << std::setfill('0') << std::setw(width) << std::hex << value;
 	auto result = s.str();
@@ -19,27 +20,27 @@ inline auto format(const int& value, const uint32_t& width) -> std::string {
 template<bool headless>
 class Emulator {
 public:
-
 	const uint64_t CPU_FREQUENCY = 4'194'304 / 4;
 	const uint64_t CYCLES_PER_FRAME = CPU_FREQUENCY / 60;
 
-	Emulator(const std::string& cartridge_path) {
-
+	Emulator(const std::string& cartridge_path)
+	{
 		memory_ = Memory{Cartridge{cartridge_path}};
 
 		const auto regs =
-			RegistersChanger{.AF = 0x01b0, .BC=0x0013, .DE = 0x00d8, .HL = 0x014d, .PC = 0x0100, .SP = 0xfffe}.get(Registers{});
+		  RegistersChanger{.AF = 0x01b0, .BC = 0x0013, .DE = 0x00d8, .HL = 0x014d, .PC = 0x0100, .SP = 0xfffe}.get(
+		    Registers{});
 
 		cpu_ = Cpu{regs};
 	}
 
-	~Emulator() {
-		if constexpr (!headless) {
-			SDL_Quit();
-		}
+	~Emulator()
+	{
+		if constexpr (!headless) { SDL_Quit(); }
 	}
 
-	auto run() -> void {
+	auto run() -> void
+	{
 		auto frame_cycles = uint64_t{0};
 		auto frames = uint64_t{0};
 		auto frames10s = uint64_t{0};
@@ -58,9 +59,7 @@ public:
 				display.render();
 
 				const auto joypad_update = joypad_.update(memory_.read(0xff00));
-				if (joypad_update.quit) {
-					break;
-				}
+				if (joypad_update.quit) { break; }
 
 				if (joypad_update.request_interupt) {
 					memory_.direct_write(0xff0f, memory_.direct_read(0xff0f) | 0x16);
@@ -75,25 +74,25 @@ public:
 				const auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
 				if (diff >= 1000) {
-						  std::cout << "INFO: FPS: " << (frames / (1000.0 / diff)) << '\n';
-						  start = std::chrono::high_resolution_clock::now();
-						  frames = 0;
+					std::cout << "INFO: FPS: " << (frames / (1000.0 / diff)) << '\n';
+					start = std::chrono::high_resolution_clock::now();
+					frames = 0;
 				}
 
 				const auto end10s = std::chrono::high_resolution_clock::now();
 				const auto diff10s = std::chrono::duration_cast<std::chrono::milliseconds>(end10s - start10s).count();
 
 				if (diff10s >= 10'000) {
-						  std::cout << "INFO: 10s average FPS: " << (frames10s / (10'000.0 / diff10s)) / 10 << '\n';
-						  start10s = std::chrono::high_resolution_clock::now();
-						  frames10s = 0;
+					std::cout << "INFO: 10s average FPS: " << (frames10s / (10'000.0 / diff10s)) / 10 << '\n';
+					start10s = std::chrono::high_resolution_clock::now();
+					frames10s = 0;
 				}
 			}
-
 		}
 	}
 
-	auto execute_next() -> uint64_t {
+	auto execute_next() -> uint64_t
+	{
 		// save_debug();
 
 		auto cycles = 0;
@@ -103,20 +102,15 @@ public:
 			if (interupt > 0) {
 				cpu_.registers().set_halt(false);
 
-				if (cpu_.registers().read_IME()) {
-					cycles = handle_interupt(interupt);
-				}
-			} else {
+				if (cpu_.registers().read_IME()) { cycles = handle_interupt(interupt); }
+			}
+			else {
 				cycles = 1;
 			}
-
 		}
 		else {
-
 			// Interupts
-			if (cpu_.registers().read_IME()) {
-				check_handle_interupts();
-			}
+			if (cpu_.registers().read_IME()) { check_handle_interupts(); }
 
 			cycles = cpu_.execute_next(memory_);
 
@@ -128,7 +122,6 @@ public:
 				serial_link_ += c;
 				memory_.write(0xff02, 0x80);
 			}
-
 		}
 
 		timer_.update(memory_, cycles);
@@ -136,40 +129,37 @@ public:
 		return cycles;
 	}
 
-	auto execute_instructions(const uint64_t& count) {
-		for (auto i = static_cast<uint64_t>(0); i < count; ++i) {
-			execute_next();
-		}
+	auto execute_instructions(const uint64_t& count)
+	{
+		for (auto i = static_cast<uint64_t>(0); i < count; ++i) { execute_next(); }
 	}
 
-	auto get_serial_link() const -> const std::string& {
+	auto get_serial_link() const -> const std::string&
+	{
 		return serial_link_;
 	}
 
 	// auto dump_memory(const std::string& filename) -> void {
-		// raw_dump(memory_, filename);
+	// raw_dump(memory_, filename);
 	// }
 
 	// auto get_cpu() -> Cpu& {
-		// return cpu_;
+	// return cpu_;
 	// }
 
 	// auto get_cpu() const -> const Cpu& {
-		// return cpu_;
+	// return cpu_;
 	// }
 
-
 private:
-
-	auto check_handle_interupts() -> void {
+	auto check_handle_interupts() -> void
+	{
 		const auto interupt = check_interupts();
-		if (interupt > 0) {
-			handle_interupt(interupt);
-		}
-
+		if (interupt > 0) { handle_interupt(interupt); }
 	}
 
-	auto check_interupts() -> uint8_t {
+	auto check_interupts() -> uint8_t
+	{
 		// Interupt Enable and Interupt Requested
 		const auto IE = memory_.read(0xffff);
 		const auto IR = memory_.read(0xff0f);
@@ -177,27 +167,28 @@ private:
 		if (IE & 0x1 && IR & 0x1) {
 			// V-Blank
 			return 0x1;
-
-		} else if (IE & 0x2 && IR & 0x2) {
+		}
+		else if (IE & 0x2 && IR & 0x2) {
 			// LCD Stat
 			return 0x2;
-
-		} else if (IE & 0x4 && IR & 0x4) {
+		}
+		else if (IE & 0x4 && IR & 0x4) {
 			// Timer
 			return 0x4;
-
-		} else if (IE & 0x8 && IR & 0x8) {
+		}
+		else if (IE & 0x8 && IR & 0x8) {
 			// Serial
 			return 0x8;
-
-		} else if (IE & 0x16 && IR & 0x16) {
+		}
+		else if (IE & 0x16 && IR & 0x16) {
 			// Joypad
 			return 0x16;
 		}
 		return 0x00;
 	}
 
-	auto handle_interupt(const uint8_t& bit) -> uint64_t {
+	auto handle_interupt(const uint8_t& bit) -> uint64_t
+	{
 		memory_.write(0xff0f, memory_.read(0xff0f) ^ bit);
 
 		auto& regs = cpu_.registers();
@@ -210,31 +201,22 @@ private:
 
 		memory_.write(SP - 1, return_address_high);
 		memory_.write(SP - 2, return_address_low);
-		regs.write("SP", SP -2);
+		regs.write("SP", SP - 2);
 
 		switch (bit) {
-			case 0x1:
-				regs.write("PC", 0x40);
-				break;
-			case 0x2:
-				regs.write("PC", 0x48);
-				break;
-			case 0x4:
-				regs.write("PC", 0x50);
-				break;
-			case 0x8:
-				regs.write("PC", 0x58);
-				break;
-			case 0x16:
-				regs.write("PC", 0x60);
-				break;
+			case 0x1: regs.write("PC", 0x40); break;
+			case 0x2: regs.write("PC", 0x48); break;
+			case 0x4: regs.write("PC", 0x50); break;
+			case 0x8: regs.write("PC", 0x58); break;
+			case 0x16: regs.write("PC", 0x60); break;
 		}
 
 		return 5;
 	}
 
 	// binjbg format
-	auto save_debug() -> void {
+	auto save_debug() -> void
+	{
 		debug_log << std::hex;
 		const auto PC = cpu_.registers().read("PC");
 		debug_log << "A:" << format(cpu_.registers().read("A"), 2) << ' ';
@@ -260,7 +242,6 @@ private:
 		}
 
 		debug_log << "\t\t" << info.instruction.mnemonic << ' ';
-
 
 		// const auto mem = cpu_.get_memory();
 

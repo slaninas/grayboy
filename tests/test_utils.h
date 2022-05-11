@@ -1,12 +1,11 @@
 #pragma once
 
 #include "catch2/catch.hpp"
+#include "cpu.h"
+#include "memory.h"
 
 #include <iostream>
 #include <sstream>
-
-#include "cpu.h"
-#include "memory.h"
 
 template<typename T>
 void p(const T& cont, const size_t num_elements)

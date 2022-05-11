@@ -1,6 +1,7 @@
 #pragma once
-#include <SDL2/SDL.h>
 #include "memory.h"
+
+#include <SDL2/SDL.h>
 
 struct SpritePixel {
 	uint8_t render_color = {};
@@ -44,7 +45,10 @@ public:
 	Display() = default;
 
 	auto update([[maybe_unused]] Memory& mem, [[maybe_unused]] const uint16_t& cycles) -> void {}
-	auto render([[maybe_unused]] Memory& mem) -> bool { return true; }
+	auto render([[maybe_unused]] Memory& mem) -> bool
+	{
+		return true;
+	}
 };
 
 // Useful sources:
@@ -54,7 +58,6 @@ public:
 template<>
 class Display<false> {
 public:
-
 	const int32_t WIDTH = 160;
 	const int32_t HEIGHT = 144;
 	const int32_t PIXEL_SCALE = 4;
@@ -62,13 +65,12 @@ public:
 	const uint64_t CYCLES_PER_FRAME = 70'224;
 	const uint64_t CYCLES_PER_SCANLINE = 456 / 4;
 
-	Display() {
-		if (!SDL_WasInit(SDL_INIT_VIDEO)) {
-			SDL_InitSubSystem(SDL_INIT_VIDEO);
-		}
+	Display()
+	{
+		if (!SDL_WasInit(SDL_INIT_VIDEO)) { SDL_InitSubSystem(SDL_INIT_VIDEO); }
 
-		SDL_Renderer * renderer;
-		SDL_Window * window;
+		SDL_Renderer* renderer;
+		SDL_Window* window;
 		SDL_CreateWindowAndRenderer(WIDTH * PIXEL_SCALE, HEIGHT * PIXEL_SCALE, 0, &window, &renderer);
 
 		renderer_.reset(renderer);
@@ -79,15 +81,13 @@ public:
 		frame_start_ = SDL_GetTicks();
 	}
 
-	auto update(Memory& mem, const uint16_t& cycles) -> void {
-
-		lcd_enabled_ = static_cast<bool>(mem.direct_read(0xff40) &( 1 << 7));
+	auto update(Memory& mem, const uint16_t& cycles) -> void
+	{
+		lcd_enabled_ = static_cast<bool>(mem.direct_read(0xff40) & (1 << 7));
 
 		frame_cycles_ += cycles;
 		if (lcd_enabled_) {
-			if (frame_cycles_ >= CYCLES_PER_FRAME) {
-				frame_cycles_ -= CYCLES_PER_FRAME;
-			}
+			if (frame_cycles_ >= CYCLES_PER_FRAME) { frame_cycles_ -= CYCLES_PER_FRAME; }
 		}
 
 		else {
@@ -123,7 +123,6 @@ public:
 				update_window(mem);
 				scanline_info_.tiles_updated = true;
 			}
-
 		}
 
 		else {
@@ -135,41 +134,35 @@ public:
 		}
 
 		if (new_status != orig_status && request_interupt) {
-				// Request interupt
-				mem.direct_write(0xff0f, mem.direct_read(0xff0f) | 0x2);
+			// Request interupt
+			mem.direct_write(0xff0f, mem.direct_read(0xff0f) | 0x2);
 		}
 
 		mem.direct_write(0xff41, (stat & ~0x3) | new_status);
 
 		if (scanline_info_.cycles >= CYCLES_PER_SCANLINE) {
 			scanline_info_.cycles -= CYCLES_PER_SCANLINE;
-			scanline_info_.tiles_updated = scanline_info_.sprites_updated = scanline_info_.hblank_issued = vblank_issued_ = false;
+			scanline_info_.tiles_updated = scanline_info_.sprites_updated = scanline_info_.hblank_issued =
+			  vblank_issued_ = false;
 
-			if (scanline < 0x90) {
-				mix_buffers(scanline);
-			}
+			if (scanline < 0x90) { mix_buffers(scanline); }
 
 			if (scanline == 0x90 && !vblank_issued_) {
 				mem.direct_write(0xff0f, mem.direct_read(0xff0f) | 0x1);
 				vblank_issued_ = true;
 			}
 
-
-			if (scanline + 1 >= 0x9a) {
-				mem.direct_write(0xff44, 0);
-			}
+			if (scanline + 1 >= 0x9a) { mem.direct_write(0xff44, 0); }
 			else {
 				mem.direct_write(0xff44, scanline + 1);
 			}
 			check_lyc(mem);
-
 		}
 	}
 
-	auto mix_buffers(const uint8_t& scanline) -> void  {
-		for (auto x = 0; x < 160; ++x) {
-			display_[x][scanline] = 0;
-		}
+	auto mix_buffers(const uint8_t& scanline) -> void
+	{
+		for (auto x = 0; x < 160; ++x) { display_[x][scanline] = 0; }
 
 		for (auto x = 0; x < 160; ++x) {
 			const auto background_pixel = bg_buffer_[x][scanline];
@@ -179,9 +172,8 @@ public:
 
 			if (sprite_pixel.raw_color != 0) {
 				// Sprite is under background
-				if (sprite_pixel.render_over_bg) {
-					display_[x][scanline] = sprite_pixel.render_color;
-				} else if (background_pixel.raw_color == 0) {
+				if (sprite_pixel.render_over_bg) { display_[x][scanline] = sprite_pixel.render_color; }
+				else if (background_pixel.raw_color == 0) {
 					display_[x][scanline] = sprite_pixel.render_color;
 				}
 			}
@@ -189,11 +181,10 @@ public:
 				display_[x][scanline] = window_buffer_[x][scanline].render_color;
 			}
 		}
-
 	}
 
-
-	auto check_lyc(Memory& mem) -> void {
+	auto check_lyc(Memory& mem) -> void
+	{
 		const auto stat = mem.direct_read(0xff41);
 		auto new_status = stat & 0x3;
 
@@ -201,26 +192,22 @@ public:
 		if (mem.direct_read(0xff44) == mem.direct_read(0xff45)) {
 			new_status |= 1 << 2;
 			if (stat & (1 << 6)) {
-			// Request interupt
+				// Request interupt
 				mem.direct_write(0xff0f, mem.direct_read(0xff0f) | 0x2);
 			}
-		} else {
+		}
+		else {
 			new_status &= ~(1 << 2);
 		}
 
 		mem.direct_write(0xff41, (stat & ~0x3) | new_status);
 	}
 
-	auto render() -> void {
-
+	auto render() -> void
+	{
 		// https://www.deviantart.com/thewolfbunny/art/Game-Boy-Palette-Grand-Ivory-881455013
-		const auto colors = std::array<std::array<uint8_t, 4>, 4>
-			{
-				{{0xd9, 0xd6, 0xbe, 0xff},
-				{0xa5, 0xa3, 0x91, 0xff},
-				{0x66, 0x64, 0x59, 0xff},
-				{0x26, 0x25, 0x21, 0xff}}
-			};
+		const auto colors = std::array<std::array<uint8_t, 4>, 4>{
+		  {{0xd9, 0xd6, 0xbe, 0xff}, {0xa5, 0xa3, 0x91, 0xff}, {0x66, 0x64, 0x59, 0xff}, {0x26, 0x25, 0x21, 0xff}}};
 
 		SDL_SetRenderDrawColor(renderer_.get(), 255, 255, 255, 255);
 		SDL_RenderClear(renderer_.get());
@@ -229,7 +216,8 @@ public:
 		for (auto y = 0; y < 144; ++y) {
 			for (auto x = 0; x < 160; ++x) {
 				const auto pixel = display_[x][y];
-				SDL_SetRenderDrawColor(renderer_.get(), colors[pixel][0], colors[pixel][1], colors[pixel][2], colors[pixel][3]);
+				SDL_SetRenderDrawColor(
+				  renderer_.get(), colors[pixel][0], colors[pixel][1], colors[pixel][2], colors[pixel][3]);
 				SDL_RenderDrawPoint(renderer_.get(), x, y);
 			}
 		}
@@ -239,29 +227,25 @@ public:
 		const auto frame_should_take = 1000 / 60;
 		const auto frame_time = SDL_GetTicks() - frame_start_;
 
-		if (frame_time < frame_should_take) {
-			SDL_Delay(frame_should_take - frame_time);
-		}
+		if (frame_time < frame_should_take) { SDL_Delay(frame_should_take - frame_time); }
 
 		frame_start_ = SDL_GetTicks();
 	}
 
 private:
-	auto update_tiles_scanline(const Memory& mem) -> void {
+	auto update_tiles_scanline(const Memory& mem) -> void
+	{
 		const auto scanline = mem.direct_read(0xff44);
-		if (scanline >= 0x90) {
-			return;
-		}
+		if (scanline >= 0x90) { return; }
 
 		if (!(mem.direct_read(0xff40) & 0x1)) {
-			for (auto x = size_t{0}; x < size_t{160}; ++x) {
-				bg_buffer_[x][scanline] = {uint8_t{0}, uint8_t{0}};
-			}
+			for (auto x = size_t{0}; x < size_t{160}; ++x) { bg_buffer_[x][scanline] = {uint8_t{0}, uint8_t{0}}; }
 			return;
 		}
 
 		const auto palette = mem.direct_read(0xff47);
-		const auto colors = std::array{palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6};
+		const auto colors =
+		  std::array{palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6};
 
 		const auto SCY = mem.direct_read(0xff42);
 		const auto SCX = mem.direct_read(0xff43);
@@ -272,11 +256,12 @@ private:
 		const auto pos_y = (scanline + SCY) % 256;
 
 		for (auto x = 0; x < 160; ++x) {
-
 			const auto pos_x = (x + SCX) % 256;
 			const auto tile_index = tile_map + pos_y / 8 * 32 + pos_x / 8;
 			const auto tile_id = mem.direct_read(tile_index);
-			const auto tile_address = tile_data == 0x8000 ? (0x8000 + tile_id * 0x10) : ((tile_id < 128 ? 0x9000 + tile_id * 0x10 : 0x8800 + (tile_id - 128) * 0x10));
+			const auto tile_address = tile_data == 0x8000
+			  ? (0x8000 + tile_id * 0x10)
+			  : ((tile_id < 128 ? 0x9000 + tile_id * 0x10 : 0x8800 + (tile_id - 128) * 0x10));
 
 			const auto first_byte = mem.direct_read(tile_address + (pos_y % 8) * 2 + 1);
 			const auto second_byte = mem.direct_read(tile_address + (pos_y % 8) * 2 + 0);
@@ -286,27 +271,24 @@ private:
 
 			const auto pixel = (static_cast<uint8_t>(first_bit) << 1) + second_bit;
 			bg_buffer_[x][scanline] = {static_cast<uint8_t>(colors[pixel]), static_cast<uint8_t>(pixel)};
-
 		}
 	}
 
-	auto update_window(const Memory& mem) -> void {
+	auto update_window(const Memory& mem) -> void
+	{
 		const auto scanline = mem.direct_read(0xff44);
-		if (scanline >= 0x90) {
-			return;
-		}
+		if (scanline >= 0x90) { return; }
 
 		const auto palette = mem.direct_read(0xff47);
-		const auto colors = std::array{palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6};
+		const auto colors =
+		  std::array{palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6};
 
 		const auto window_y = mem.direct_read(0xff4A);
 		const auto window_x = mem.direct_read(0xff4B) - 0x7;
 
 		const auto using_window = (mem.direct_read(0xff40) & (1 << 5)) && window_y <= scanline;
 		if (!using_window) {
-			for (auto x = size_t{0}; x < 160; ++x) {
-				window_buffer_[x][scanline] = {};
-			}
+			for (auto x = size_t{0}; x < 160; ++x) { window_buffer_[x][scanline] = {}; }
 			return;
 		}
 
@@ -316,11 +298,12 @@ private:
 		const auto pos_y = scanline - window_y;
 
 		for (auto x = std::max(0, window_x); x < 160; ++x) {
-
 			const auto pos_x = x - window_x;
 			const auto tile_index = tile_map + pos_y / 8 * 32 + pos_x / 8;
 			const auto tile_id = mem.direct_read(tile_index);
-			const auto tile_address = tile_data == 0x8000 ? (0x8000 + tile_id * 0x10) : ((tile_id < 128 ? 0x9000 + tile_id * 0x10 : 0x8800 + (tile_id - 128) * 0x10));
+			const auto tile_address = tile_data == 0x8000
+			  ? (0x8000 + tile_id * 0x10)
+			  : ((tile_id < 128 ? 0x9000 + tile_id * 0x10 : 0x8800 + (tile_id - 128) * 0x10));
 
 			const auto first_byte = mem.direct_read(tile_address + (pos_y % 8) * 2 + 1);
 			const auto second_byte = mem.direct_read(tile_address + (pos_y % 8) * 2 + 0);
@@ -330,26 +313,18 @@ private:
 
 			const auto pixel = (static_cast<uint8_t>(first_bit) << 1) + second_bit;
 			window_buffer_[x][scanline] = {true, static_cast<uint8_t>(colors[pixel]), static_cast<uint8_t>(pixel)};
-
 		}
-
-
 	}
 
-	auto update_sprites(const Memory& mem) -> void {
+	auto update_sprites(const Memory& mem) -> void
+	{
 		const auto scanline = mem.direct_read(0xff44);
-		if (scanline >= 0x90) {
-			return;
-		}
+		if (scanline >= 0x90) { return; }
 
-		for (auto x = size_t{0}; x < 160; ++x) {
-				sprites_buffer_[x][scanline] = {};
-		}
+		for (auto x = size_t{0}; x < 160; ++x) { sprites_buffer_[x][scanline] = {}; }
 
 		// Objects disabled
-		if (!(mem.direct_read(0xff40) & (1 << 1))) {
-			return;
-		}
+		if (!(mem.direct_read(0xff40) & (1 << 1))) { return; }
 
 		const auto large_sprites = mem.direct_read(0xff40) & (1 << 2);
 
@@ -365,18 +340,20 @@ private:
 			const auto palette_address = (attrs_raw & (1 << 4)) ? 0xff49 : 0xff48;
 			const auto palette = mem.direct_read(palette_address);
 
-			const auto s = Sprite {
-				.tile_number = tile_number,
-				.render_priority = static_cast<bool>(attrs_raw & (1 << 7)),
-				.y_flip = static_cast<bool>(attrs_raw & (1 << 6)),
-				.x_flip = static_cast<bool>(attrs_raw & (1 << 5)),
-				.colors = {
-					static_cast<uint8_t>(palette & 0x3),
-					static_cast<uint8_t>((palette & 0xc) >> 2),
-					static_cast<uint8_t>((palette & 0x30) >> 4),
-					static_cast<uint8_t>((palette & 0xc0) >> 6),},
-				.pos_x = x_pos,
-				.pos_y = y_pos,
+			const auto s = Sprite{
+			  .tile_number = tile_number,
+			  .render_priority = static_cast<bool>(attrs_raw & (1 << 7)),
+			  .y_flip = static_cast<bool>(attrs_raw & (1 << 6)),
+			  .x_flip = static_cast<bool>(attrs_raw & (1 << 5)),
+			  .colors =
+			    {
+			      static_cast<uint8_t>(palette & 0x3),
+			      static_cast<uint8_t>((palette & 0xc) >> 2),
+			      static_cast<uint8_t>((palette & 0x30) >> 4),
+			      static_cast<uint8_t>((palette & 0xc0) >> 6),
+			    },
+			  .pos_x = x_pos,
+			  .pos_y = y_pos,
 
 			};
 			all_sprites.push_back(s);
@@ -386,7 +363,6 @@ private:
 				sprite2.pos_y += 8;
 				all_sprites.push_back(sprite2);
 			}
-
 		}
 
 		auto sprites = std::vector<Sprite>{};
@@ -402,38 +378,33 @@ private:
 		std::stable_sort(begin(sprites), end(sprites), [](const auto& a, const auto& b) { return a.pos_x >= b.pos_x; });
 
 		std::for_each(cbegin(sprites), cend(sprites), [&mem, this, scanline](const auto& s) {
-				auto tile = load_tile(mem, 0x8000 + s.tile_number * 0x10);
+			auto tile = load_tile(mem, 0x8000 + s.tile_number * 0x10);
 
-				if (s.x_flip) {
-					for (auto y = size_t{0}; y < 8; ++y) {
-						for (auto x = size_t{0}; x < 4; ++x) {
-							std::swap(tile[x + 8 * y], tile[7 - x + 8 * y]);
-						}
-					}
+			if (s.x_flip) {
+				for (auto y = size_t{0}; y < 8; ++y) {
+					for (auto x = size_t{0}; x < 4; ++x) { std::swap(tile[x + 8 * y], tile[7 - x + 8 * y]); }
 				}
+			}
 
-				if (s.y_flip) {
-					for (auto y = size_t{0}; y < 4; ++y) {
-						for (auto x = size_t{0}; x < 8; ++x) {
-							std::swap(tile[x + 8 * y], tile[x + 8 * (7 - y)]);
-						}
-					}
+			if (s.y_flip) {
+				for (auto y = size_t{0}; y < 4; ++y) {
+					for (auto x = size_t{0}; x < 8; ++x) { std::swap(tile[x + 8 * y], tile[x + 8 * (7 - y)]); }
 				}
+			}
 
-				const auto pixel_y = scanline - s.pos_y;
-				for (auto x = std::max(int16_t{0}, s.pos_x); x < std::min(s.pos_x + 8, 160); ++x) {
-					const auto pixel_x = x - s.pos_x;
-					const auto pixel_val = tile[pixel_x + 8 * pixel_y];
-					if (pixel_val != 0) {
-						sprites_buffer_[x][scanline] = {s.colors[pixel_val], pixel_val, !s.render_priority};
-					}
+			const auto pixel_y = scanline - s.pos_y;
+			for (auto x = std::max(int16_t{0}, s.pos_x); x < std::min(s.pos_x + 8, 160); ++x) {
+				const auto pixel_x = x - s.pos_x;
+				const auto pixel_val = tile[pixel_x + 8 * pixel_y];
+				if (pixel_val != 0) {
+					sprites_buffer_[x][scanline] = {s.colors[pixel_val], pixel_val, !s.render_priority};
 				}
+			}
 		});
-
-
 	}
 
-	auto load_tile(const Memory& mem, const uint16_t& addr) -> std::array<uint8_t, 64> {
+	auto load_tile(const Memory& mem, const uint16_t& addr) -> std::array<uint8_t, 64>
+	{
 		auto result = std::array<uint8_t, 64>{};
 
 		for (auto row = 0; row < 8; ++row) {
@@ -452,7 +423,6 @@ private:
 		return result;
 	}
 
-
 	std::unique_ptr<SDL_Renderer, decltype(&SDL_DestroyRenderer)> renderer_ = {nullptr, SDL_DestroyRenderer};
 	std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> window_ = {nullptr, SDL_DestroyWindow};
 
@@ -468,7 +438,6 @@ private:
 
 	ScanlineInfo scanline_info_ = {};
 };
-
 
 /*
 uint8_t palettes[][4][4] = {

@@ -54,7 +54,8 @@ public:
 			if (std::string(reg_name) == std::string("AF")) {
 				// Only 4 highest bits of F can be written to
 				*reinterpret_cast<uint16_t*>(register_array_.data() + reg_index) = (value & 0xfff0) + (read("F") & 0xf);
-			} else {
+			}
+			else {
 				*reinterpret_cast<uint16_t*>(register_array_.data() + reg_index) = value;
 			}
 		}
@@ -162,11 +163,13 @@ public:
 		return ime_flag_;
 	}
 
-	auto set_halt(const bool& value) {
+	auto set_halt(const bool& value)
+	{
 		halt_ = value;
 	}
 
-	[[nodiscard]] auto read_halt() const {
+	[[nodiscard]] auto read_halt() const
+	{
 		return halt_;
 	}
 

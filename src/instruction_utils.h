@@ -110,7 +110,7 @@ void instruction_add(
 	regs.write(dest_name, dest_new);
 	regs.set_flag("N", false);
 
-	if constexpr (real_size == 1 ) {
+	if constexpr (real_size == 1) {
 		regs.set_flag("Z", dest_new == 0);
 		regs.set_flag("H", half_carry_add_8bit(dest_old, second_reg));
 		regs.set_flag("C", carry_add_8bit(dest_old, second_reg));
@@ -489,7 +489,8 @@ inline void instruction_set_bit(const char (&reg_name)[2], const uint8_t positio
 	regs.write(reg_name, new_value);
 }
 
-inline auto instruction_set_bit_hl(Memory& memory, const Registers& regs, const uint8_t& bit) -> uint64_t {
+inline auto instruction_set_bit_hl(Memory& memory, const Registers& regs, const uint8_t& bit) -> uint64_t
+{
 	const auto HL = regs.read("HL");
 	const auto old_value = memory.read(HL);
 
@@ -511,7 +512,8 @@ inline void instruction_reset_bit(const char (&reg_name)[2], const uint8_t posit
 	regs.write(reg_name, new_value);
 }
 
-inline void instruction_call(Registers& regs, Memory& memory) {
+inline void instruction_call(Registers& regs, Memory& memory)
+{
 	const auto PC = regs.read("PC");
 	const auto SP = regs.read("SP");
 

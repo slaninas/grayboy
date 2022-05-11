@@ -102,11 +102,11 @@ public:
 	}
 
 private:
-	auto get_direction_keys() const -> uint8_t
+	[[nodiscard]] auto get_direction_keys() const -> uint8_t
 	{
 		return ~(joypad_state_ & 0x0f);
 	}
-	auto get_button_keys() const -> uint8_t
+	[[nodiscard]] auto get_button_keys() const -> uint8_t
 	{
 		return ~((joypad_state_ >> 4) & 0x0f);
 	}

@@ -21,7 +21,7 @@ public:
 		}
 
 		auto request_interupt = false;
-		const auto keys_state = SDL_GetKeyboardState(nullptr);
+		const auto * const keys_state = SDL_GetKeyboardState(nullptr);
 
 		if (keys_state[SDL_SCANCODE_RIGHT]) { request_interupt |= pressed_key(joyp, 0); }
 		else {
@@ -72,10 +72,10 @@ private:
 	{
 		auto was_unsed = false;
 
-		if ((joypad_state_ & (1 << key)) == false) { was_unsed = true; }
+		if (!(joypad_state_ & (1 << key))) { was_unsed = true; }
 
 		joypad_state_ = (joypad_state_ | (1 << key));
-		const auto action_button_pressed = key > 3 ? true : false;
+		const auto action_button_pressed = key > 3;
 
 		auto request_interupt = false;
 

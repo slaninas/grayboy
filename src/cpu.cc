@@ -2,8 +2,9 @@
 
 #include <stdexcept>
 
-[[nodiscard]] auto Cpu::execute_opcode(const uint16_t& opcode, const uint16_t& PC, Registers& regs, Memory& memory)
-  const -> uint8_t
+// NOLINTBEGIN(readability-function-cognitive-complexity, readability-function-size)
+[[nodiscard]] auto
+Cpu::execute_opcode(const uint16_t& opcode, const uint16_t& PC, Registers& regs, Memory& memory) -> uint8_t
 {
 	switch (opcode) {
 		case 0x00: {
@@ -804,7 +805,7 @@
 
 			regs.write("A", A_new);
 			regs.set_flag("Z", A_new == 0);
-			regs.set_flag("H", 0);
+			regs.set_flag("H", false);
 			regs.set_flag("C", C_new);
 
 			return 1;
@@ -2894,3 +2895,4 @@
 	throw std::runtime_error{"Opcode " + std::to_string(opcode) + "(dec) is not valid."};
 	return 0;
 }
+// NOLINTEND(readability-function-cognitive-complexity, readability-function-size)

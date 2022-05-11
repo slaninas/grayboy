@@ -69,7 +69,7 @@ public:
 			if (memory_banking_type_ == MemoryBanking::NO_BANKING) { return; }
 
 			if (memory_banking_type_ == MemoryBanking::MBC2) {
-				if ((address & (1 << 4)) >> 4 == 1) return;
+				if (((address & (1 << 4)) >> 4) == 1) { return; }
 			}
 
 			if ((val & 0xf) == 0xA) { ram_banking_enabled_ = true; }
@@ -121,7 +121,7 @@ public:
 		}
 	}
 
-	auto read(const uint16_t& address) const -> uint8_t
+	[[nodiscard]] auto read(const uint16_t& address) const -> uint8_t
 	{
 		if (address <= 0x3fff) { return buffer_[address]; }
 		else if (address <= 0x7fff) {

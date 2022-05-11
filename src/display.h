@@ -183,7 +183,7 @@ public:
 		}
 	}
 
-	auto check_lyc(Memory& mem) -> void
+	static auto check_lyc(Memory& mem) -> void
 	{
 		const auto stat = mem.direct_read(0xff41);
 		auto new_status = stat & 0x3;
@@ -403,7 +403,7 @@ private:
 		});
 	}
 
-	auto load_tile(const Memory& mem, const uint16_t& addr) -> std::array<uint8_t, 64>
+	static auto load_tile(const Memory& mem, const uint16_t& addr) -> std::array<uint8_t, 64>
 	{
 		auto result = std::array<uint8_t, 64>{};
 

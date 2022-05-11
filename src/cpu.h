@@ -36,7 +36,7 @@ public:
 		return cycles;
 	}
 
-	[[nodiscard]] auto execute_opcode(const uint16_t& opcode, const uint16_t& PC, Registers& regs, Memory& memory) const
+	[[nodiscard]] static auto execute_opcode(const uint16_t& opcode, const uint16_t& PC, Registers& regs, Memory& memory)
 	  -> uint8_t;
 
 	[[nodiscard]] auto disassemble_next(const uint16_t& starting_address, const Memory& memory) const -> DisassemblyInfo
@@ -75,7 +75,7 @@ private:
 		return instructions_[index];
 	}
 
-	[[nodiscard]] auto get_opcode(const uint16_t& starting_address, const Memory& memory) const -> uint16_t
+	[[nodiscard]] static auto get_opcode(const uint16_t& starting_address, const Memory& memory) -> uint16_t
 	{
 		const auto first_byte = static_cast<uint16_t>(memory.read(starting_address));
 		if (first_byte == 0xcb) {

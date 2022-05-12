@@ -47,13 +47,13 @@ public:
 
 		while (true) {
 			const auto cycles = execute_next();
-			display.update(memory_, cycles);
+			display_.update(memory_, cycles);
 
 			frame_cycles += cycles;
 
 			if (frame_cycles >= CYCLES_PER_FRAME) {
 				frame_cycles -= CYCLES_PER_FRAME;
-				display.render();
+				display_.render();
 
 				const auto joypad_update = joypad_.update(memory_.read(0xff00));
 				if (joypad_update.quit) {
@@ -249,7 +249,7 @@ private:
 	Cpu cpu_ = {};
 	Memory memory_ = {};
 	Joypad joypad_ = {};
-	Display<headless> display = {};
+	Display<headless> display_ = {};
 	std::string serial_link_ = {};
 	Timer timer_ = {};
 

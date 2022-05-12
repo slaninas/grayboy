@@ -332,6 +332,7 @@ struct MakeRegisters {
 		return registers;
 	}
 
+	// NOLINTBEGIN(readability-convert-member-functions-to-static)
 	void check_consistency() const
 	{
 		assert(
@@ -343,6 +344,7 @@ struct MakeRegisters {
 		assert(
 		  !(HL.has_value() && (H.has_value() || L.has_value())) && "You can't set HL and H (or L) at the same time");
 	}
+	// NOLINTEND(readability-convert-member-functions-to-static)
 };
 
 struct RegistersChanger {
@@ -385,6 +387,7 @@ struct RegistersChanger {
 		return changed_regs;
 	}
 
+	// NOLINTBEGIN(readability-convert-member-functions-to-static)
 	void check_consistency() const
 	{
 		assert(
@@ -396,6 +399,7 @@ struct RegistersChanger {
 		assert(
 		  !(HL.has_value() && (H.has_value() || L.has_value())) && "You can't change HL and H (or L) at the same time");
 	}
+	// NOLINTEND(readability-convert-member-functions-to-static)
 };
 
 struct MakeFlags {

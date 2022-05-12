@@ -188,11 +188,21 @@ private:
 		regs.write("SP", SP - 2);
 
 		switch (bit) {
-			case 0x1: regs.write("PC", 0x40); break;
-			case 0x2: regs.write("PC", 0x48); break;
-			case 0x4: regs.write("PC", 0x50); break;
-			case 0x8: regs.write("PC", 0x58); break;
-			case 0x16: regs.write("PC", 0x60); break;
+			case 0x1:
+				regs.write("PC", 0x40);
+				break;
+			case 0x2:
+				regs.write("PC", 0x48);
+				break;
+			case 0x4:
+				regs.write("PC", 0x50);
+				break;
+			case 0x8:
+				regs.write("PC", 0x58);
+				break;
+			case 0x16:
+				regs.write("PC", 0x60);
+				break;
 		}
 
 		return 5;

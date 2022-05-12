@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-int main(int argc, char *argv[])
+auto main(int argc, char *argv[]) -> int
 {
 	if (argc != 4) {
 		std::cout << "Usage " << argv[0] << " test_rom instructions_count expected_output\n";
@@ -11,9 +11,9 @@ int main(int argc, char *argv[])
 
 	const auto test_rom = std::string(argv[1]);
 	const auto instructions_count = static_cast<uint64_t>(std::stoi(argv[2]));
-	const auto expected_output = argv[3];
+	const auto * const expected_output = argv[3];
 
-	const auto test_name = test_rom.substr(test_rom.rfind("/") + 1);
+	const auto test_name = test_rom.substr(test_rom.rfind('/') + 1);
 
 	std::cout << "xTest " << test_name << ' ';
 	std::cout << std::setw(30) << std::setfill('.') << " ";

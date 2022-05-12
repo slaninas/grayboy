@@ -39,24 +39,20 @@ public:
 		switch (mbc) {
 			case 0:
 				memory_banking_type_ = MemoryBanking::NO_BANKING;
-				std::cout << "INFO: MemoryBanking::NO_BANKING;\n";
 				break;
 			case 1:
 			case 2:
 			case 3:
 				memory_banking_type_ = MemoryBanking::MBC1;
-				std::cout << "INFO: MemoryBanking::MBC1;\n";
 				break;
 			case 5:
 			case 6:
 				memory_banking_type_ = MemoryBanking::MBC2;
-				std::cout << "INFO: MemoryBanking::MBC2;\n";
 				throw std::exception{};
 				break;
 		}
 
 		total_ram_banks_ = read(0x147);
-		std::cout << "INFO: total_ram_banks_ " << (int)total_ram_banks_ << '\n';
 		ram_banks_.resize(total_ram_banks_);
 
 		for (auto& ram_bank : ram_banks_) { std::fill(begin(ram_bank), end(ram_bank), 0x00); }

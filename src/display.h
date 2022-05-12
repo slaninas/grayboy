@@ -232,7 +232,8 @@ public:
 
 		SDL_RenderPresent(renderer_.get());
 
-		const auto frame_should_take = 1000 / 60;
+		// Use 17 ms per frame, this is close to the actuall hardware
+		const auto frame_should_take = 17;
 		const auto frame_time = SDL_GetTicks() - frame_start_;
 
 		if (frame_time < frame_should_take) {

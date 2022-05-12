@@ -62,6 +62,7 @@ public:
 
 	// Banking: http://www.codeslinger.co.uk/pages/projects/gameboy/banking.html
 	//          https://gbdev.io/pandocs/MBC1.html
+	// NOLINTBEGIN(readability-function-cognitive-complexity)
 	auto write(const uint16_t& address, const uint8_t& val) -> void
 	{
 		// Enable ram banking
@@ -120,6 +121,7 @@ public:
 			if (ram_banking_enabled_) { ram_banks_[current_ram_bank_][address - 0xa000] = val; }
 		}
 	}
+	// NOLINTEND(readability-function-cognitive-complexity)
 
 	[[nodiscard]] auto read(const uint16_t& address) const -> uint8_t
 	{

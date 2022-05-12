@@ -45,7 +45,7 @@ public:
 	Display() = default;
 
 	auto update([[maybe_unused]] Memory& mem, [[maybe_unused]] const uint16_t& cycles) -> void {}
-	auto render([[maybe_unused]] Memory& mem) -> bool
+	auto render() -> bool
 	{
 		return true;
 	}

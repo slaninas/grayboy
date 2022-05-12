@@ -5,8 +5,8 @@
 #include "display.h"
 #include "joypad.h"
 #include "timer.h"
+#include "fps.h"
 
-#include <chrono>
 
 inline auto format(const int& value, const uint32_t& width) -> std::string
 {
@@ -54,6 +54,7 @@ public:
 			if (frame_cycles >= CYCLES_PER_FRAME) {
 				frame_cycles -= CYCLES_PER_FRAME;
 				display_.render();
+				fps_.next_frame();
 
 				const auto joypad_update = joypad_.update(memory_.read(0xff00));
 				if (joypad_update.quit) {
@@ -252,6 +253,7 @@ private:
 	Display<headless> display_ = {};
 	std::string serial_link_ = {};
 	Timer timer_ = {};
+	Fps fps_ = {};
 
 	uint64_t total_cycles_ = {};
 	std::ofstream debug_log = std::ofstream("debug_log");

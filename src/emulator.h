@@ -44,11 +44,6 @@ public:
 	auto run() -> void
 	{
 		auto frame_cycles = uint64_t{0};
-		auto frames = uint64_t{0};
-		auto frames10s = uint64_t{0};
-
-		auto start = std::chrono::high_resolution_clock::now();
-		auto start10s = std::chrono::high_resolution_clock::now();
 
 		while (true) {
 			const auto cycles = execute_next();
@@ -70,27 +65,6 @@ public:
 				}
 
 				memory_.update_joypad(joypad_update.state);
-
-				++frames;
-				++frames10s;
-
-				const auto end = std::chrono::high_resolution_clock::now();
-				const auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-
-				if (diff >= 1000) {
-					std::cout << "INFO: FPS: " << (frames / (1000.0 / diff)) << '\n';
-					start = std::chrono::high_resolution_clock::now();
-					frames = 0;
-				}
-
-				const auto end10s = std::chrono::high_resolution_clock::now();
-				const auto diff10s = std::chrono::duration_cast<std::chrono::milliseconds>(end10s - start10s).count();
-
-				if (diff10s >= 10'000) {
-					std::cout << "INFO: 10s average FPS: " << (frames10s / (10'000.0 / diff10s)) / 10 << '\n';
-					start10s = std::chrono::high_resolution_clock::now();
-					frames10s = 0;
-				}
 			}
 		}
 	}

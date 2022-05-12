@@ -409,9 +409,14 @@ private:
 	[[nodiscard]] static auto get_filtered_sprites(std::vector<Sprite> sprites, const uint8_t& scanline)
 	  -> std::vector<Sprite>
 	{
-		sprites.erase(std::remove_if(begin(sprites), end(sprites), [scanline](const auto& s) {
-			return !(s.pos_x + 7 >= 0 && s.pos_x < 160 && s.pos_y + 7 >= scanline && s.pos_y <= scanline);
-		}));
+		sprites.erase(
+		  std::remove_if(
+		    begin(sprites),
+		    end(sprites),
+		    [scanline](const auto& s) {
+			    return !(s.pos_x + 7 >= 0 && s.pos_x < 160 && s.pos_y + 7 >= scanline && s.pos_y <= scanline);
+		    }),
+		  end(sprites));
 
 		// Get first 10 based on lowest x, then sort them in reverse
 		std::stable_sort(begin(sprites), end(sprites), [](const auto& a, const auto& b) { return a.pos_x < b.pos_x; });

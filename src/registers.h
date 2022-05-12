@@ -46,9 +46,7 @@ public:
 
 		// 8bit registers
 		if constexpr (reg_name_size == 1) {
-			assert(
-			  ((value & static_cast<uint16_t>(0xff00)) == 0) &&
-			  "Writing 16bit value into 8bit register is not allowed.");
+			assert(((value & static_cast<uint16_t>(0xff00)) == 0) && "Writing 16bit value into 8bit register is not allowed.");
 			register_array_[reg_index] = value;
 		}
 		// Combined 16bit registers
@@ -155,8 +153,7 @@ public:
 		result << "PC: " << std::setw(4) << std::setfill('0') << static_cast<int>(read("PC")) << '\n';
 
 		result << std::string(15, '-') << '\n';
-		result << "Z=" << read_flag("Z") << " N=" << read_flag("N") << " H=" << read_flag("H")
-		       << " C=" << read_flag("C") << '\n';
+		result << "Z=" << read_flag("Z") << " N=" << read_flag("N") << " H=" << read_flag("H") << " C=" << read_flag("C") << '\n';
 
 		os << result.str();
 	}
@@ -381,14 +378,10 @@ struct MakeRegisters {
 	// NOLINTBEGIN(readability-convert-member-functions-to-static)
 	void check_consistency() const
 	{
-		assert(
-		  !(AF.has_value() && (A.has_value() || F.has_value())) && "You can't set AF and A (or F) at the same time");
-		assert(
-		  !(BC.has_value() && (B.has_value() || C.has_value())) && "You can't set BC and B (or C) at the same time");
-		assert(
-		  !(DE.has_value() && (D.has_value() || E.has_value())) && "You can't set DE and D (or E) at the same time");
-		assert(
-		  !(HL.has_value() && (H.has_value() || L.has_value())) && "You can't set HL and H (or L) at the same time");
+		assert(!(AF.has_value() && (A.has_value() || F.has_value())) && "You can't set AF and A (or F) at the same time");
+		assert(!(BC.has_value() && (B.has_value() || C.has_value())) && "You can't set BC and B (or C) at the same time");
+		assert(!(DE.has_value() && (D.has_value() || E.has_value())) && "You can't set DE and D (or E) at the same time");
+		assert(!(HL.has_value() && (H.has_value() || L.has_value())) && "You can't set HL and H (or L) at the same time");
 	}
 	// NOLINTEND(readability-convert-member-functions-to-static)
 };
@@ -466,14 +459,10 @@ struct RegistersChanger {
 	// NOLINTBEGIN(readability-convert-member-functions-to-static)
 	void check_consistency() const
 	{
-		assert(
-		  !(AF.has_value() && (A.has_value() || F.has_value())) && "You can't change AF and A (or F) at the same time");
-		assert(
-		  !(BC.has_value() && (B.has_value() || C.has_value())) && "You can't change BC and B (or C) at the same time");
-		assert(
-		  !(DE.has_value() && (D.has_value() || E.has_value())) && "You can't change DE and D (or E) at the same time");
-		assert(
-		  !(HL.has_value() && (H.has_value() || L.has_value())) && "You can't change HL and H (or L) at the same time");
+		assert(!(AF.has_value() && (A.has_value() || F.has_value())) && "You can't change AF and A (or F) at the same time");
+		assert(!(BC.has_value() && (B.has_value() || C.has_value())) && "You can't change BC and B (or C) at the same time");
+		assert(!(DE.has_value() && (D.has_value() || E.has_value())) && "You can't change DE and D (or E) at the same time");
+		assert(!(HL.has_value() && (H.has_value() || L.has_value())) && "You can't change HL and H (or L) at the same time");
 	}
 	// NOLINTEND(readability-convert-member-functions-to-static)
 };

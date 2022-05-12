@@ -3,10 +3,9 @@
 #include "cartridge.h"
 #include "cpu.h"
 #include "display.h"
+#include "fps.h"
 #include "joypad.h"
 #include "timer.h"
-#include "fps.h"
-
 
 inline auto format(const int& value, const uint32_t& width) -> std::string
 {
@@ -28,8 +27,7 @@ public:
 		memory_ = Memory{Cartridge{cartridge_path}};
 
 		const auto regs =
-		  RegistersChanger{.AF = 0x01b0, .BC = 0x0013, .DE = 0x00d8, .HL = 0x014d, .PC = 0x0100, .SP = 0xfffe}.get(
-		    Registers{});
+		  RegistersChanger{.AF = 0x01b0, .BC = 0x0013, .DE = 0x00d8, .HL = 0x014d, .PC = 0x0100, .SP = 0xfffe}.get(Registers{});
 
 		cpu_ = Cpu{regs};
 	}

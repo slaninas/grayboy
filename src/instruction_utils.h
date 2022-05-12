@@ -95,10 +95,7 @@ void instruction_dec(const char (&reg_name)[kSize], Registers& regs)
 }
 
 template<size_t kDestSize, size_t kSecondRegNameSize>
-void instruction_add(
-  const char (&dest_name)[kDestSize],
-  const char (&second_reg_name)[kSecondRegNameSize],
-  Registers& regs)
+void instruction_add(const char (&dest_name)[kDestSize], const char (&second_reg_name)[kSecondRegNameSize], Registers& regs)
 {
 	static_assert(kDestSize == kSecondRegNameSize, "Add for 8bit + 16bit or vice versa not implemented.");
 	constexpr auto real_size = kDestSize - 1;
@@ -146,10 +143,7 @@ void instruction_addc(const char (&dest_name)[kDestSize], const ValueType& value
 }
 
 template<size_t kDestSize, size_t kSecondRegNameSize>
-void instruction_addc(
-  const char (&dest_name)[kDestSize],
-  const char (&second_reg_name)[kSecondRegNameSize],
-  Registers& regs)
+void instruction_addc(const char (&dest_name)[kDestSize], const char (&second_reg_name)[kSecondRegNameSize], Registers& regs)
 {
 	instruction_addc(dest_name, regs.read(second_reg_name), regs);
 }
@@ -172,10 +166,7 @@ void instruction_sub(const char (&dest_name)[kDestSize], const ValueType& value,
 }
 
 template<size_t kDestSize, size_t kSecondRegNameSize>
-void instruction_sub(
-  const char (&dest_name)[kDestSize],
-  const char (&second_reg_name)[kSecondRegNameSize],
-  Registers& regs)
+void instruction_sub(const char (&dest_name)[kDestSize], const char (&second_reg_name)[kSecondRegNameSize], Registers& regs)
 {
 	instruction_sub(dest_name, regs.read(second_reg_name), regs);
 }
@@ -206,10 +197,7 @@ void instruction_subc(const char (&dest_name)[kDestSize], const ValueType& value
 }
 
 template<size_t kDestSize, size_t kSecondRegNameSize>
-void instruction_subc(
-  const char (&dest_name)[kDestSize],
-  const char (&second_reg_name)[kSecondRegNameSize],
-  Registers& regs)
+void instruction_subc(const char (&dest_name)[kDestSize], const char (&second_reg_name)[kSecondRegNameSize], Registers& regs)
 {
 	instruction_subc(dest_name, regs.read(second_reg_name), regs);
 }
@@ -232,10 +220,7 @@ void instruction_and(const char (&dest_name)[kDestSize], const ValueType& value,
 }
 
 template<size_t kDestSize, size_t kSecondRegNameSize>
-void instruction_and(
-  const char (&dest_name)[kDestSize],
-  const char (&second_reg_name)[kSecondRegNameSize],
-  Registers& regs)
+void instruction_and(const char (&dest_name)[kDestSize], const char (&second_reg_name)[kSecondRegNameSize], Registers& regs)
 {
 	static_assert(kDestSize == kSecondRegNameSize, "Registers must be of a same size. And only 8bit are supported.");
 	instruction_and(dest_name, regs.read(second_reg_name), regs);
@@ -258,10 +243,7 @@ void instruction_xor(const char (&dest_name)[kDestSize], const ValueType& value,
 	regs.set_flag("C", false);
 }
 template<size_t kDestSize, size_t kSecondRegNameSize>
-void instruction_xor(
-  const char (&dest_name)[kDestSize],
-  const char (&second_reg_name)[kSecondRegNameSize],
-  Registers& regs)
+void instruction_xor(const char (&dest_name)[kDestSize], const char (&second_reg_name)[kSecondRegNameSize], Registers& regs)
 {
 	static_assert(kDestSize == kSecondRegNameSize, "Registers must be of a same size. And only 8bit are supported.");
 	instruction_xor(dest_name, regs.read(second_reg_name), regs);
@@ -285,10 +267,7 @@ void instruction_or(const char (&dest_name)[kDestSize], const ValueType& value, 
 }
 
 template<size_t kDestSize, size_t kSecondRegNameSize>
-void instruction_or(
-  const char (&dest_name)[kDestSize],
-  const char (&second_reg_name)[kSecondRegNameSize],
-  Registers& regs)
+void instruction_or(const char (&dest_name)[kDestSize], const char (&second_reg_name)[kSecondRegNameSize], Registers& regs)
 {
 	static_assert(kDestSize == kSecondRegNameSize, "Registers must be of a same size. And only 8bit are supported.");
 	instruction_or(dest_name, regs.read(second_reg_name), regs);
@@ -311,10 +290,7 @@ void instruction_cp(const char (&dest_name)[kDestSize], const ValueType& value, 
 }
 
 template<size_t kDestSize, size_t kSecondRegNameSize>
-void instruction_cp(
-  const char (&dest_name)[kDestSize],
-  const char (&second_reg_name)[kSecondRegNameSize],
-  Registers& regs)
+void instruction_cp(const char (&dest_name)[kDestSize], const char (&second_reg_name)[kSecondRegNameSize], Registers& regs)
 {
 	static_assert(kDestSize == kSecondRegNameSize, "Registers must be of a same size. And only 8bit are supported.");
 	instruction_cp(dest_name, regs.read(second_reg_name), regs);
@@ -366,8 +342,7 @@ inline void instruction_rl(const char (&reg_name)[2], Registers& regs)
 inline auto rrc(uint8_t old_value)
 {
 	const auto carry = static_cast<bool>(old_value & 1);
-	const auto new_value =
-	  static_cast<uint8_t>(old_value >> 1) + static_cast<uint8_t>(static_cast<uint8_t>(carry) << 7);
+	const auto new_value = static_cast<uint8_t>(old_value >> 1) + static_cast<uint8_t>(static_cast<uint8_t>(carry) << 7);
 	return std::pair{new_value, carry};
 }
 
@@ -381,8 +356,7 @@ inline void instruction_rrc(const char (&reg_name)[2], Registers& regs)
 
 inline auto rr(uint8_t old_value, const bool carry)
 {
-	const auto new_value =
-	  static_cast<uint8_t>(old_value >> 1) + static_cast<uint8_t>(static_cast<uint8_t>(carry) << 7);
+	const auto new_value = static_cast<uint8_t>(old_value >> 1) + static_cast<uint8_t>(static_cast<uint8_t>(carry) << 7);
 	const auto new_carry = static_cast<bool>(old_value & 1);
 	return std::pair{new_value, new_carry};
 }

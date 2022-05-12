@@ -146,8 +146,7 @@ public:
 
 		if (scanline_info_.cycles >= CYCLES_PER_SCANLINE) {
 			scanline_info_.cycles -= CYCLES_PER_SCANLINE;
-			scanline_info_.tiles_updated = scanline_info_.sprites_updated = scanline_info_.hblank_issued =
-			  vblank_issued_ = false;
+			scanline_info_.tiles_updated = scanline_info_.sprites_updated = scanline_info_.hblank_issued = vblank_issued_ = false;
 
 			if (scanline < 0x90) {
 				mix_buffers(scanline);
@@ -226,8 +225,7 @@ public:
 		for (auto y = 0; y < 144; ++y) {
 			for (auto x = 0; x < 160; ++x) {
 				const auto pixel = display_[x][y];
-				SDL_SetRenderDrawColor(
-				  renderer_.get(), colors[pixel][0], colors[pixel][1], colors[pixel][2], colors[pixel][3]);
+				SDL_SetRenderDrawColor(renderer_.get(), colors[pixel][0], colors[pixel][1], colors[pixel][2], colors[pixel][3]);
 				SDL_RenderDrawPoint(renderer_.get(), x, y);
 			}
 		}
@@ -258,8 +256,7 @@ private:
 		}
 
 		const auto palette = mem.direct_read(0xff47);
-		const auto colors =
-		  std::array{palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6};
+		const auto colors = std::array{palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6};
 
 		const auto SCY = mem.direct_read(0xff42);
 		const auto SCX = mem.direct_read(0xff43);
@@ -296,8 +293,7 @@ private:
 		}
 
 		const auto palette = mem.direct_read(0xff47);
-		const auto colors =
-		  std::array{palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6};
+		const auto colors = std::array{palette & 0x3, (palette & 0xc) >> 2, (palette & 0x30) >> 4, (palette & 0xc0) >> 6};
 
 		const auto window_y = mem.direct_read(0xff4A);
 		const auto window_x = mem.direct_read(0xff4B) - 0x7;
@@ -406,8 +402,7 @@ private:
 		return all_sprites;
 	}
 
-	[[nodiscard]] static auto get_filtered_sprites(std::vector<Sprite> sprites, const uint8_t& scanline)
-	  -> std::vector<Sprite>
+	[[nodiscard]] static auto get_filtered_sprites(std::vector<Sprite> sprites, const uint8_t& scanline) -> std::vector<Sprite>
 	{
 		sprites.erase(
 		  std::remove_if(
@@ -428,8 +423,7 @@ private:
 		return sprites;
 	}
 
-	static auto load_tile(const Memory& mem, const uint16_t& addr, const bool& x_flip, const bool& y_flip)
-	  -> std::array<uint8_t, 64>
+	static auto load_tile(const Memory& mem, const uint16_t& addr, const bool& x_flip, const bool& y_flip) -> std::array<uint8_t, 64>
 	{
 		auto tile = std::array<uint8_t, 64>{};
 

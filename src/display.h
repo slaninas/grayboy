@@ -106,7 +106,7 @@ public:
 
 		auto request_interupt = false;
 		const auto orig_status = stat & 0x3;
-		auto new_status = orig_status;
+		auto new_status = 0;
 
 		if (scanline_info_.cycles < 80 / 4) {
 			new_status = 2;

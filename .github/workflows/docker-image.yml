@@ -20,5 +20,9 @@ jobs:
         submodules: 'true'
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name
-    - name: Run Docker
+    - name: Run ctest
       run: docker run my-image-name
+    - name: ctest
+      run: docker run -w /app/build-docker -t my-image-name ctest
+    - name: clang-tidy
+      run: docker run -w /app/build-docker -t my-image-name run-clang-tidy-14.py

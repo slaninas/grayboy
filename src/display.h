@@ -326,9 +326,27 @@ private:
 		// Objects disabled
 		if (!(mem.direct_read(0xff40) & (1 << 1))) { return; }
 
-		const auto large_sprites = mem.direct_read(0xff40) & (1 << 2);
+		const auto sprites = get_filtered_sprites(get_all_sprites(mem), scanline);
 
+		std::for_each(cbegin(sprites), cend(sprites), [&mem, this, scanline](const auto& s) {
+			auto tile = load_tile(mem, 0x8000 + s.tile_number * 0x10, s.x_flip, s.y_flip);
+
+			const auto pixel_y = scanline - s.pos_y;
+			for (auto x = std::max(int16_t{0}, s.pos_x); x < std::min(s.pos_x + 8, 160); ++x) {
+				const auto pixel_x = x - s.pos_x;
+				const auto pixel_val = tile[pixel_x + 8 * pixel_y];
+				if (pixel_val != 0) {
+					sprites_buffer_[x][scanline] = {s.colors[pixel_val], pixel_val, !s.render_priority};
+				}
+			}
+		});
+	}
+
+	static auto get_all_sprites(const Memory& mem) -> std::vector<Sprite>
+	{
 		auto all_sprites = std::vector<Sprite>{};
+
+		const auto large_sprites = mem.direct_read(0xff40) & (1 << 2);
 
 		for (auto sprite = 0; sprite < 40; ++sprite) {
 			const auto index = sprite * 4;
@@ -365,10 +383,15 @@ private:
 			}
 		}
 
-		auto sprites = std::vector<Sprite>{};
-		std::copy_if(begin(all_sprites), end(all_sprites), std::back_inserter(sprites), [scanline](const auto& s) {
-			return s.pos_x + 7 >= 0 && s.pos_x < 160 && s.pos_y + 7 >= scanline && s.pos_y <= scanline;
-		});
+		return all_sprites;
+	}
+
+	[[nodiscard]] static auto get_filtered_sprites(std::vector<Sprite> sprites, const uint8_t& scanline)
+	  -> std::vector<Sprite>
+	{
+		sprites.erase(std::remove_if(begin(sprites), end(sprites), [scanline](const auto& s) {
+			return !(s.pos_x + 7 >= 0 && s.pos_x < 160 && s.pos_y + 7 >= scanline && s.pos_y <= scanline);
+		}));
 
 		// Get first 10 based on lowest x, then sort them in reverse
 		std::stable_sort(begin(sprites), end(sprites), [](const auto& a, const auto& b) { return a.pos_x < b.pos_x; });
@@ -377,50 +400,40 @@ private:
 		sprites.erase(last, cend(sprites));
 		std::stable_sort(begin(sprites), end(sprites), [](const auto& a, const auto& b) { return a.pos_x >= b.pos_x; });
 
-		std::for_each(cbegin(sprites), cend(sprites), [&mem, this, scanline](const auto& s) {
-			auto tile = load_tile(mem, 0x8000 + s.tile_number * 0x10);
-
-			if (s.x_flip) {
-				for (auto y = size_t{0}; y < 8; ++y) {
-					for (auto x = size_t{0}; x < 4; ++x) { std::swap(tile[x + 8 * y], tile[7 - x + 8 * y]); }
-				}
-			}
-
-			if (s.y_flip) {
-				for (auto y = size_t{0}; y < 4; ++y) {
-					for (auto x = size_t{0}; x < 8; ++x) { std::swap(tile[x + 8 * y], tile[x + 8 * (7 - y)]); }
-				}
-			}
-
-			const auto pixel_y = scanline - s.pos_y;
-			for (auto x = std::max(int16_t{0}, s.pos_x); x < std::min(s.pos_x + 8, 160); ++x) {
-				const auto pixel_x = x - s.pos_x;
-				const auto pixel_val = tile[pixel_x + 8 * pixel_y];
-				if (pixel_val != 0) {
-					sprites_buffer_[x][scanline] = {s.colors[pixel_val], pixel_val, !s.render_priority};
-				}
-			}
-		});
+		return sprites;
 	}
 
-	static auto load_tile(const Memory& mem, const uint16_t& addr) -> std::array<uint8_t, 64>
+	static auto load_tile(const Memory& mem, const uint16_t& addr, const bool& x_flip, const bool& y_flip)
+	  -> std::array<uint8_t, 64>
 	{
-		auto result = std::array<uint8_t, 64>{};
+		auto tile = std::array<uint8_t, 64>{};
 
 		for (auto row = 0; row < 8; ++row) {
 			const auto first_byte = mem.direct_read(addr + row * 2 + 1);
 			const auto second_byte = mem.direct_read(addr + row * 2 + 0);
-			result[8 * row + 0] = ((first_byte & 0x80) >> 6) + ((second_byte & 0x80) >> 7);
-			result[8 * row + 1] = ((first_byte & 0x40) >> 5) + ((second_byte & 0x40) >> 6);
-			result[8 * row + 2] = ((first_byte & 0x20) >> 4) + ((second_byte & 0x20) >> 5);
-			result[8 * row + 3] = ((first_byte & 0x10) >> 3) + ((second_byte & 0x10) >> 4);
-			result[8 * row + 4] = ((first_byte & 0x08) >> 2) + ((second_byte & 0x08) >> 3);
-			result[8 * row + 5] = ((first_byte & 0x04) >> 1) + ((second_byte & 0x04) >> 2);
-			result[8 * row + 6] = ((first_byte & 0x02) >> 0) + ((second_byte & 0x02) >> 1);
-			result[8 * row + 7] = ((first_byte & 0x01) << 1) + ((second_byte & 0x01) >> 0);
+			tile[8 * row + 0] = ((first_byte & 0x80) >> 6) + ((second_byte & 0x80) >> 7);
+			tile[8 * row + 1] = ((first_byte & 0x40) >> 5) + ((second_byte & 0x40) >> 6);
+			tile[8 * row + 2] = ((first_byte & 0x20) >> 4) + ((second_byte & 0x20) >> 5);
+			tile[8 * row + 3] = ((first_byte & 0x10) >> 3) + ((second_byte & 0x10) >> 4);
+			tile[8 * row + 4] = ((first_byte & 0x08) >> 2) + ((second_byte & 0x08) >> 3);
+			tile[8 * row + 5] = ((first_byte & 0x04) >> 1) + ((second_byte & 0x04) >> 2);
+			tile[8 * row + 6] = ((first_byte & 0x02) >> 0) + ((second_byte & 0x02) >> 1);
+			tile[8 * row + 7] = ((first_byte & 0x01) << 1) + ((second_byte & 0x01) >> 0);
 		}
 
-		return result;
+		if (x_flip) {
+			for (auto y = size_t{0}; y < 8; ++y) {
+				for (auto x = size_t{0}; x < 4; ++x) { std::swap(tile[x + 8 * y], tile[7 - x + 8 * y]); }
+			}
+		}
+
+		if (y_flip) {
+			for (auto y = size_t{0}; y < 4; ++y) {
+				for (auto x = size_t{0}; x < 8; ++x) { std::swap(tile[x + 8 * y], tile[x + 8 * (7 - y)]); }
+			}
+		}
+
+		return tile;
 	}
 
 	std::unique_ptr<SDL_Renderer, decltype(&SDL_DestroyRenderer)> renderer_ = {nullptr, SDL_DestroyRenderer};

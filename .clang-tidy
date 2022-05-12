@@ -4,6 +4,10 @@
 # -readability-magic-numbers: It's an emulator, I think it's ok to use them
 # -readability-avoid-const-params-in-decls: Wut?
 
+# TODO: Add?
+# cppcoreguidelines-*,
+# clang-analyzer-*
+
 Checks: >
   -*,
   readability*,

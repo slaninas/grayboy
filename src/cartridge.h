@@ -30,7 +30,9 @@ public:
 	Cartridge(const std::string& filename)
 	{
 		auto file = std::ifstream(filename, std::ios::binary);
-		if (file.fail()) { throw std::invalid_argument(std::string("Can't open file >") + filename + "<"); }
+		if (file.fail()) {
+			throw std::invalid_argument(std::string("Can't open file >") + filename + "<");
+		}
 		buffer_ = std::vector<uint8_t>(std::istreambuf_iterator<char>(file), {});
 
 		const auto mbc = read(0x147);
@@ -67,13 +69,19 @@ public:
 	{
 		// Enable ram banking
 		if (address <= 0x1fff) {
-			if (memory_banking_type_ == MemoryBanking::NO_BANKING) { return; }
-
-			if (memory_banking_type_ == MemoryBanking::MBC2) {
-				if (((address & (1 << 4)) >> 4) == 1) { return; }
+			if (memory_banking_type_ == MemoryBanking::NO_BANKING) {
+				return;
 			}
 
-			if ((val & 0xf) == 0xA) { ram_banking_enabled_ = true; }
+			if (memory_banking_type_ == MemoryBanking::MBC2) {
+				if (((address & (1 << 4)) >> 4) == 1) {
+					return;
+				}
+			}
+
+			if ((val & 0xf) == 0xA) {
+				ram_banking_enabled_ = true;
+			}
 			else if ((val & 0xf) == 0x0) {
 				ram_banking_enabled_ = false;
 			}
@@ -83,14 +91,18 @@ public:
 				// Change ROM bank
 				if (memory_banking_type_ == MemoryBanking::MBC2) {
 					current_rom_bank_ = val & 0xf;
-					if (current_rom_bank_ == 0) { current_rom_bank_ = 1; }
+					if (current_rom_bank_ == 0) {
+						current_rom_bank_ = 1;
+					}
 					return;
 				}
 
 				const auto lower5 = val & 31;
 				current_rom_bank_ &= 224;
 				current_rom_bank_ = lower5;
-				if (current_rom_bank_ == 0) { current_rom_bank_ = 1; }
+				if (current_rom_bank_ == 0) {
+					current_rom_bank_ = 1;
+				}
 			}
 		}
 		else if (address >= 0x4000 && address <= 0x5fff) {
@@ -101,7 +113,9 @@ public:
 					const auto val_crop = val & 224;
 					current_rom_bank_ |= val_crop;
 
-					if (current_rom_bank_ == 0) { current_rom_bank_ = 1; }
+					if (current_rom_bank_ == 0) {
+						current_rom_bank_ = 1;
+					}
 				}
 				else {
 					current_ram_bank_ = val & 0x3;
@@ -113,19 +127,25 @@ public:
 				// change ROM RAM mode
 				const auto val_crop = val & 0x1;
 				rom_banking_ = val_crop == 0;
-				if (rom_banking_) { current_ram_bank_ = 0; }
+				if (rom_banking_) {
+					current_ram_bank_ = 0;
+				}
 			}
 		}
 
 		else if (address >= 0xa000 && address <= 0xbfff) {
-			if (ram_banking_enabled_) { ram_banks_[current_ram_bank_][address - 0xa000] = val; }
+			if (ram_banking_enabled_) {
+				ram_banks_[current_ram_bank_][address - 0xa000] = val;
+			}
 		}
 	}
 	// NOLINTEND(readability-function-cognitive-complexity)
 
 	[[nodiscard]] auto read(const uint16_t& address) const -> uint8_t
 	{
-		if (address <= 0x3fff) { return buffer_[address]; }
+		if (address <= 0x3fff) {
+			return buffer_[address];
+		}
 		else if (address <= 0x7fff) {
 			return buffer_[address - 0x4000 + (current_rom_bank_ * 0x4000)];
 		}
@@ -211,7 +231,9 @@ private:
 		auto line_counter = 1;
 		for (auto i = start; i < end; ++i, line_counter++) {
 			std::cout << std::setw(2) << buffer_[i] << ' ';
-			if (line_counter % 16 == 0) { std::cout << '\n'; }
+			if (line_counter % 16 == 0) {
+				std::cout << '\n';
+			}
 		}
 		std::cout << '\n';
 		std::cout << std::dec;

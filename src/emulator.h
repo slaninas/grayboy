@@ -36,7 +36,9 @@ public:
 
 	~Emulator()
 	{
-		if constexpr (!headless) { SDL_Quit(); }
+		if constexpr (!headless) {
+			SDL_Quit();
+		}
 	}
 
 	auto run() -> void
@@ -59,7 +61,9 @@ public:
 				display.render();
 
 				const auto joypad_update = joypad_.update(memory_.read(0xff00));
-				if (joypad_update.quit) { break; }
+				if (joypad_update.quit) {
+					break;
+				}
 
 				if (joypad_update.request_interupt) {
 					memory_.direct_write(0xff0f, memory_.direct_read(0xff0f) | 0x16);
@@ -102,7 +106,9 @@ public:
 			if (interupt > 0) {
 				cpu_.registers().set_halt(false);
 
-				if (cpu_.registers().read_IME()) { cycles = handle_interupt(interupt); }
+				if (cpu_.registers().read_IME()) {
+					cycles = handle_interupt(interupt);
+				}
 			}
 			else {
 				cycles = 1;
@@ -110,7 +116,9 @@ public:
 		}
 		else {
 			// Interupts
-			if (cpu_.registers().read_IME()) { check_handle_interupts(); }
+			if (cpu_.registers().read_IME()) {
+				check_handle_interupts();
+			}
 
 			cycles = cpu_.execute_next(memory_);
 
@@ -155,7 +163,9 @@ private:
 	auto check_handle_interupts() -> void
 	{
 		const auto interupt = check_interupts();
-		if (interupt > 0) { handle_interupt(interupt); }
+		if (interupt > 0) {
+			handle_interupt(interupt);
+		}
 	}
 
 	auto check_interupts() -> uint8_t

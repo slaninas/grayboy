@@ -22,7 +22,9 @@ public:
 
 			auto frequency = 4096;
 
-			if ((TAC & 0x3) == 0x0) { frequency = frequency * 1; }
+			if ((TAC & 0x3) == 0x0) {
+				frequency = frequency * 1;
+			}
 			else if ((TAC & 0x3) == 0x1) {
 				frequency = frequency * 64;
 			}

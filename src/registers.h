@@ -29,7 +29,9 @@ public:
 		const auto reg_index = register_index(reg_name);
 
 		// 8bit registers
-		if constexpr (reg_name_size == 1) { return register_array_[reg_index]; }
+		if constexpr (reg_name_size == 1) {
+			return register_array_[reg_index];
+		}
 		// Combined 16bit registers
 		else {
 			return *reinterpret_cast<const uint16_t*>(register_array_.data() + reg_index);
@@ -66,10 +68,18 @@ public:
 	{
 		static_assert(kSize == 2 && "Flags are only one letter (+ \n), you cannot address them by more letters.");
 		const auto flag = std::string_view{flag_name};
-		if (flag == "Z") { return static_cast<bool>(read("F") & (1 << 7)); }
-		if (flag == "N") { return static_cast<bool>(read("F") & (1 << 6)); }
-		if (flag == "H") { return static_cast<bool>(read("F") & (1 << 5)); }
-		if (flag == "C") { return static_cast<bool>(read("F") & (1 << 4)); }
+		if (flag == "Z") {
+			return static_cast<bool>(read("F") & (1 << 7));
+		}
+		if (flag == "N") {
+			return static_cast<bool>(read("F") & (1 << 6));
+		}
+		if (flag == "H") {
+			return static_cast<bool>(read("F") & (1 << 5));
+		}
+		if (flag == "C") {
+			return static_cast<bool>(read("F") & (1 << 4));
+		}
 
 		assert(false && "You should not be here, it means you called read_flag with incorrect flag name.");
 		return false;
@@ -84,25 +94,33 @@ public:
 
 		switch (flag) {
 			case 'Z':
-				if (value) { write("F", F_value | 1 << 7); }
+				if (value) {
+					write("F", F_value | 1 << 7);
+				}
 				else if (F_value & (1 << 7)) {
 					write("F", F_value ^ (1 << 7));
 				}
 				break;
 			case 'N':
-				if (value) { write("F", F_value | 1 << 6); }
+				if (value) {
+					write("F", F_value | 1 << 6);
+				}
 				else if (F_value & (1 << 6)) {
 					write("F", F_value ^ (1 << 6));
 				}
 				break;
 			case 'H':
-				if (value) { write("F", F_value | 1 << 5); }
+				if (value) {
+					write("F", F_value | 1 << 5);
+				}
 				else if (F_value & (1 << 5)) {
 					write("F", F_value ^ (1 << 5));
 				}
 				break;
 			case 'C':
-				if (value) { write("F", F_value | 1 << 4); }
+				if (value) {
+					write("F", F_value | 1 << 4);
+				}
 				else if (F_value & (1 << 4)) {
 					write("F", F_value ^ (1 << 4));
 				}
@@ -175,24 +193,52 @@ public:
 
 	static auto register_index(const std::string_view& reg_name) -> int
 	{
-		if (reg_name == "AF") { return 0; }
-		if (reg_name == "F") { return 0; }
-		if (reg_name == "A") { return 1; }
+		if (reg_name == "AF") {
+			return 0;
+		}
+		if (reg_name == "F") {
+			return 0;
+		}
+		if (reg_name == "A") {
+			return 1;
+		}
 
-		if (reg_name == "BC") { return 2; }
-		if (reg_name == "C") { return 2; }
-		if (reg_name == "B") { return 3; }
+		if (reg_name == "BC") {
+			return 2;
+		}
+		if (reg_name == "C") {
+			return 2;
+		}
+		if (reg_name == "B") {
+			return 3;
+		}
 
-		if (reg_name == "DE") { return 4; }
-		if (reg_name == "E") { return 4; }
-		if (reg_name == "D") { return 5; }
+		if (reg_name == "DE") {
+			return 4;
+		}
+		if (reg_name == "E") {
+			return 4;
+		}
+		if (reg_name == "D") {
+			return 5;
+		}
 
-		if (reg_name == "HL") { return 6; }
-		if (reg_name == "L") { return 6; }
-		if (reg_name == "H") { return 7; }
+		if (reg_name == "HL") {
+			return 6;
+		}
+		if (reg_name == "L") {
+			return 6;
+		}
+		if (reg_name == "H") {
+			return 7;
+		}
 
-		if (reg_name == "PC") { return 8; }
-		if (reg_name == "SP") { return 10; }
+		if (reg_name == "PC") {
+			return 8;
+		}
+		if (reg_name == "SP") {
+			return 10;
+		}
 
 		assert(false && "Used register doesn't exist.");
 		return 0;
@@ -369,21 +415,51 @@ struct RegistersChanger {
 	{
 		check_consistency();
 		auto changed_regs = registers;
-		if (AF.has_value()) { changed_regs.write("AF", AF.value()); };
-		if (A.has_value()) { changed_regs.write("A", A.value()); }
-		if (F.has_value()) { changed_regs.write("F", F.value()); }
-		if (BC.has_value()) { changed_regs.write("BC", BC.value()); }
-		if (B.has_value()) { changed_regs.write("B", B.value()); }
-		if (C.has_value()) { changed_regs.write("C", C.value()); }
-		if (DE.has_value()) { changed_regs.write("DE", DE.value()); }
-		if (D.has_value()) { changed_regs.write("D", D.value()); }
-		if (E.has_value()) { changed_regs.write("E", E.value()); }
-		if (HL.has_value()) { changed_regs.write("HL", HL.value()); }
-		if (H.has_value()) { changed_regs.write("H", H.value()); }
-		if (L.has_value()) { changed_regs.write("L", L.value()); }
-		if (PC.has_value()) { changed_regs.write("PC", PC.value()); }
-		if (SP.has_value()) { changed_regs.write("SP", SP.value()); }
-		if (IME.has_value()) { changed_regs.set_IME(IME.value()); }
+		if (AF.has_value()) {
+			changed_regs.write("AF", AF.value());
+		};
+		if (A.has_value()) {
+			changed_regs.write("A", A.value());
+		}
+		if (F.has_value()) {
+			changed_regs.write("F", F.value());
+		}
+		if (BC.has_value()) {
+			changed_regs.write("BC", BC.value());
+		}
+		if (B.has_value()) {
+			changed_regs.write("B", B.value());
+		}
+		if (C.has_value()) {
+			changed_regs.write("C", C.value());
+		}
+		if (DE.has_value()) {
+			changed_regs.write("DE", DE.value());
+		}
+		if (D.has_value()) {
+			changed_regs.write("D", D.value());
+		}
+		if (E.has_value()) {
+			changed_regs.write("E", E.value());
+		}
+		if (HL.has_value()) {
+			changed_regs.write("HL", HL.value());
+		}
+		if (H.has_value()) {
+			changed_regs.write("H", H.value());
+		}
+		if (L.has_value()) {
+			changed_regs.write("L", L.value());
+		}
+		if (PC.has_value()) {
+			changed_regs.write("PC", PC.value());
+		}
+		if (SP.has_value()) {
+			changed_regs.write("SP", SP.value());
+		}
+		if (IME.has_value()) {
+			changed_regs.set_IME(IME.value());
+		}
 		return changed_regs;
 	}
 

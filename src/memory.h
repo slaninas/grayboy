@@ -46,17 +46,23 @@ public:
 
 	[[nodiscard]] auto read(const uint16_t address) const -> uint8_t
 	{
-		if (address <= 0x7fff) { return cartridge_.read(address); }
+		if (address <= 0x7fff) {
+			return cartridge_.read(address);
+		}
 
 		if (address == 0xff00) {
-			if (~direct_read(0xff00) & (1 << 4)) { return static_cast<uint8_t>(get_direction_keys()); }
+			if (~direct_read(0xff00) & (1 << 4)) {
+				return static_cast<uint8_t>(get_direction_keys());
+			}
 			else if (~direct_read(0xff00) & (1 << 5)) {
 				return static_cast<uint8_t>(get_button_keys());
 			}
 		}
 
 		// This part of memory is not usable and always returns 0xff
-		if (address >= 0xfea0 && address <= 0xfeff) { return 0xff; }
+		if (address >= 0xfea0 && address <= 0xfeff) {
+			return 0xff;
+		}
 		return array_[address];
 	}
 

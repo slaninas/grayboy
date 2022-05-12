@@ -36,8 +36,8 @@ public:
 		return cycles;
 	}
 
-	[[nodiscard]] static auto execute_opcode(const uint16_t& opcode, const uint16_t& PC, Registers& regs, Memory& memory)
-	  -> uint8_t;
+	[[nodiscard]] static auto
+	execute_opcode(const uint16_t& opcode, const uint16_t& PC, Registers& regs, Memory& memory) -> uint8_t;
 
 	[[nodiscard]] auto disassemble_next(const uint16_t& starting_address, const Memory& memory) const -> DisassemblyInfo
 	{

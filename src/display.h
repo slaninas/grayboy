@@ -67,7 +67,9 @@ public:
 
 	Display()
 	{
-		if (!SDL_WasInit(SDL_INIT_VIDEO)) { SDL_InitSubSystem(SDL_INIT_VIDEO); }
+		if (!SDL_WasInit(SDL_INIT_VIDEO)) {
+			SDL_InitSubSystem(SDL_INIT_VIDEO);
+		}
 
 		SDL_Renderer* renderer;
 		SDL_Window* window;
@@ -87,7 +89,9 @@ public:
 
 		frame_cycles_ += cycles;
 		if (lcd_enabled_) {
-			if (frame_cycles_ >= CYCLES_PER_FRAME) { frame_cycles_ -= CYCLES_PER_FRAME; }
+			if (frame_cycles_ >= CYCLES_PER_FRAME) {
+				frame_cycles_ -= CYCLES_PER_FRAME;
+			}
 		}
 
 		else {
@@ -145,14 +149,18 @@ public:
 			scanline_info_.tiles_updated = scanline_info_.sprites_updated = scanline_info_.hblank_issued =
 			  vblank_issued_ = false;
 
-			if (scanline < 0x90) { mix_buffers(scanline); }
+			if (scanline < 0x90) {
+				mix_buffers(scanline);
+			}
 
 			if (scanline == 0x90 && !vblank_issued_) {
 				mem.direct_write(0xff0f, mem.direct_read(0xff0f) | 0x1);
 				vblank_issued_ = true;
 			}
 
-			if (scanline + 1 >= 0x9a) { mem.direct_write(0xff44, 0); }
+			if (scanline + 1 >= 0x9a) {
+				mem.direct_write(0xff44, 0);
+			}
 			else {
 				mem.direct_write(0xff44, scanline + 1);
 			}
@@ -172,7 +180,9 @@ public:
 
 			if (sprite_pixel.raw_color != 0) {
 				// Sprite is under background
-				if (sprite_pixel.render_over_bg) { display_[x][scanline] = sprite_pixel.render_color; }
+				if (sprite_pixel.render_over_bg) {
+					display_[x][scanline] = sprite_pixel.render_color;
+				}
 				else if (background_pixel.raw_color == 0) {
 					display_[x][scanline] = sprite_pixel.render_color;
 				}
@@ -227,7 +237,9 @@ public:
 		const auto frame_should_take = 1000 / 60;
 		const auto frame_time = SDL_GetTicks() - frame_start_;
 
-		if (frame_time < frame_should_take) { SDL_Delay(frame_should_take - frame_time); }
+		if (frame_time < frame_should_take) {
+			SDL_Delay(frame_should_take - frame_time);
+		}
 
 		frame_start_ = SDL_GetTicks();
 	}
@@ -236,7 +248,9 @@ private:
 	auto update_tiles_scanline(const Memory& mem) -> void
 	{
 		const auto scanline = mem.direct_read(0xff44);
-		if (scanline >= 0x90) { return; }
+		if (scanline >= 0x90) {
+			return;
+		}
 
 		if (!(mem.direct_read(0xff40) & 0x1)) {
 			for (auto x = size_t{0}; x < size_t{160}; ++x) { bg_buffer_[x][scanline] = {uint8_t{0}, uint8_t{0}}; }
@@ -277,7 +291,9 @@ private:
 	auto update_window(const Memory& mem) -> void
 	{
 		const auto scanline = mem.direct_read(0xff44);
-		if (scanline >= 0x90) { return; }
+		if (scanline >= 0x90) {
+			return;
+		}
 
 		const auto palette = mem.direct_read(0xff47);
 		const auto colors =
@@ -319,12 +335,16 @@ private:
 	auto update_sprites(const Memory& mem) -> void
 	{
 		const auto scanline = mem.direct_read(0xff44);
-		if (scanline >= 0x90) { return; }
+		if (scanline >= 0x90) {
+			return;
+		}
 
 		for (auto x = size_t{0}; x < 160; ++x) { sprites_buffer_[x][scanline] = {}; }
 
 		// Objects disabled
-		if (!(mem.direct_read(0xff40) & (1 << 1))) { return; }
+		if (!(mem.direct_read(0xff40) & (1 << 1))) {
+			return;
+		}
 
 		const auto sprites = get_filtered_sprites(get_all_sprites(mem), scanline);
 

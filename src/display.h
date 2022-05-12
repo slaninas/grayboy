@@ -79,6 +79,7 @@ public:
 		window_.reset(window);
 
 		SDL_RenderSetScale(renderer_.get(), PIXEL_SCALE, PIXEL_SCALE);
+		SDL_SetWindowTitle(window_.get(), "GrayBoy");
 
 		frame_start_ = SDL_GetTicks();
 	}

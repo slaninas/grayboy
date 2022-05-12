@@ -120,18 +120,6 @@ public:
 		return serial_link_;
 	}
 
-	// auto dump_memory(const std::string& filename) -> void {
-	// raw_dump(memory_, filename);
-	// }
-
-	// auto get_cpu() -> Cpu& {
-	// return cpu_;
-	// }
-
-	// auto get_cpu() const -> const Cpu& {
-	// return cpu_;
-	// }
-
 private:
 	auto check_handle_interupts() -> void
 	{

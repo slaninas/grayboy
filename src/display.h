@@ -168,8 +168,6 @@ public:
 
 	auto mix_buffers(const uint8_t& scanline) -> void
 	{
-		for (auto x = 0; x < 160; ++x) { display_[x][scanline] = 0; }
-
 		for (auto x = 0; x < 160; ++x) {
 			const auto background_pixel = bg_buffer_[x][scanline];
 			display_[x][scanline] = background_pixel.render_color;

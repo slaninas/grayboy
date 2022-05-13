@@ -11,9 +11,9 @@ This may change in the future but with the v0.1 release I consider this project 
 
 
 ## Accuracy
-- All CPU instructions are implemented and all blargg individual cpu_instr test [ROMs](https://github.com/retrio/gb-test-roms/tree/master/cpu_instrs/individual) passes.
+- All CPU instructions are implemented and all blargg individual cpu_instr tests [ROMs](https://github.com/retrio/gb-test-roms/tree/master/cpu_instrs/individual) are passing
 
-- Blargg timing tests fail due to inaccuracies (timer/display is updated after each instruction is executed, not after each read/write operation).
+- Blargg timing tests fail due to inaccuracies (timer/display is updated after each instruction is executed, not after each read/write operation)
 
 - DMA transfer is instant
 
@@ -46,7 +46,7 @@ git clone https://github.com/slaninas/grayboy/
 cd grayboy && git submodule --update --init
 mkdir build && cd build && make
 ./src/grayboy your_game
-````
+```
 
 ## Controls
 - Arrow keys, ENTER, SPACEBAR, A, S

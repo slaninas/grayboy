@@ -15,7 +15,7 @@ auto main(int argc, char *argv[]) -> int
 
 	const auto test_name = test_rom.substr(test_rom.rfind('/') + 1);
 
-	std::cout << "xTest " << test_name << ' ';
+	std::cout << "Test " << test_name << ' ';
 	std::cout << std::setw(30) << std::setfill('.') << " ";
 
 	auto emu = Emulator<true>{test_rom};

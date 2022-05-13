@@ -147,10 +147,6 @@ public:
 			scanline_info_.cycles -= CYCLES_PER_SCANLINE;
 			scanline_info_.tiles_updated = scanline_info_.sprites_updated = scanline_info_.hblank_issued = vblank_issued_ = false;
 
-			if (scanline < 0x90) {
-				mix_buffers(scanline);
-			}
-
 			if (scanline == 0x90 && !vblank_issued_) {
 				mem.direct_write(0xff0f, mem.direct_read(0xff0f) | 0x1);
 				vblank_issued_ = true;
@@ -166,27 +162,46 @@ public:
 		}
 	}
 
-	auto mix_buffers(const uint8_t& scanline) -> void
+	auto update_surface() -> void
 	{
-		for (auto x = 0; x < 160; ++x) {
-			const auto background_pixel = bg_buffer_[x][scanline];
-			display_[x][scanline] = background_pixel.render_color;
+		// https://www.deviantart.com/thewolfbunny/art/Game-Boy-Palette-Grand-Ivory-881455013
+		const auto colors = std::array<std::array<uint8_t, 4>, 4>{
+		  {{0xd9, 0xd6, 0xbe, 0xff}, {0xa5, 0xa3, 0x91, 0xff}, {0x66, 0x64, 0x59, 0xff}, {0x26, 0x25, 0x21, 0xff}}};
 
-			const auto sprite_pixel = sprites_buffer_[x][scanline];
+		const auto sdl_colors = std::array<Uint32, 4>{
+		  SDL_MapRGBA(surface_->format, colors[0][0], colors[0][1], colors[0][2], 0xff),
+		  SDL_MapRGBA(surface_->format, colors[1][0], colors[1][1], colors[1][2], 0xff),
+		  SDL_MapRGBA(surface_->format, colors[2][0], colors[2][1], colors[2][2], 0xff),
+		  SDL_MapRGBA(surface_->format, colors[3][0], colors[3][1], colors[3][2], 0xff),
+		};
 
-			if (sprite_pixel.raw_color != 0) {
-				// Sprite is under background
-				if (sprite_pixel.render_over_bg) {
-					display_[x][scanline] = sprite_pixel.render_color;
+		SDL_LockSurface(surface_.get());
+
+		for (auto y = 0; y < 144; ++y) {
+			for (auto x = 0; x < 160; ++x) {
+				const auto background_pixel = bg_buffer_[y][x];
+				auto pixel = background_pixel.render_color;
+
+				const auto sprite_pixel = sprites_buffer_[y][x];
+
+				if (window_buffer_[y][x].active) {
+					pixel = window_buffer_[y][x].render_color;
 				}
-				else if (background_pixel.raw_color == 0) {
-					display_[x][scanline] = sprite_pixel.render_color;
+				else if (sprite_pixel.raw_color != 0) {
+					// Sprite is under background
+					if (sprite_pixel.render_over_bg) {
+						pixel = sprite_pixel.render_color;
+					}
+					else if (background_pixel.raw_color == 0) {
+						pixel = sprite_pixel.render_color;
+					}
 				}
-			}
-			if (window_buffer_[x][scanline].active) {
-				display_[x][scanline] = window_buffer_[x][scanline].render_color;
+				auto target_pixel = (Uint32*)((Uint8*)surface_->pixels + y * surface_->pitch + x * surface_->format->BytesPerPixel);
+				*target_pixel = sdl_colors[pixel];
 			}
 		}
+
+		SDL_UnlockSurface(surface_.get());
 	}
 
 	static auto check_lyc(Memory& mem) -> void
@@ -211,32 +226,9 @@ public:
 
 	auto render() -> void
 	{
-		// https://www.deviantart.com/thewolfbunny/art/Game-Boy-Palette-Grand-Ivory-881455013
-		const auto colors = std::array<std::array<uint8_t, 4>, 4>{
-		  {{0xd9, 0xd6, 0xbe, 0xff}, {0xa5, 0xa3, 0x91, 0xff}, {0x66, 0x64, 0x59, 0xff}, {0x26, 0x25, 0x21, 0xff}}};
 
-		const auto sdl_colors = std::array<Uint32, 4>{
-		  SDL_MapRGBA(surface_->format, colors[0][0], colors[0][1], colors[0][2], 0xff),
-		  SDL_MapRGBA(surface_->format, colors[1][0], colors[1][1], colors[1][2], 0xff),
-		  SDL_MapRGBA(surface_->format, colors[2][0], colors[2][1], colors[2][2], 0xff),
-		  SDL_MapRGBA(surface_->format, colors[3][0], colors[3][1], colors[3][2], 0xff),
-		};
-
-		SDL_LockSurface(surface_.get());
-
-		for (auto y = 0; y < 144; ++y) {
-			for (auto x = 0; x < 160; ++x) {
-				const auto pixel = display_[x][y];
-
-				// See https://stackoverflow.com/a/20070273/1112468
-				auto * target_pixel = (Uint32*)((Uint8*)surface_->pixels + y * surface_->pitch + x * surface_->format->BytesPerPixel);
-				*target_pixel = sdl_colors[pixel];
-			}
-		}
-		SDL_UnlockSurface(surface_.get());
-
+		update_surface();
 		SDL_BlitScaled(surface_.get(), nullptr, window_surface_, nullptr);
-
 		SDL_UpdateWindowSurface(window_.get());
 
 		// Use 17 ms per frame, this is close to the actuall hardware
@@ -259,7 +251,7 @@ private:
 		}
 
 		if (!(mem.direct_read(0xff40) & 0x1)) {
-			for (auto x = size_t{0}; x < size_t{160}; ++x) { bg_buffer_[x][scanline] = {uint8_t{0}, uint8_t{0}}; }
+			for (auto x = size_t{0}; x < size_t{160}; ++x) { bg_buffer_[scanline][x] = {uint8_t{0}, uint8_t{0}}; }
 			return;
 		}
 
@@ -289,7 +281,7 @@ private:
 			const auto second_bit = static_cast<bool>(second_byte & (1 << (7 - pos_x % 8)));
 
 			const auto pixel = (static_cast<uint8_t>(first_bit) << 1) + second_bit;
-			bg_buffer_[x][scanline] = {static_cast<uint8_t>(colors[pixel]), static_cast<uint8_t>(pixel)};
+			bg_buffer_[scanline][x] = {static_cast<uint8_t>(colors[pixel]), static_cast<uint8_t>(pixel)};
 		}
 	}
 
@@ -308,7 +300,7 @@ private:
 
 		const auto using_window = (mem.direct_read(0xff40) & (1 << 5)) && window_y <= scanline;
 		if (!using_window) {
-			for (auto x = size_t{0}; x < 160; ++x) { window_buffer_[x][scanline] = {}; }
+			for (auto x = size_t{0}; x < 160; ++x) { window_buffer_[scanline][x] = {}; }
 			return;
 		}
 
@@ -332,7 +324,7 @@ private:
 			const auto second_bit = static_cast<bool>(second_byte & (1 << (7 - pos_x % 8)));
 
 			const auto pixel = (static_cast<uint8_t>(first_bit) << 1) + second_bit;
-			window_buffer_[x][scanline] = {true, static_cast<uint8_t>(colors[pixel]), static_cast<uint8_t>(pixel)};
+			window_buffer_[scanline][x] = {true, static_cast<uint8_t>(colors[pixel]), static_cast<uint8_t>(pixel)};
 		}
 	}
 
@@ -343,7 +335,7 @@ private:
 			return;
 		}
 
-		for (auto x = size_t{0}; x < 160; ++x) { sprites_buffer_[x][scanline] = {}; }
+		for (auto x = size_t{0}; x < 160; ++x) { sprites_buffer_[scanline][x] = {}; }
 
 		// Objects disabled
 		if (!(mem.direct_read(0xff40) & (1 << 1))) {
@@ -360,7 +352,7 @@ private:
 				const auto pixel_x = x - s.pos_x;
 				const auto pixel_val = tile[pixel_x + 8 * pixel_y];
 				if (pixel_val != 0) {
-					sprites_buffer_[x][scanline] = {s.colors[pixel_val], pixel_val, !s.render_priority};
+					sprites_buffer_[scanline][x] = {s.colors[pixel_val], pixel_val, !s.render_priority};
 				}
 			}
 		});
@@ -369,6 +361,7 @@ private:
 	static auto get_all_sprites(const Memory& mem) -> std::vector<Sprite>
 	{
 		auto all_sprites = std::vector<Sprite>{};
+		all_sprites.reserve(40);
 
 		const auto large_sprites = mem.direct_read(0xff40) & (1 << 2);
 
@@ -468,10 +461,9 @@ private:
 	SDL_Surface * window_surface_ = {};
 	std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> surface_ = {nullptr, SDL_FreeSurface};
 
-	std::array<std::array<WindowPixel, 144>, 160> window_buffer_;
-	std::array<std::array<BackgroundPixel, 144>, 160> bg_buffer_;
-	std::array<std::array<SpritePixel, 144>, 160> sprites_buffer_;
-	std::array<std::array<uint8_t, 144>, 160> display_;
+	std::array<std::array<WindowPixel, 160>, 144> window_buffer_;
+	std::array<std::array<BackgroundPixel, 160>, 144> bg_buffer_;
+	std::array<std::array<SpritePixel, 160>, 144> sprites_buffer_;
 
 	uint64_t frame_cycles_ = {};
 	Uint32 frame_start_ = {};

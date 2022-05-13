@@ -71,15 +71,13 @@ public:
 			SDL_InitSubSystem(SDL_INIT_VIDEO);
 		}
 
-		SDL_Renderer* renderer;
-		SDL_Window* window;
-		SDL_CreateWindowAndRenderer(WIDTH * PIXEL_SCALE, HEIGHT * PIXEL_SCALE, 0, &window, &renderer);
+		SDL_Window* window =
+		  SDL_CreateWindow("GrayBoy", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH * PIXEL_SCALE, HEIGHT * PIXEL_SCALE, 0);
 
-		renderer_.reset(renderer);
 		window_.reset(window);
 
-		SDL_RenderSetScale(renderer_.get(), PIXEL_SCALE, PIXEL_SCALE);
-		SDL_SetWindowTitle(window_.get(), "GrayBoy");
+		window_surface_ = SDL_GetWindowSurface(window_.get());
+		surface_.reset(SDL_CreateRGBSurface(0, WIDTH, HEIGHT, 32, 0, 0, 0, 0));
 
 		frame_start_ = SDL_GetTicks();
 	}
@@ -219,19 +217,29 @@ public:
 		const auto colors = std::array<std::array<uint8_t, 4>, 4>{
 		  {{0xd9, 0xd6, 0xbe, 0xff}, {0xa5, 0xa3, 0x91, 0xff}, {0x66, 0x64, 0x59, 0xff}, {0x26, 0x25, 0x21, 0xff}}};
 
-		SDL_SetRenderDrawColor(renderer_.get(), 255, 255, 255, 255);
-		SDL_RenderClear(renderer_.get());
-		SDL_SetRenderDrawColor(renderer_.get(), 0, 0, 0, 255);
+		const auto sdl_colors = std::array<Uint32, 4>{
+		  SDL_MapRGBA(surface_->format, colors[0][0], colors[0][1], colors[0][2], 0xff),
+		  SDL_MapRGBA(surface_->format, colors[1][0], colors[1][1], colors[1][2], 0xff),
+		  SDL_MapRGBA(surface_->format, colors[2][0], colors[2][1], colors[2][2], 0xff),
+		  SDL_MapRGBA(surface_->format, colors[3][0], colors[3][1], colors[3][2], 0xff),
+		};
+
+		SDL_LockSurface(surface_.get());
 
 		for (auto y = 0; y < 144; ++y) {
 			for (auto x = 0; x < 160; ++x) {
 				const auto pixel = display_[x][y];
-				SDL_SetRenderDrawColor(renderer_.get(), colors[pixel][0], colors[pixel][1], colors[pixel][2], colors[pixel][3]);
-				SDL_RenderDrawPoint(renderer_.get(), x, y);
+
+				// See https://stackoverflow.com/a/20070273/1112468
+				auto * target_pixel = (Uint32*)((Uint8*)surface_->pixels + y * surface_->pitch + x * surface_->format->BytesPerPixel);
+				*target_pixel = sdl_colors[pixel];
 			}
 		}
+		SDL_UnlockSurface(surface_.get());
 
-		SDL_RenderPresent(renderer_.get());
+		SDL_BlitScaled(surface_.get(), nullptr, window_surface_, nullptr);
+
+		SDL_UpdateWindowSurface(window_.get());
 
 		// Use 17 ms per frame, this is close to the actuall hardware
 		const auto frame_should_take = 17;
@@ -457,8 +465,10 @@ private:
 		return tile;
 	}
 
-	std::unique_ptr<SDL_Renderer, decltype(&SDL_DestroyRenderer)> renderer_ = {nullptr, SDL_DestroyRenderer};
 	std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> window_ = {nullptr, SDL_DestroyWindow};
+	// This is part of the window and it's destroyed with the window, do not free it manually
+	SDL_Surface * window_surface_ = {};
+	std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> surface_ = {nullptr, SDL_FreeSurface};
 
 	std::array<std::array<WindowPixel, 144>, 160> window_buffer_;
 	std::array<std::array<BackgroundPixel, 144>, 160> bg_buffer_;

@@ -196,7 +196,7 @@ public:
 						pixel = sprite_pixel.render_color;
 					}
 				}
-				auto target_pixel = (Uint32*)((Uint8*)surface_->pixels + y * surface_->pitch + x * surface_->format->BytesPerPixel);
+				auto * target_pixel = (Uint32*)((Uint8*)surface_->pixels + y * surface_->pitch + x * surface_->format->BytesPerPixel);
 				*target_pixel = sdl_colors[pixel];
 			}
 		}

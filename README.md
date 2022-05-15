@@ -50,3 +50,11 @@ mkdir build && cd build && make
 
 ## Controls
 - Arrow keys, ENTER, SPACEBAR, A, S
+
+## Useful sources
+- [opcodes](https://meganesulli.com/generate-gb-opcodes/)
+- [emudev](https://emudev.de/gameboy-emulator/overview/)
+- [codeslinger](http://www.codeslinger.co.uk/pages/projects/gameboy.html)
+- [GbdevWiki](https://gbdev.gg8.se/wiki/articles/Main_Page)
+- [BGB](https://bgb.bircd.org/)
+- [binjgb](https://github.com/binji/binjgb)
